@@ -1,0 +1,42 @@
+<!--
+  ANNOUNCEMENT BANNER PARTIAL
+  Dismissed via HTMX DELETE — Axum returns empty string, HTMX swaps this element out.
+-->
+<div
+  id="announcement-banner"
+  class="announcement-banner"
+  role="alert"
+  aria-live="polite"
+>
+  <p class="announcement-banner__text">
+    Build scalable, production ready applications without usage limits with
+    Workers Paid.
+  </p>
+
+  <a href="#" class="announcement-banner__cta">Get Started</a>
+
+  <button
+    class="announcement-banner__close"
+    type="button"
+    aria-label="Dismiss announcement"
+    hx-delete="/ui/banner"
+    hx-target="#announcement-banner"
+    hx-swap="outerHTML"
+  >
+    <!-- Lucide: x -->
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M18 6 6 18" />
+      <path d="m6 6 12 12" />
+    </svg>
+  </button>
+</div>

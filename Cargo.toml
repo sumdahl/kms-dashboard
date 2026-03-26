@@ -1,0 +1,13 @@
+[package]
+name = "kms-dashboard"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+axum = "0.7"
+tokio = { version = "1", features = ["full"] }
+askama = "0.12"
+askama_axum = "0.4"
+tower-http = { version = "0.5", features = ["fs"] }
+tower = "0.4"
+serde = { version = "1", features = ["derive"] }

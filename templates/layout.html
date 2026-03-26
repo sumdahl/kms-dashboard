@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Dashboard{% endblock %}</title>
+
+    <!-- Design tokens and layout -->
+    <link rel="stylesheet" href="/static/css/tokens.css" />
+    <link rel="stylesheet" href="/static/css/layout.css" />
+    <link rel="stylesheet" href="/static/css/sidebar.css" />
+    <link rel="stylesheet" href="/static/css/components.css" />
+
+    <!-- HTMX -->
+    <script src="/static/js/htmx.min.js" defer></script>
+
+    <!--
+    Carbon Web Components (ES modules — loaded on demand per page).
+    Only import the components you actually use on a given page.
+    Example: <script type="module" src="/nm/@carbon/web-components/es/components/tooltip/index.js"></script>
+  -->
+    {% block head_scripts %}{% endblock %}
+  </head>
+
+  <body class="{% if sidebar_pinned %}sidebar-expanded{% endif %}">
+    <!-- ── Sidebar ───────────────────────────────────────────────────────── -->
+    {% include "partials/sidebar.html" %}
+
+    <!-- ── Main Wrapper ──────────────────────────────────────────────────── -->
+    <div class="main-wrapper">
+      <!-- Header bar — sticky top -->
+      {% include "partials/header.html" %}
+
+      <!-- Scrollable main content -->
+      <main class="main-content">
+        <!-- Announcement banner (conditionally rendered) -->
+        {% if show_banner %} {% include "partials/banner.html" %} {% endif %}
+
+        <!-- Page-specific content -->
+        <div class="page-content">{% block content %}{% endblock %}</div>
+      </main>
+    </div>
+
+    <!-- ── Footer Bar (spans both columns) ──────────────────────────────── -->
+    <footer class="app-footer">
+      <!--
+      Left zone: same width as the sidebar column.
+      Contains the sidebar toggle button (Zone C — click only).
+      This element is OUTSIDE the sidebar, so hovering here
+      does not trigger Zone A hover expansion. That is intentional.
+    -->
+      <div class="app-footer__toggle-zone">
+        <button
+          id="sidebar-toggle"
+          class="sidebar-toggle-btn"
+          title="Toggle sidebar"
+          aria-label="Toggle sidebar"
+        >
+          <!-- Lucide: panel-left -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect width="18" height="18" x="3" y="3" rx="2" ry="2" />
+            <line x1="9" x2="9" y1="3" y2="21" />
+          </svg>
+        </button>
+      </div>
+
+      <!-- Footer links — centered in the remaining space -->
+      <div class="app-footer__links">
+        <a href="#">Support</a>
+        <span class="footer-sep">|</span>
+        <a href="#">System Status</a>
+        <span class="footer-sep">|</span>
+        <a href="#">Careers</a>
+        <span class="footer-sep">|</span>
+        <a href="#">Terms of Use</a>
+        <span class="footer-sep">|</span>
+        <a href="#">Report Security Issues</a>
+        <span class="footer-sep">|</span>
+        <a href="#">Privacy Policy</a>
+        <span class="footer-sep">|</span>
+        <span class="footer-copy">© 2026 Dashboard, Inc.</span>
+      </div>
+    </footer>
+
+    <!-- Sidebar interaction logic (minimal vanilla JS) -->
+    <script src="/static/js/sidebar.js"></script>
+
+    {% block body_scripts %}{% endblock %}
+  </body>
+</html>

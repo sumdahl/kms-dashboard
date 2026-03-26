@@ -1,0 +1,64 @@
+<!--
+  HEADER PARTIAL — sticky top bar
+  Contains: action buttons (right-aligned), no left content (sidebar has its own header)
+-->
+<header class="app-header" role="banner">
+  <div class="app-header__actions">
+    <!-- Ask AI -->
+    <button class="header-action" type="button" aria-label="Ask AI">
+      <!-- Lucide: sparkles -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+        <path d="M20 3v4" />
+        <path d="M22 5h-4" />
+      </svg>
+      Ask AI
+    </button>
+
+    <!-- Support -->
+    <button class="header-action" type="button" aria-label="Support">
+      <!-- Lucide: life-buoy -->
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <circle cx="12" cy="12" r="4" />
+        <line x1="4.93" x2="9.17" y1="4.93" y2="9.17" />
+        <line x1="14.83" x2="19.07" y1="14.83" y2="19.07" />
+        <line x1="14.83" x2="19.07" y1="9.17" y2="4.93" />
+        <line x1="14.83" x2="18.36" y1="9.17" y2="5.64" />
+        <line x1="4.93" x2="9.17" y1="19.07" y2="14.83" />
+      </svg>
+      Support
+    </button>
+
+    <!-- User avatar — shows first character of email as initial -->
+    <div
+      class="header-avatar"
+      role="button"
+      tabindex="0"
+      aria-label="Account menu"
+      title="{{ user_email }}"
+    >
+      {{ user_email|truncate(1) }}
+    </div>
+  </div>
+</header>

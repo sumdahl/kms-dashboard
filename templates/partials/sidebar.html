@@ -1,0 +1,648 @@
+<!--
+  SIDEBAR PARTIAL
+  ═══════════════
+  Rendered in the correct initial state by the server (sidebar_pinned from cookie).
+  JS in sidebar.js handles all subsequent hover/click state changes.
+
+  Structure:
+    aside#sidebar
+      └── div#sidebar-hover-zone  ← Zone A: hover triggers expand
+            ├── .sidebar__account
+            ├── .sidebar__search-wrap
+            └── .sidebar__nav
+                  ├── direct links (.sidebar__item)
+                  ├── accordion groups (details.sidebar__group)
+                  ├── section headers (.sidebar__section)
+                  └── dividers (.sidebar__divider)
+-->
+
+<aside
+  id="sidebar"
+  class="sidebar {% if sidebar_pinned %}is-expanded{% endif %}"
+  data-pinned="{{ sidebar_pinned }}"
+>
+  <!-- Zone A — everything in here triggers hover expansion -->
+  <div id="sidebar-hover-zone" class="sidebar__hover-zone">
+    <!-- ── Account Header ──────────────────────────────────────────── -->
+    <div class="sidebar__account">
+      <!-- Logo placeholder box (replace with <img> when you have a logo) -->
+      <div class="sidebar__logo-box" aria-hidden="true"></div>
+
+      <!-- Account info — fades in when expanded -->
+      <div class="sidebar__account-info">
+        <span class="sidebar__account-email">{{ user_email }}</span>
+        <!-- Lucide: chevrons-up-down -->
+        <svg
+          class="sidebar__account-chevron"
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="m7 15 5 5 5-5" />
+          <path d="m7 9 5-5 5 5" />
+        </svg>
+      </div>
+    </div>
+
+    <!-- ── Search ──────────────────────────────────────────────────── -->
+    <div class="sidebar__search-wrap">
+      <div
+        class="sidebar__search"
+        role="button"
+        tabindex="0"
+        aria-label="Quick search"
+      >
+        <!-- Lucide: search -->
+        <svg
+          class="sidebar__search-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.35-4.35" />
+        </svg>
+        <span class="sidebar__search-text">Quick search...</span>
+        <span class="sidebar__search-kbd">⌘K</span>
+      </div>
+    </div>
+
+    <!-- ── Nav ─────────────────────────────────────────────────────── -->
+    <nav class="sidebar__nav" aria-label="Main navigation">
+      <!-- Account home (active) -->
+      <a
+        href="/"
+        class="sidebar__item sidebar__item--active"
+        aria-current="page"
+      >
+        <svg
+          class="sidebar__item-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+          <polyline points="9 22 9 12 15 12 15 22" />
+        </svg>
+        <span class="sidebar__item-label">Account home</span>
+      </a>
+
+      <!-- Recents — expandable accordion with two-line sub-items -->
+      <details class="sidebar__group" open>
+        <summary class="sidebar__item">
+          <svg
+            class="sidebar__item-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <polyline points="12 6 12 12 16 14" />
+          </svg>
+          <span class="sidebar__item-label">Recents</span>
+          <svg
+            class="sidebar__item-chevron"
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </summary>
+        <div class="sidebar__sub-items">
+          <a href="#" class="sidebar__sub-item">
+            <span class="sidebar__sub-title">Workers &amp; Pages</span>
+            <span class="sidebar__sub-category">Compute</span>
+          </a>
+          <a href="#" class="sidebar__sub-item">
+            <span class="sidebar__sub-title">Log search</span>
+            <span class="sidebar__sub-category">Log Explorer</span>
+          </a>
+          <a href="#" class="sidebar__sub-item">
+            <span class="sidebar__sub-title">Zero Trust</span>
+            <span class="sidebar__sub-category">Protect &amp; Connect</span>
+          </a>
+          <a href="#" class="sidebar__sub-item">
+            <span class="sidebar__sub-title">Transfers</span>
+            <span class="sidebar__sub-category">Domains</span>
+          </a>
+          <a href="#" class="sidebar__sub-item">
+            <span class="sidebar__sub-title">Overview</span>
+            <span class="sidebar__sub-category">Domains</span>
+          </a>
+        </div>
+      </details>
+
+      <!-- Analytics & logs -->
+      <details class="sidebar__group">
+        <summary class="sidebar__item">
+          <svg
+            class="sidebar__item-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <line x1="18" x2="18" y1="20" y2="10" />
+            <line x1="12" x2="12" y1="20" y2="4" />
+            <line x1="6" x2="6" y1="20" y2="14" />
+          </svg>
+          <span class="sidebar__item-label">Analytics &amp; logs</span>
+          <svg
+            class="sidebar__item-chevron"
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </summary>
+        <div class="sidebar__sub-items">
+          <a href="#" class="sidebar__sub-link">Log Explorer</a>
+          <a href="#" class="sidebar__sub-link">
+            Account analytics
+            <span
+              class="sidebar__badge sidebar__badge--beta"
+              style="margin-left: 6px"
+              >Beta</span
+            >
+          </a>
+          <a href="#" class="sidebar__sub-link">Web analytics</a>
+          <a href="#" class="sidebar__sub-link">
+            Trace
+            <span
+              class="sidebar__badge sidebar__badge--beta"
+              style="margin-left: 6px"
+              >Beta</span
+            >
+          </a>
+        </div>
+      </details>
+
+      <!-- Domains -->
+      <details class="sidebar__group">
+        <summary class="sidebar__item">
+          <svg
+            class="sidebar__item-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="2" x2="22" y1="12" y2="12" />
+            <path
+              d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+            />
+          </svg>
+          <span class="sidebar__item-label">Domains</span>
+          <svg
+            class="sidebar__item-chevron"
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </summary>
+        <div class="sidebar__sub-items">
+          <a href="#" class="sidebar__sub-link">Overview</a>
+          <a href="#" class="sidebar__sub-link">Registrations</a>
+          <a href="#" class="sidebar__sub-link">Transfers</a>
+        </div>
+      </details>
+
+      <!-- ── Section: Build ─────────────────────────────────────────── -->
+      <div class="sidebar__section">
+        <div class="sidebar__section-divider"></div>
+        <span class="sidebar__section-label">Build</span>
+      </div>
+
+      <!-- Compute -->
+      <details class="sidebar__group">
+        <summary class="sidebar__item">
+          <svg
+            class="sidebar__item-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2" />
+          </svg>
+          <span class="sidebar__item-label">Compute</span>
+          <svg
+            class="sidebar__item-chevron"
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </summary>
+        <div class="sidebar__sub-items">
+          <a href="#" class="sidebar__sub-link">Workers &amp; Pages</a>
+          <a href="#" class="sidebar__sub-link">Observability</a>
+          <a href="#" class="sidebar__sub-link">Workers for Platforms</a>
+          <a href="#" class="sidebar__sub-link">
+            Containers
+            <span
+              class="sidebar__badge sidebar__badge--beta"
+              style="margin-left: 6px"
+              >Beta</span
+            >
+          </a>
+          <a href="#" class="sidebar__sub-link">Durable Objects</a>
+          <a href="#" class="sidebar__sub-link">Queues</a>
+          <a href="#" class="sidebar__sub-link">Workflows</a>
+        </div>
+      </details>
+
+      <!-- AI -->
+      <details class="sidebar__group">
+        <summary class="sidebar__item">
+          <svg
+            class="sidebar__item-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+            <path d="M20 3v4" />
+            <path d="M22 5h-4" />
+          </svg>
+          <span class="sidebar__item-label">AI</span>
+          <svg
+            class="sidebar__item-chevron"
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </summary>
+        <div class="sidebar__sub-items">
+          <a href="#" class="sidebar__sub-link">AI Gateway</a>
+          <a href="#" class="sidebar__sub-link">Vectorize</a>
+          <a href="#" class="sidebar__sub-link">Workers AI</a>
+        </div>
+      </details>
+
+      <!-- Storage & databases -->
+      <details class="sidebar__group">
+        <summary class="sidebar__item">
+          <svg
+            class="sidebar__item-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <ellipse cx="12" cy="5" rx="9" ry="3" />
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
+          </svg>
+          <span class="sidebar__item-label">Storage &amp; databases</span>
+          <svg
+            class="sidebar__item-chevron"
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </summary>
+        <div class="sidebar__sub-items">
+          <a href="#" class="sidebar__sub-link">KV</a>
+          <a href="#" class="sidebar__sub-link">R2</a>
+          <a href="#" class="sidebar__sub-link">D1</a>
+          <a href="#" class="sidebar__sub-link">Hyperdrive</a>
+        </div>
+      </details>
+
+      <!-- Media -->
+      <details class="sidebar__group">
+        <summary class="sidebar__item">
+          <svg
+            class="sidebar__item-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="10" />
+            <polygon points="10 8 16 12 10 16 10 8" />
+          </svg>
+          <span class="sidebar__item-label">Media</span>
+          <svg
+            class="sidebar__item-chevron"
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </summary>
+        <div class="sidebar__sub-items">
+          <a href="#" class="sidebar__sub-link">Images</a>
+          <a href="#" class="sidebar__sub-link">Stream</a>
+        </div>
+      </details>
+
+      <!-- ── Section: Protect & Connect ────────────────────────────── -->
+      <div class="sidebar__section">
+        <div class="sidebar__section-divider"></div>
+        <span class="sidebar__section-label">Protect &amp; Connect</span>
+      </div>
+
+      <!-- Application security -->
+      <details class="sidebar__group">
+        <summary class="sidebar__item">
+          <svg
+            class="sidebar__item-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          </svg>
+          <span class="sidebar__item-label">Application security</span>
+          <svg
+            class="sidebar__item-chevron"
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </summary>
+        <div class="sidebar__sub-items">
+          <a href="#" class="sidebar__sub-link">WAF</a>
+          <a href="#" class="sidebar__sub-link">DDoS protection</a>
+          <a href="#" class="sidebar__sub-link">Bot management</a>
+        </div>
+      </details>
+
+      <!-- Zero Trust (direct link — no sub-items) -->
+      <a href="#" class="sidebar__item">
+        <svg
+          class="sidebar__item-icon"
+          xmlns="http://www.w3.org/2000/svg"
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          <path d="m9 12 2 2 4-4" />
+        </svg>
+        <span class="sidebar__item-label">Zero Trust</span>
+      </a>
+
+      <!-- Networking -->
+      <details class="sidebar__group">
+        <summary class="sidebar__item">
+          <svg
+            class="sidebar__item-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <rect x="16" y="16" width="6" height="6" rx="1" />
+            <rect x="2" y="16" width="6" height="6" rx="1" />
+            <rect x="9" y="2" width="6" height="6" rx="1" />
+            <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
+            <path d="M12 12V8" />
+          </svg>
+          <span class="sidebar__item-label">Networking</span>
+          <svg
+            class="sidebar__item-chevron"
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </summary>
+        <div class="sidebar__sub-items">
+          <a href="#" class="sidebar__sub-link">Magic WAN</a>
+          <a href="#" class="sidebar__sub-link">Magic Transit</a>
+          <a href="#" class="sidebar__sub-link">Tunnel</a>
+        </div>
+      </details>
+
+      <!-- Delivery & performance -->
+      <details class="sidebar__group">
+        <summary class="sidebar__item">
+          <svg
+            class="sidebar__item-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+          </svg>
+          <span class="sidebar__item-label">Delivery &amp; performance</span>
+          <svg
+            class="sidebar__item-chevron"
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </summary>
+        <div class="sidebar__sub-items">
+          <a href="#" class="sidebar__sub-link">CDN</a>
+          <a href="#" class="sidebar__sub-link">Cache rules</a>
+          <a href="#" class="sidebar__sub-link">Page rules</a>
+        </div>
+      </details>
+
+      <!-- ── Hard Divider + Manage account ─────────────────────────── -->
+      <div class="sidebar__divider"></div>
+
+      <!-- Manage account -->
+      <details class="sidebar__group">
+        <summary class="sidebar__item">
+          <svg
+            class="sidebar__item-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path
+              d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+            />
+            <circle cx="12" cy="12" r="3" />
+          </svg>
+          <span class="sidebar__item-label">Manage account</span>
+          <svg
+            class="sidebar__item-chevron"
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m9 18 6-6-6-6" />
+          </svg>
+        </summary>
+        <div class="sidebar__sub-items">
+          <a href="#" class="sidebar__sub-link">Members</a>
+          <a href="#" class="sidebar__sub-link">Billing &amp; subscriptions</a>
+          <a href="#" class="sidebar__sub-link">Audit log</a>
+          <a href="#" class="sidebar__sub-link">API tokens</a>
+        </div>
+      </details>
+    </nav>
+  </div>
+  <!-- /sidebar-hover-zone -->
+</aside>

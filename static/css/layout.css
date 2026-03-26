@@ -1,0 +1,279 @@
+/* ==========================================================================
+   LAYOUT — App Shell, Header, Main Content, Footer
+   ========================================================================== */
+
+/* ── App Shell ──────────────────────────────────────────────────────────── */
+
+body {
+  display: grid;
+  /* Sidebar column starts at collapsed width. JS toggles .sidebar-expanded on body. */
+  grid-template-columns: var(--sidebar-w-collapsed) 1fr;
+  grid-template-rows: 1fr var(--footer-h);
+  grid-template-areas:
+    "sidebar main"
+    "footer  footer";
+  min-height: 100vh;
+  /* Column width transitions with the sidebar */
+  transition: grid-template-columns var(--sidebar-transition);
+}
+
+body.sidebar-expanded {
+  grid-template-columns: var(--sidebar-w-expanded) 1fr;
+}
+
+/* ── Sidebar Column ─────────────────────────────────────────────────────── */
+
+.sidebar {
+  grid-area: sidebar;
+  /* Sidebar fills its grid column — grid controls the width, not the sidebar */
+  position: sticky;
+  top: 0;
+  height: calc(100vh - var(--footer-h));
+  overflow: hidden;
+  background-color: var(--cf-surface-01);
+  border-right: 1px solid var(--cf-border-subtle);
+  display: flex;
+  flex-direction: column;
+  z-index: 200;
+}
+
+/* ── Main Wrapper ───────────────────────────────────────────────────────── */
+
+.main-wrapper {
+  grid-area: main;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--footer-h));
+  min-width: 0; /* prevent grid blowout */
+  overflow: hidden;
+}
+
+/* ── Header Bar ─────────────────────────────────────────────────────────── */
+
+.app-header {
+  height: var(--header-h);
+  min-height: var(--header-h);
+  background-color: var(--cf-surface-01);
+  border-bottom: 1px solid var(--cf-border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0 var(--space-4);
+  gap: var(--space-2);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+/* ── Main Content Area ──────────────────────────────────────────────────── */
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--cf-bg-page);
+  overflow-y: auto;
+}
+
+.page-content {
+  padding: var(--content-py) var(--content-px);
+  flex: 1;
+}
+
+/* ── Announcement Banner ────────────────────────────────────────────────── */
+
+.announcement-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: 0 var(--space-4);
+  height: 40px;
+  min-height: 40px;
+  background-color: var(--cf-banner-bg);
+  border-bottom: 1px solid var(--cf-banner-border);
+  font-size: var(--font-size-sm);
+  color: var(--cf-banner-text);
+  position: relative;
+}
+
+.announcement-banner__text {
+  flex: 1;
+  text-align: center;
+}
+
+.announcement-banner__cta {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border: 1px solid var(--cf-btn-primary-bg);
+  border-radius: var(--radius-sm);
+  color: var(--cf-btn-primary-bg);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  background: transparent;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.announcement-banner__cta:hover {
+  background-color: var(--cf-btn-primary-bg);
+  color: var(--cf-text-on-primary);
+}
+
+.announcement-banner__close {
+  position: absolute;
+  right: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  color: var(--cf-banner-text);
+  transition: background-color var(--transition-fast);
+}
+
+.announcement-banner__close:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+/* ── Page Header Zone ───────────────────────────────────────────────────── */
+
+.page-header {
+  margin-bottom: var(--space-6);
+}
+
+.page-header__breadcrumb {
+  font-size: var(--font-size-sm);
+  color: var(--cf-text-helper);
+  margin-bottom: var(--space-1);
+}
+
+.page-header__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.page-header__title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--cf-text-primary);
+  line-height: var(--line-height-tight);
+}
+
+.page-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.page-header__meta {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-2);
+}
+
+/* ── Footer Bar ─────────────────────────────────────────────────────────── */
+
+.app-footer {
+  grid-area: footer;
+  display: flex;
+  align-items: center;
+  height: var(--footer-h);
+  background-color: var(--cf-surface-01);
+  border-top: 1px solid var(--cf-border-subtle);
+  position: sticky;
+  bottom: 0;
+  z-index: 200;
+}
+
+/*
+  The footer's left zone mirrors the sidebar column width exactly.
+  It transitions in sync with the sidebar / body grid column.
+*/
+.app-footer__toggle-zone {
+  width: var(--sidebar-w-collapsed);
+  min-width: var(--sidebar-w-collapsed);
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid var(--cf-border-subtle);
+  flex-shrink: 0;
+  transition:
+    width var(--sidebar-transition),
+    min-width var(--sidebar-transition);
+}
+
+body.sidebar-expanded .app-footer__toggle-zone {
+  width: var(--sidebar-w-expanded);
+  min-width: var(--sidebar-w-expanded);
+}
+
+.sidebar-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  color: var(--cf-icon-muted);
+  transition:
+    color var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.sidebar-toggle-btn:hover {
+  color: var(--cf-icon-secondary);
+  background-color: var(--cf-surface-active);
+}
+
+body.sidebar-expanded .sidebar-toggle-btn {
+  color: var(--cf-icon-secondary);
+}
+
+.app-footer__links {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
+  padding: 0 var(--space-4);
+  flex-wrap: wrap;
+}
+
+.app-footer__links a,
+.app-footer__links span {
+  font-size: var(--font-size-sm);
+  color: var(--cf-text-helper);
+  white-space: nowrap;
+}
+
+.app-footer__links a {
+  transition: color var(--transition-fast);
+}
+
+.app-footer__links a:hover {
+  color: var(--cf-text-primary);
+}
+
+.footer-sep {
+  color: var(--cf-border-subtle);
+  user-select: none;
+}
+
+.footer-copy {
+  color: var(--cf-text-helper);
+}
