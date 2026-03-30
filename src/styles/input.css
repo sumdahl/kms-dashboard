@@ -102,11 +102,20 @@
 /* ============================================================
    BASE RESET
    ============================================================ */
+
+@layer utilities {
+  .no-transition * {
+    transition: none !important;
+  }
+}
 @layer base {
   *,
   *::before,
   *::after {
     box-sizing: border-box;
+  }
+  html.dark {
+    color-scheme: dark;
   }
 
   .dark {
@@ -316,4 +325,13 @@
   summary::-webkit-details-marker {
     display: none;
   }
+}
+
+/* Prevent theme flicker */
+.no-transition * {
+  transition: none !important;
+}
+
+html.dark {
+  color-scheme: dark;
 }

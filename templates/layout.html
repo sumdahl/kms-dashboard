@@ -4,7 +4,21 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Dashboard{% endblock %}</title>
-    <link rel="stylesheet" href="/static/css/output.css" />
+    <script>
+      (function () {
+        try {
+          const theme = localStorage.getItem("theme");
+          const systemDark = window.matchMedia(
+            "(prefers-color-scheme: dark)",
+          ).matches;
+
+          if (theme === "dark" || (!theme && systemDark)) {
+            document.documentElement.classList.add("dark");
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="stylesheet" href="/static/css/output.css?v={{ css_version }}" />
     <script src="/static/js/htmx.min.js" defer></script>
     {% block head_scripts %}{% endblock %}
   </head>
@@ -109,9 +123,16 @@
         syncIcons();
 
         btn.addEventListener("click", function () {
+          html.classList.add("no-transition");
+
           const isDark = html.classList.toggle("dark");
           localStorage.setItem("theme", isDark ? "dark" : "light");
+
           syncIcons();
+
+          window.getComputedStyle(html).opacity;
+
+          html.classList.remove("no-transition");
         });
       })();
     </script>
