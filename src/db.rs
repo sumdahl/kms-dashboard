@@ -25,7 +25,6 @@ pub async fn seed_admin(pool: &Db) -> AppResult<()> {
     let admin_email = "admin@example.com";
     let admin_password = "admin_password";
 
-    // Use standard query to avoid macro type inference issues during bootstrap
     let exists = sqlx::query("SELECT user_id FROM users WHERE email = $1")
         .bind(admin_email)
         .fetch_optional(pool)
@@ -35,9 +34,10 @@ pub async fn seed_admin(pool: &Db) -> AppResult<()> {
         let hashed = hash_password(admin_password)?;
         
         sqlx::query(
-            "INSERT INTO users (email, password_hash, is_admin) VALUES ($1, $2, $3)"
+            "INSERT INTO users (email, full_name, password_hash, is_admin) VALUES ($1, $2, $3, $4)"
         )
         .bind(admin_email)
+        .bind("System Admin") // We must provide a name because the column is NOT NULL
         .bind(hashed)
         .bind(true)
         .execute(pool)

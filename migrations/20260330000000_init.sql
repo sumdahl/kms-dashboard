@@ -5,6 +5,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE IF NOT EXISTS users (
     user_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     email VARCHAR(255) UNIQUE NOT NULL,
+    full_name VARCHAR(255) NOT NULL, -- Added this
     password_hash TEXT NOT NULL,
     is_admin BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -21,8 +22,8 @@ CREATE TABLE IF NOT EXISTS roles (
 -- Role Permissions table
 CREATE TABLE IF NOT EXISTS role_permissions (
     role_id UUID NOT NULL REFERENCES roles(role_id) ON DELETE CASCADE,
-    resource VARCHAR(100) NOT NULL, -- Changed from custom type
-    access_level VARCHAR(50) NOT NULL, -- Changed from custom type
+    resource VARCHAR(100) NOT NULL,
+    access_level VARCHAR(50) NOT NULL,
     PRIMARY KEY (role_id, resource, access_level)
 );
 

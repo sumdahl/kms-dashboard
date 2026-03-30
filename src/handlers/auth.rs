@@ -1,8 +1,9 @@
 use axum::{extract::State, Json};
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 use crate::db::Db;
 use crate::error::{AppResult, AppError};
-use crate::auth::hashing::verify_password;
+use crate::auth::hashing::{verify_password, hash_password};
 use crate::auth::jwt::create_jwt;
 use crate::models::User;
 
@@ -16,6 +17,13 @@ pub struct LoginRequest {
 pub struct AuthResponse {
     pub token: String,
     pub user_id: String,
+}
+
+#[derive(Deserialize)]
+pub struct SignupRequest {
+    pub email: String,
+    pub full_name: String, // Added this
+    pub password: String,
 }
 
 pub async fn login(
@@ -40,4 +48,38 @@ pub async fn login(
         token,
         user_id: user.user_id.to_string(),
     }))
+}
+
+pub async fn signup(
+    State(pool): State<Db>,
+    Json(payload): Json<SignupRequest>,
+) -> AppResult<Json<serde_json::Value>> {
+    // 1. Check if user already exists
+    let exists = sqlx::query("SELECT user_id FROM users WHERE email = $1")
+        .bind(&payload.email)
+        .fetch_optional(&pool)
+        .await?;
+
+    if exists.is_some() {
+        return Err(AppError::EmailTaken);
+    }
+
+    // 2. Hash password and insert
+    let hashed = hash_password(&payload.password)?;
+    let user_id = Uuid::new_v4();
+
+    sqlx::query(
+        "INSERT INTO users (user_id, email, full_name, password_hash) VALUES ($1, $2, $3, $4)"
+    )
+    .bind(user_id)
+    .bind(&payload.email)
+    .bind(&payload.full_name) // Bind name
+    .bind(hashed)
+    .execute(&pool)
+    .await?;
+
+    Ok(Json(serde_json::json!({
+        "status": "success",
+        "user_id": user_id
+    })))
 }
