@@ -16,6 +16,7 @@ struct HomeTemplate {
     sidebar_pinned: bool,
     user_email: String,
     show_banner: bool,
+    css_version: &'static str, // <-- Add this
 }
 
 async fn home() -> impl axum::response::IntoResponse {
@@ -23,6 +24,8 @@ async fn home() -> impl axum::response::IntoResponse {
         sidebar_pinned: false,
         user_email: "user@example.com".to_string(),
         show_banner: true,
+        // env!() pulls the value set in build.rs at compile time
+        css_version: env!("CSS_VERSION"),
     }
 }
 
