@@ -7,7 +7,6 @@
       "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
     --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
       "Courier New", monospace;
-    --color-green-100: oklch(96.2% 0.044 156.743);
     --color-black: #000;
     --color-white: #fff;
     --spacing: 0.25rem;
@@ -52,8 +51,6 @@
     --color-banner-bg: #dbeafe;
     --color-banner-border: #bfdbfe;
     --color-banner-text: #1e40af;
-    --color-badge-beta-bg: #d0e2ff;
-    --color-badge-beta-text: #0043ce;
     --color-progress-track: #e0e0e0;
     --color-progress-from: #bfdbfe;
     --color-progress-to: #3b82f6;
@@ -246,8 +243,14 @@
   .bottom-0 {
     bottom: calc(var(--spacing) * 0);
   }
+  .bottom-2 {
+    bottom: calc(var(--spacing) * 2);
+  }
   .left-0 {
     left: calc(var(--spacing) * 0);
+  }
+  .left-2 {
+    left: calc(var(--spacing) * 2);
   }
   .z-40 {
     z-index: 40;
@@ -278,9 +281,6 @@
   }
   .mb-6 {
     margin-bottom: calc(var(--spacing) * 6);
-  }
-  .ml-1 {
-    margin-left: calc(var(--spacing) * 1);
   }
   .ml-auto {
     margin-left: auto;
@@ -327,6 +327,9 @@
   .h-16 {
     height: calc(var(--spacing) * 16);
   }
+  .h-\[14px\] {
+    height: 14px;
+  }
   .h-\[18px\] {
     height: 18px;
   }
@@ -341,9 +344,6 @@
   }
   .h-px {
     height: 1px;
-  }
-  .min-h-8 {
-    min-height: calc(var(--spacing) * 8);
   }
   .min-h-10 {
     min-height: calc(var(--spacing) * 10);
@@ -377,6 +377,9 @@
   }
   .w-16 {
     width: calc(var(--spacing) * 16);
+  }
+  .w-\[14px\] {
+    width: 14px;
   }
   .w-\[18px\] {
     width: 18px;
@@ -510,9 +513,6 @@
   .border-surface-02 {
     border-color: var(--color-surface-02);
   }
-  .bg-badge-beta-bg {
-    background-color: var(--color-badge-beta-bg);
-  }
   .bg-banner-bg {
     background-color: var(--color-banner-bg);
   }
@@ -558,9 +558,6 @@
   .p-4 {
     padding: calc(var(--spacing) * 4);
   }
-  .px-1\.5 {
-    padding-inline: calc(var(--spacing) * 1.5);
-  }
   .px-2 {
     padding-inline: calc(var(--spacing) * 2);
   }
@@ -590,9 +587,6 @@
   }
   .py-8 {
     padding-block: calc(var(--spacing) * 8);
-  }
-  .py-px {
-    padding-block: 1px;
   }
   .pb-1 {
     padding-bottom: calc(var(--spacing) * 1);
@@ -669,9 +663,6 @@
   }
   .whitespace-nowrap {
     white-space: nowrap;
-  }
-  .text-badge-beta-text {
-    color: var(--color-badge-beta-text);
   }
   .text-banner-text {
     color: var(--color-banner-text);

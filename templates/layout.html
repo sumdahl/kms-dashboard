@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Dashboard{% endblock %}</title>
+    <script type="module" src="/static/js/lucide-icons.js"></script>
     <script>
       (function () {
         try {
@@ -39,14 +40,14 @@
     </div>
 
     <footer
-      class="flex items-center h-10 bg-surface-01 border-t border-border-subtle sticky bottom-0 z-50"
+      class="relative flex items-center h-10 bg-surface-01 border-t border-border-subtle bottom-0 z-50"
     >
       <div
-        class="footer-toggle-zone flex items-center justify-center h-full border-r border-border-subtle shrink-0"
+        class="footer-toggle-zone flex items-center justify-center h-full border-r border-border-subtle shrink-0 relative"
       >
         <button
           id="sidebar-toggle"
-          class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-icon-secondary hover:bg-surface-active transition-colors"
+          class="absolute bottom-2 left-2 flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-icon-secondary hover:bg-surface-active transition-colors"
           title="Toggle sidebar"
           aria-label="Toggle sidebar"
         >
@@ -68,6 +69,7 @@
       </div>
 
       <div class="flex-1 flex items-center justify-center flex-wrap gap-2 px-4">
+        <!-- footer links -->
         <a
           href="#"
           class="text-xs text-text-helper hover:text-text-primary transition-colors whitespace-nowrap"
@@ -103,6 +105,7 @@
     </footer>
 
     <script src="/static/js/sidebar.js"></script>
+
     <script>
       (function () {
         const btn = document.getElementById("theme-toggle");
