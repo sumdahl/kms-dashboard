@@ -6,7 +6,7 @@
     "copy-htmx": "cp node_modules/htmx.org/dist/htmx.min.js static/js/htmx.min.js",
     "build:css": "postcss src/styles/input.css -o static/css/output.css",
     "watch:css": "postcss src/styles/input.css -o static/css/output.css --watch",
-    "dev": "npm run copy-htmx && npm run watch:css"
+    "dev": "cargo watch -q -c -w src -w templates -s \"npm run build:css\" -x run"
   },
   "dependencies": {
     "htmx.org": "^2.0.4",

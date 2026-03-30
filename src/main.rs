@@ -1,13 +1,14 @@
 use askama::Template;
-use askama_axum::IntoResponse;
 use axum::{
     extract::Form,
     response::Html,
     routing::{delete, get, post},
     Router,
 };
+
 use serde::Deserialize;
 use tower_http::services::ServeDir;
+use tower_livereload::LiveReloadLayer;
 
 #[derive(Template)]
 #[template(path = "dashboard/home.html")]
@@ -45,7 +46,8 @@ async fn main() {
         .route("/ui/sidebar/pin", post(sidebar_pin))
         .route("/ui/banner", delete(banner_dismiss))
         .nest_service("/static", ServeDir::new("static"))
-        .nest_service("/nm", ServeDir::new("node_modules"));
+        .nest_service("/nm", ServeDir::new("node_modules"))
+        .layer(LiveReloadLayer::new());
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
         .await

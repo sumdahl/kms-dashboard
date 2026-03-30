@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@source "../../templates/**/*.html";
+
 /* ============================================================
    THEME TOKENS
    All Cloudflare design tokens registered here become Tailwind
