@@ -4,7 +4,7 @@ use uuid::Uuid;
 
 #[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
 pub struct User {
-    pub user_id:       String,
+    pub user_id:       Uuid,
     pub email:         String,
     pub password_hash: String,
     pub is_admin:      bool,
@@ -14,7 +14,7 @@ pub struct User {
 impl User {
     pub fn new(email: &str, password_hash: &str) -> Self {
         Self {
-            user_id:       Uuid::new_v4().to_string(),
+            user_id:       Uuid::new_v4(),
             email:         email.to_string(),
             password_hash: password_hash.to_string(),
             is_admin:      false,

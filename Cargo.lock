@@ -923,6 +923,7 @@ dependencies = [
  "askama_axum",
  "axum",
  "chrono",
+ "dotenvy",
  "jsonwebtoken",
  "serde",
  "serde_json",
