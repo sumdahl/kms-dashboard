@@ -522,9 +522,6 @@
   .bg-btn-primary {
     background-color: var(--color-btn-primary);
   }
-  .bg-orange-500 {
-    background-color: var(--color-orange-500);
-  }
   .bg-progress-track {
     background-color: var(--color-progress-track);
   }
