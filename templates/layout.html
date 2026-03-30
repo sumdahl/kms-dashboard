@@ -4,33 +4,28 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>{% block title %}Dashboard{% endblock %}</title>
-
-    <!-- Compiled Tailwind output — single stylesheet -->
     <link rel="stylesheet" href="/static/css/output.css" />
-
-    <!-- HTMX -->
     <script src="/static/js/htmx.min.js" defer></script>
-
     {% block head_scripts %}{% endblock %}
   </head>
+  <body
+    class="app-shell flex flex-col min-h-screen {% if sidebar_pinned %}sidebar-expanded{% endif %}"
+  >
+    <div class="flex flex-1 overflow-hidden">
+      {% include "partials/sidebar.html" %}
 
-  <body class="app-shell {% if sidebar_pinned %}sidebar-expanded{% endif %}">
-    {% include "partials/sidebar.html" %}
+      <div class="flex-1 flex flex-col min-w-0">
+        {% include "partials/header.html" %}
 
-    <div
-      class="[grid-area:main] flex flex-col min-h-[calc(100vh-40px)] overflow-hidden min-w-0"
-    >
-      {% include "partials/header.html" %}
-
-      <main class="flex-1 flex flex-col bg-bg-page overflow-y-auto">
-        {% if show_banner %} {% include "partials/banner.html" %} {% endif %}
-
-        <div class="px-8 py-6 flex-1">{% block content %}{% endblock %}</div>
-      </main>
+        <main class="flex-1 flex flex-col bg-bg-page overflow-y-auto">
+          {% if show_banner %} {% include "partials/banner.html" %} {% endif %}
+          <div class="px-8 py-6 flex-1">{% block content %}{% endblock %}</div>
+        </main>
+      </div>
     </div>
 
     <footer
-      class="[grid-area:footer] flex items-center h-10 bg-surface-01 border-t border-border-subtle sticky bottom-0 z-50"
+      class="flex items-center h-10 bg-surface-01 border-t border-border-subtle sticky bottom-0 z-50"
     >
       <div
         class="footer-toggle-zone flex items-center justify-center h-full border-r border-border-subtle shrink-0"
@@ -58,43 +53,35 @@
         </button>
       </div>
 
-      <div class="flex-1 flex items-center justify-center flex-wrap gap-1 px-4">
+      <div class="flex-1 flex items-center justify-center flex-wrap gap-2 px-4">
         <a
           href="#"
           class="text-xs text-text-helper hover:text-text-primary transition-colors whitespace-nowrap"
           >Support</a
         >
         <span class="text-xs text-border-subtle select-none">|</span>
+
         <a
           href="#"
           class="text-xs text-text-helper hover:text-text-primary transition-colors whitespace-nowrap"
           >System Status</a
         >
         <span class="text-xs text-border-subtle select-none">|</span>
-        <!-- <a
-          href="#"
-          class="text-xs text-text-helper hover:text-text-primary transition-colors whitespace-nowrap"
-          >Careers</a
-        >
-        <span class="text-xs text-border-subtle select-none">|</span>
-        <a
-          href="#"
-          class="text-xs text-text-helper hover:text-text-primary transition-colors whitespace-nowrap"
-          >Terms of Use</a
-        > -->
-        <span class="text-xs text-border-subtle select-none">|</span>
+
         <a
           href="#"
           class="text-xs text-text-helper hover:text-text-primary transition-colors whitespace-nowrap"
           >Report Security Issues</a
         >
         <span class="text-xs text-border-subtle select-none">|</span>
+
         <a
           href="#"
           class="text-xs text-text-helper hover:text-text-primary transition-colors whitespace-nowrap"
           >Privacy Policy</a
         >
         <span class="text-xs text-border-subtle select-none">|</span>
+
         <span class="text-xs text-text-helper whitespace-nowrap"
           >© 2026 Dashboard, Inc.</span
         >
@@ -102,6 +89,32 @@
     </footer>
 
     <script src="/static/js/sidebar.js"></script>
+    <script>
+      (function () {
+        const btn = document.getElementById("theme-toggle");
+        const sun = document.getElementById("icon-sun");
+        const moon = document.getElementById("icon-moon");
+        const html = document.documentElement;
+
+        // Safety check: only run if the button exists in the header/DOM
+        if (!btn) return;
+
+        function syncIcons() {
+          const isDark = html.classList.contains("dark");
+          if (sun) sun.classList.toggle("hidden", !isDark);
+          if (moon) moon.classList.toggle("hidden", isDark);
+        }
+
+        // Initialize icons on load
+        syncIcons();
+
+        btn.addEventListener("click", function () {
+          const isDark = html.classList.toggle("dark");
+          localStorage.setItem("theme", isDark ? "dark" : "light");
+          syncIcons();
+        });
+      })();
+    </script>
     {% block body_scripts %}{% endblock %}
   </body>
 </html>

@@ -109,6 +109,35 @@
     box-sizing: border-box;
   }
 
+  .dark {
+    --color-bg-page: #0f0f0f;
+    --color-surface-01: #161616;
+    --color-surface-02: #262626;
+    --color-surface-active: #393939;
+    --color-surface-hover: #212121;
+
+    --color-text-primary: #f4f4f4;
+    --color-text-secondary: #c6c6c6;
+    --color-text-helper: #8d8d8d;
+    --color-text-placeholder: #6f6f6f;
+    --color-text-on-primary: #ffffff;
+    --color-text-link: #4589ff;
+
+    --color-border-subtle: #393939;
+    --color-border-strong: #525252;
+
+    --color-icon-muted: #6f6f6f;
+    --color-icon-secondary: #c6c6c6;
+    --color-icon-primary: #f4f4f4;
+
+    --color-banner-bg: #1e3a8a;
+    --color-banner-border: #1e40af;
+    --color-banner-text: #dbeafe;
+
+    --color-badge-bg: #393939;
+    --color-badge-text: #c6c6c6;
+  }
+
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
