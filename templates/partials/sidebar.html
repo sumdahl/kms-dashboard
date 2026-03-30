@@ -1,39 +1,29 @@
-<!--
-  SIDEBAR PARTIAL
-  ═══════════════
-  Rendered in the correct initial state by the server (sidebar_pinned from cookie).
-  JS in sidebar.js handles all subsequent hover/click state changes.
-
-  Structure:
-    aside#sidebar
-      └── div#sidebar-hover-zone  ← Zone A: hover triggers expand
-            ├── .sidebar__account
-            ├── .sidebar__search-wrap
-            └── .sidebar__nav
-                  ├── direct links (.sidebar__item)
-                  ├── accordion groups (details.sidebar__group)
-                  ├── section headers (.sidebar__section)
-                  └── dividers (.sidebar__divider)
--->
-
 <aside
   id="sidebar"
-  class="sidebar {% if sidebar_pinned %}is-expanded{% endif %}"
+  class="sidebar [grid-area:sidebar] sticky top-0 h-[calc(100vh-40px)] overflow-hidden bg-surface-01 border-r border-border-subtle flex flex-col z-50"
   data-pinned="{{ sidebar_pinned }}"
 >
-  <!-- Zone A — everything in here triggers hover expansion -->
-  <div id="sidebar-hover-zone" class="sidebar__hover-zone">
-    <!-- ── Account Header ──────────────────────────────────────────── -->
-    <div class="sidebar__account">
-      <!-- Logo placeholder box (replace with <img> when you have a logo) -->
-      <div class="sidebar__logo-box" aria-hidden="true"></div>
-
-      <!-- Account info — fades in when expanded -->
-      <div class="sidebar__account-info">
-        <span class="sidebar__account-email">{{ user_email }}</span>
-        <!-- Lucide: chevrons-up-down -->
+  <!-- Zone A: hover triggers expand/collapse -->
+  <div
+    id="sidebar-hover-zone"
+    class="sidebar-scroll flex-1 flex flex-col overflow-hidden overflow-y-auto"
+  >
+    <!-- Account header -->
+    <div
+      class="flex items-center gap-3 px-3 h-12 min-h-12 border-b border-border-subtle overflow-hidden cursor-pointer hover:bg-surface-hover transition-colors"
+    >
+      <!-- Logo placeholder -->
+      <div
+        class="w-6 h-6 min-w-6 rounded-sm border border-border-subtle bg-surface-02 shrink-0"
+      ></div>
+      <!-- Account info fades in when expanded -->
+      <div class="sidebar-label flex items-center gap-2 min-w-0 flex-1">
+        <span
+          class="text-[13px] font-medium text-text-primary overflow-hidden text-ellipsis whitespace-nowrap flex-1 min-w-0"
+          >{{ user_email }}</span
+        >
         <svg
-          class="sidebar__account-chevron"
+          class="text-icon-muted shrink-0"
           xmlns="http://www.w3.org/2000/svg"
           width="14"
           height="14"
@@ -50,17 +40,13 @@
       </div>
     </div>
 
-    <!-- ── Search ──────────────────────────────────────────────────── -->
-    <div class="sidebar__search-wrap">
+    <!-- Search -->
+    <div class="px-2 py-3 border-b border-border-subtle overflow-hidden">
       <div
-        class="sidebar__search"
-        role="button"
-        tabindex="0"
-        aria-label="Quick search"
+        class="flex items-center gap-2 h-8 px-2 border border-border-subtle rounded-md bg-surface-02 cursor-text hover:border-border-strong transition-colors overflow-hidden"
       >
-        <!-- Lucide: search -->
         <svg
-          class="sidebar__search-icon"
+          class="text-icon-muted shrink-0"
           xmlns="http://www.w3.org/2000/svg"
           width="14"
           height="14"
@@ -74,24 +60,24 @@
           <circle cx="11" cy="11" r="8" />
           <path d="m21 21-4.35-4.35" />
         </svg>
-        <span class="sidebar__search-text">Quick search...</span>
-        <span class="sidebar__search-kbd">⌘K</span>
+        <span class="sidebar-label text-[13px] text-text-placeholder flex-1"
+          >Quick search...</span
+        >
+        <span class="sidebar-label text-[10px] text-text-helper">⌘K</span>
       </div>
     </div>
 
-    <!-- ── Nav ─────────────────────────────────────────────────────── -->
-    <nav class="sidebar__nav" aria-label="Main navigation">
+    <!-- Nav -->
+    <nav class="p-2 flex flex-col gap-0.5 flex-1" aria-label="Main navigation">
       <!-- Account home (active) -->
       <a
         href="/"
-        class="sidebar__item sidebar__item--active"
+        class="flex items-center gap-3 h-10 px-3 rounded-md bg-surface-active text-text-primary font-semibold overflow-hidden"
         aria-current="page"
       >
         <svg
-          class="sidebar__item-icon"
+          class="w-[18px] h-[18px] min-w-[18px] text-icon-secondary shrink-0"
           xmlns="http://www.w3.org/2000/svg"
-          width="18"
-          height="18"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -102,17 +88,17 @@
           <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
           <polyline points="9 22 9 12 15 12 15 22" />
         </svg>
-        <span class="sidebar__item-label">Account home</span>
+        <span class="sidebar-label text-[14px] flex-1">Account home</span>
       </a>
 
-      <!-- Recents — expandable accordion with two-line sub-items -->
-      <details class="sidebar__group" open>
-        <summary class="sidebar__item">
+      <!-- Recents -->
+      <details class="flex flex-col">
+        <summary
+          class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+        >
           <svg
-            class="sidebar__item-icon"
+            class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -123,9 +109,9 @@
             <circle cx="12" cy="12" r="10" />
             <polyline points="12 6 12 12 16 14" />
           </svg>
-          <span class="sidebar__item-label">Recents</span>
+          <span class="sidebar-label text-[14px] flex-1">Recents</span>
           <svg
-            class="sidebar__item-chevron"
+            class="sidebar-label chevron text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
             width="14"
             height="14"
@@ -139,38 +125,78 @@
             <path d="m9 18 6-6-6-6" />
           </svg>
         </summary>
-        <div class="sidebar__sub-items">
-          <a href="#" class="sidebar__sub-item">
-            <span class="sidebar__sub-title">Workers &amp; Pages</span>
-            <span class="sidebar__sub-category">Compute</span>
+        <div class="sidebar-label flex flex-col pb-1">
+          <a
+            href="#"
+            class="flex flex-col justify-center min-h-[44px] px-3 pl-9 rounded-sm hover:bg-surface-hover transition-colors"
+          >
+            <span
+              class="text-[13px] font-medium text-text-primary leading-tight"
+              >Workers &amp; Pages</span
+            >
+            <span class="text-[11px] text-text-helper leading-tight"
+              >Compute</span
+            >
           </a>
-          <a href="#" class="sidebar__sub-item">
-            <span class="sidebar__sub-title">Log search</span>
-            <span class="sidebar__sub-category">Log Explorer</span>
+          <a
+            href="#"
+            class="flex flex-col justify-center min-h-[44px] px-3 pl-9 rounded-sm hover:bg-surface-hover transition-colors"
+          >
+            <span
+              class="text-[13px] font-medium text-text-primary leading-tight"
+              >Log search</span
+            >
+            <span class="text-[11px] text-text-helper leading-tight"
+              >Log Explorer</span
+            >
           </a>
-          <a href="#" class="sidebar__sub-item">
-            <span class="sidebar__sub-title">Zero Trust</span>
-            <span class="sidebar__sub-category">Protect &amp; Connect</span>
+          <a
+            href="#"
+            class="flex flex-col justify-center min-h-[44px] px-3 pl-9 rounded-sm hover:bg-surface-hover transition-colors"
+          >
+            <span
+              class="text-[13px] font-medium text-text-primary leading-tight"
+              >Zero Trust</span
+            >
+            <span class="text-[11px] text-text-helper leading-tight"
+              >Protect &amp; Connect</span
+            >
           </a>
-          <a href="#" class="sidebar__sub-item">
-            <span class="sidebar__sub-title">Transfers</span>
-            <span class="sidebar__sub-category">Domains</span>
+          <a
+            href="#"
+            class="flex flex-col justify-center min-h-[44px] px-3 pl-9 rounded-sm hover:bg-surface-hover transition-colors"
+          >
+            <span
+              class="text-[13px] font-medium text-text-primary leading-tight"
+              >Transfers</span
+            >
+            <span class="text-[11px] text-text-helper leading-tight"
+              >Domains</span
+            >
           </a>
-          <a href="#" class="sidebar__sub-item">
-            <span class="sidebar__sub-title">Overview</span>
-            <span class="sidebar__sub-category">Domains</span>
+          <a
+            href="#"
+            class="flex flex-col justify-center min-h-[44px] px-3 pl-9 rounded-sm hover:bg-surface-hover transition-colors"
+          >
+            <span
+              class="text-[13px] font-medium text-text-primary leading-tight"
+              >Overview</span
+            >
+            <span class="text-[11px] text-text-helper leading-tight"
+              >Domains</span
+            >
           </a>
         </div>
       </details>
 
       <!-- Analytics & logs -->
-      <details class="sidebar__group">
-        <summary class="sidebar__item">
+      <details class="flex flex-col">
+        <summary
+          class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+        >
           <svg
-            class="sidebar__item-icon"
+            class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -182,9 +208,11 @@
             <line x1="12" x2="12" y1="20" y2="4" />
             <line x1="6" x2="6" y1="20" y2="14" />
           </svg>
-          <span class="sidebar__item-label">Analytics &amp; logs</span>
+          <span class="sidebar-label text-[14px] flex-1"
+            >Analytics &amp; logs</span
+          >
           <svg
-            class="sidebar__item-chevron"
+            class="sidebar-label chevron text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
             width="14"
             height="14"
@@ -198,22 +226,34 @@
             <path d="m9 18 6-6-6-6" />
           </svg>
         </summary>
-        <div class="sidebar__sub-items">
-          <a href="#" class="sidebar__sub-link">Log Explorer</a>
-          <a href="#" class="sidebar__sub-link">
+        <div class="sidebar-label flex flex-col pb-1">
+          <a
+            href="#"
+            class="flex items-center gap-2 min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Log Explorer</a
+          >
+          <a
+            href="#"
+            class="flex items-center gap-2 min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+          >
             Account analytics
             <span
-              class="sidebar__badge sidebar__badge--beta"
-              style="margin-left: 6px"
+              class="text-[10px] font-medium px-1.5 py-px rounded-full bg-badge-beta-bg text-badge-beta-text ml-1"
               >Beta</span
             >
           </a>
-          <a href="#" class="sidebar__sub-link">Web analytics</a>
-          <a href="#" class="sidebar__sub-link">
+          <a
+            href="#"
+            class="flex items-center gap-2 min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Web analytics</a
+          >
+          <a
+            href="#"
+            class="flex items-center gap-2 min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+          >
             Trace
             <span
-              class="sidebar__badge sidebar__badge--beta"
-              style="margin-left: 6px"
+              class="text-[10px] font-medium px-1.5 py-px rounded-full bg-badge-beta-bg text-badge-beta-text ml-1"
               >Beta</span
             >
           </a>
@@ -221,13 +261,13 @@
       </details>
 
       <!-- Domains -->
-      <details class="sidebar__group">
-        <summary class="sidebar__item">
+      <details class="flex flex-col">
+        <summary
+          class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+        >
           <svg
-            class="sidebar__item-icon"
+            class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -241,9 +281,9 @@
               d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
             />
           </svg>
-          <span class="sidebar__item-label">Domains</span>
+          <span class="sidebar-label text-[14px] flex-1">Domains</span>
           <svg
-            class="sidebar__item-chevron"
+            class="sidebar-label chevron text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
             width="14"
             height="14"
@@ -257,27 +297,42 @@
             <path d="m9 18 6-6-6-6" />
           </svg>
         </summary>
-        <div class="sidebar__sub-items">
-          <a href="#" class="sidebar__sub-link">Overview</a>
-          <a href="#" class="sidebar__sub-link">Registrations</a>
-          <a href="#" class="sidebar__sub-link">Transfers</a>
+        <div class="sidebar-label flex flex-col pb-1">
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Overview</a
+          >
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Registrations</a
+          >
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Transfers</a
+          >
         </div>
       </details>
 
-      <!-- ── Section: Build ─────────────────────────────────────────── -->
-      <div class="sidebar__section">
-        <div class="sidebar__section-divider"></div>
-        <span class="sidebar__section-label">Build</span>
+      <!-- ── Build section ──────────────────────────────────────────── -->
+      <div class="mt-2">
+        <div class="section-divider bg-border-subtle my-1"></div>
+        <span
+          class="section-label flex items-end px-3 pb-1 text-[11px] text-text-helper whitespace-nowrap overflow-hidden"
+          >Build</span
+        >
       </div>
 
       <!-- Compute -->
-      <details class="sidebar__group">
-        <summary class="sidebar__item">
+      <details class="flex flex-col">
+        <summary
+          class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+        >
           <svg
-            class="sidebar__item-icon"
+            class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -287,9 +342,9 @@
           >
             <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2" />
           </svg>
-          <span class="sidebar__item-label">Compute</span>
+          <span class="sidebar-label text-[14px] flex-1">Compute</span>
           <svg
-            class="sidebar__item-chevron"
+            class="sidebar-label chevron text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
             width="14"
             height="14"
@@ -303,32 +358,58 @@
             <path d="m9 18 6-6-6-6" />
           </svg>
         </summary>
-        <div class="sidebar__sub-items">
-          <a href="#" class="sidebar__sub-link">Workers &amp; Pages</a>
-          <a href="#" class="sidebar__sub-link">Observability</a>
-          <a href="#" class="sidebar__sub-link">Workers for Platforms</a>
-          <a href="#" class="sidebar__sub-link">
+        <div class="sidebar-label flex flex-col pb-1">
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Workers &amp; Pages</a
+          >
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Observability</a
+          >
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Workers for Platforms</a
+          >
+          <a
+            href="#"
+            class="flex items-center gap-2 min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+          >
             Containers
             <span
-              class="sidebar__badge sidebar__badge--beta"
-              style="margin-left: 6px"
+              class="text-[10px] font-medium px-1.5 py-px rounded-full bg-badge-beta-bg text-badge-beta-text"
               >Beta</span
             >
           </a>
-          <a href="#" class="sidebar__sub-link">Durable Objects</a>
-          <a href="#" class="sidebar__sub-link">Queues</a>
-          <a href="#" class="sidebar__sub-link">Workflows</a>
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Durable Objects</a
+          >
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Queues</a
+          >
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Workflows</a
+          >
         </div>
       </details>
 
       <!-- AI -->
-      <details class="sidebar__group">
-        <summary class="sidebar__item">
+      <details class="flex flex-col">
+        <summary
+          class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+        >
           <svg
-            class="sidebar__item-icon"
+            class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -340,9 +421,9 @@
             <path d="M20 3v4" />
             <path d="M22 5h-4" />
           </svg>
-          <span class="sidebar__item-label">AI</span>
+          <span class="sidebar-label text-[14px] flex-1">AI</span>
           <svg
-            class="sidebar__item-chevron"
+            class="sidebar-label chevron text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
             width="14"
             height="14"
@@ -356,21 +437,33 @@
             <path d="m9 18 6-6-6-6" />
           </svg>
         </summary>
-        <div class="sidebar__sub-items">
-          <a href="#" class="sidebar__sub-link">AI Gateway</a>
-          <a href="#" class="sidebar__sub-link">Vectorize</a>
-          <a href="#" class="sidebar__sub-link">Workers AI</a>
+        <div class="sidebar-label flex flex-col pb-1">
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >AI Gateway</a
+          >
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Vectorize</a
+          >
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Workers AI</a
+          >
         </div>
       </details>
 
       <!-- Storage & databases -->
-      <details class="sidebar__group">
-        <summary class="sidebar__item">
+      <details class="flex flex-col">
+        <summary
+          class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+        >
           <svg
-            class="sidebar__item-icon"
+            class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -382,9 +475,11 @@
             <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" />
             <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" />
           </svg>
-          <span class="sidebar__item-label">Storage &amp; databases</span>
+          <span class="sidebar-label text-[14px] flex-1"
+            >Storage &amp; databases</span
+          >
           <svg
-            class="sidebar__item-chevron"
+            class="sidebar-label chevron text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
             width="14"
             height="14"
@@ -398,22 +493,33 @@
             <path d="m9 18 6-6-6-6" />
           </svg>
         </summary>
-        <div class="sidebar__sub-items">
-          <a href="#" class="sidebar__sub-link">KV</a>
-          <a href="#" class="sidebar__sub-link">R2</a>
-          <a href="#" class="sidebar__sub-link">D1</a>
-          <a href="#" class="sidebar__sub-link">Hyperdrive</a>
+        <div class="sidebar-label flex flex-col pb-1">
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >KV</a
+          >
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >R2</a
+          >
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >D1</a
+          >
         </div>
       </details>
 
       <!-- Media -->
-      <details class="sidebar__group">
-        <summary class="sidebar__item">
+      <details class="flex flex-col">
+        <summary
+          class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+        >
           <svg
-            class="sidebar__item-icon"
+            class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -424,9 +530,9 @@
             <circle cx="12" cy="12" r="10" />
             <polygon points="10 8 16 12 10 16 10 8" />
           </svg>
-          <span class="sidebar__item-label">Media</span>
+          <span class="sidebar-label text-[14px] flex-1">Media</span>
           <svg
-            class="sidebar__item-chevron"
+            class="sidebar-label chevron text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
             width="14"
             height="14"
@@ -440,26 +546,37 @@
             <path d="m9 18 6-6-6-6" />
           </svg>
         </summary>
-        <div class="sidebar__sub-items">
-          <a href="#" class="sidebar__sub-link">Images</a>
-          <a href="#" class="sidebar__sub-link">Stream</a>
+        <div class="sidebar-label flex flex-col pb-1">
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Images</a
+          >
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Stream</a
+          >
         </div>
       </details>
 
-      <!-- ── Section: Protect & Connect ────────────────────────────── -->
-      <div class="sidebar__section">
-        <div class="sidebar__section-divider"></div>
-        <span class="sidebar__section-label">Protect &amp; Connect</span>
+      <!-- ── Protect & Connect section ──────────────────────────────── -->
+      <div class="mt-2">
+        <div class="section-divider bg-border-subtle my-1"></div>
+        <span
+          class="section-label flex items-end px-3 pb-1 text-[11px] text-text-helper whitespace-nowrap overflow-hidden"
+          >Protect &amp; Connect</span
+        >
       </div>
 
       <!-- Application security -->
-      <details class="sidebar__group">
-        <summary class="sidebar__item">
+      <details class="flex flex-col">
+        <summary
+          class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+        >
           <svg
-            class="sidebar__item-icon"
+            class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -469,9 +586,11 @@
           >
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           </svg>
-          <span class="sidebar__item-label">Application security</span>
+          <span class="sidebar-label text-[14px] flex-1"
+            >Application security</span
+          >
           <svg
-            class="sidebar__item-chevron"
+            class="sidebar-label chevron text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
             width="14"
             height="14"
@@ -485,20 +604,28 @@
             <path d="m9 18 6-6-6-6" />
           </svg>
         </summary>
-        <div class="sidebar__sub-items">
-          <a href="#" class="sidebar__sub-link">WAF</a>
-          <a href="#" class="sidebar__sub-link">DDoS protection</a>
-          <a href="#" class="sidebar__sub-link">Bot management</a>
+        <div class="sidebar-label flex flex-col pb-1">
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >WAF</a
+          >
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >DDoS protection</a
+          >
         </div>
       </details>
 
-      <!-- Zero Trust (direct link — no sub-items) -->
-      <a href="#" class="sidebar__item">
+      <!-- Zero Trust (direct link) -->
+      <a
+        href="#"
+        class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors overflow-hidden"
+      >
         <svg
-          class="sidebar__item-icon"
+          class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"
           xmlns="http://www.w3.org/2000/svg"
-          width="18"
-          height="18"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
@@ -509,17 +636,17 @@
           <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
           <path d="m9 12 2 2 4-4" />
         </svg>
-        <span class="sidebar__item-label">Zero Trust</span>
+        <span class="sidebar-label text-[14px]">Zero Trust</span>
       </a>
 
       <!-- Networking -->
-      <details class="sidebar__group">
-        <summary class="sidebar__item">
+      <details class="flex flex-col">
+        <summary
+          class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+        >
           <svg
-            class="sidebar__item-icon"
+            class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -533,9 +660,9 @@
             <path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3" />
             <path d="M12 12V8" />
           </svg>
-          <span class="sidebar__item-label">Networking</span>
+          <span class="sidebar-label text-[14px] flex-1">Networking</span>
           <svg
-            class="sidebar__item-chevron"
+            class="sidebar-label chevron text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
             width="14"
             height="14"
@@ -549,21 +676,28 @@
             <path d="m9 18 6-6-6-6" />
           </svg>
         </summary>
-        <div class="sidebar__sub-items">
-          <a href="#" class="sidebar__sub-link">Magic WAN</a>
-          <a href="#" class="sidebar__sub-link">Magic Transit</a>
-          <a href="#" class="sidebar__sub-link">Tunnel</a>
+        <div class="sidebar-label flex flex-col pb-1">
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Magic WAN</a
+          >
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Magic Transit</a
+          >
         </div>
       </details>
 
       <!-- Delivery & performance -->
-      <details class="sidebar__group">
-        <summary class="sidebar__item">
+      <details class="flex flex-col">
+        <summary
+          class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+        >
           <svg
-            class="sidebar__item-icon"
+            class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -573,9 +707,11 @@
           >
             <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
           </svg>
-          <span class="sidebar__item-label">Delivery &amp; performance</span>
+          <span class="sidebar-label text-[14px] flex-1"
+            >Delivery &amp; performance</span
+          >
           <svg
-            class="sidebar__item-chevron"
+            class="sidebar-label chevron text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
             width="14"
             height="14"
@@ -589,24 +725,30 @@
             <path d="m9 18 6-6-6-6" />
           </svg>
         </summary>
-        <div class="sidebar__sub-items">
-          <a href="#" class="sidebar__sub-link">CDN</a>
-          <a href="#" class="sidebar__sub-link">Cache rules</a>
-          <a href="#" class="sidebar__sub-link">Page rules</a>
+        <div class="sidebar-label flex flex-col pb-1">
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >CDN</a
+          >
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Cache rules</a
+          >
         </div>
       </details>
 
-      <!-- ── Hard Divider + Manage account ─────────────────────────── -->
-      <div class="sidebar__divider"></div>
+      <!-- Divider + Manage account -->
+      <div class="h-px bg-border-subtle my-2 shrink-0"></div>
 
-      <!-- Manage account -->
-      <details class="sidebar__group">
-        <summary class="sidebar__item">
+      <details class="flex flex-col">
+        <summary
+          class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+        >
           <svg
-            class="sidebar__item-icon"
+            class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
-            width="18"
-            height="18"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -619,9 +761,9 @@
             />
             <circle cx="12" cy="12" r="3" />
           </svg>
-          <span class="sidebar__item-label">Manage account</span>
+          <span class="sidebar-label text-[14px] flex-1">Manage account</span>
           <svg
-            class="sidebar__item-chevron"
+            class="sidebar-label chevron text-icon-muted shrink-0"
             xmlns="http://www.w3.org/2000/svg"
             width="14"
             height="14"
@@ -635,11 +777,22 @@
             <path d="m9 18 6-6-6-6" />
           </svg>
         </summary>
-        <div class="sidebar__sub-items">
-          <a href="#" class="sidebar__sub-link">Members</a>
-          <a href="#" class="sidebar__sub-link">Billing &amp; subscriptions</a>
-          <a href="#" class="sidebar__sub-link">Audit log</a>
-          <a href="#" class="sidebar__sub-link">API tokens</a>
+        <div class="sidebar-label flex flex-col pb-1">
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Members</a
+          >
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >Billing &amp; subscriptions</a
+          >
+          <a
+            href="#"
+            class="flex items-center min-h-8 px-3 pl-9 rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+            >API tokens</a
+          >
         </div>
       </details>
     </nav>

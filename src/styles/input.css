@@ -1,0 +1,288 @@
+@import "tailwindcss";
+
+/* ============================================================
+   THEME TOKENS
+   All Cloudflare design tokens registered here become Tailwind
+   utility classes automatically:
+   --color-surface-01  →  bg-surface-01 / text-surface-01 / border-surface-01
+   --font-family-sans  →  font-sans
+   --radius-card       →  rounded-card
+   ============================================================ */
+
+@theme {
+  /* ── Google Fonts ──────────────────────────────────────────────────── */
+  /* Inline the @import here so Tailwind's build picks it up */
+
+  /* ── Typography ─────────────────────────────────────────────────────── */
+  --font-family-sans:
+    "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+
+  --font-size-2xs: 0.625rem; /* 10px */
+  --font-size-xs: 0.6875rem; /* 11px */
+  --font-size-sm: 0.75rem; /* 12px */
+  --font-size-base: 0.8125rem; /* 13px */
+  --font-size-md: 0.875rem; /* 14px */
+  --font-size-lg: 1rem; /* 16px */
+  --font-size-xl: 1.25rem; /* 20px */
+  --font-size-2xl: 1.5rem; /* 24px */
+  --font-size-stat: 1.75rem; /* 28px */
+
+  /* ── Colors: Surfaces ───────────────────────────────────────────────── */
+  --color-bg-page: #fafafa;
+  --color-surface-01: #ffffff;
+  --color-surface-02: #f7f7f7;
+  --color-surface-active: #e8e8e8;
+  --color-surface-hover: #f4f4f4;
+
+  /* ── Colors: Text ───────────────────────────────────────────────────── */
+  --color-text-primary: #161616;
+  --color-text-secondary: #525252;
+  --color-text-helper: #8d8d8d;
+  --color-text-placeholder: #a8a8a8;
+  --color-text-on-primary: #ffffff;
+  --color-text-link: #046dff;
+
+  /* ── Colors: Borders ────────────────────────────────────────────────── */
+  --color-border-subtle: #e0e0e0;
+  --color-border-strong: #c6c6c6;
+
+  /* ── Colors: Icons ──────────────────────────────────────────────────── */
+  --color-icon-muted: #8d8d8d;
+  --color-icon-secondary: #525252;
+  --color-icon-primary: #161616;
+
+  /* ── Colors: Buttons ────────────────────────────────────────────────── */
+  --color-btn-primary: #046dff;
+  --color-btn-primary-hover: #0057d9;
+  --color-btn-primary-press: #0043b0;
+
+  /* ── Colors: Status ─────────────────────────────────────────────────── */
+  --color-status-green: #24a148;
+  --color-status-red: #da1e28;
+  --color-status-blue: #046dff;
+  --color-status-yellow: #f1c21b;
+
+  /* ── Colors: Banner ─────────────────────────────────────────────────── */
+  --color-banner-bg: #dbeafe;
+  --color-banner-border: #bfdbfe;
+  --color-banner-text: #1e40af;
+
+  /* ── Colors: Badges ─────────────────────────────────────────────────── */
+  --color-badge-bg: #e0e0e0;
+  --color-badge-text: #525252;
+  --color-badge-beta-bg: #d0e2ff;
+  --color-badge-beta-text: #0043ce;
+
+  /* ── Colors: Progress ───────────────────────────────────────────────── */
+  --color-progress-track: #e0e0e0;
+  --color-progress-from: #bfdbfe;
+  --color-progress-to: #3b82f6;
+
+  /* ── Border Radius ──────────────────────────────────────────────────── */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-card: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* ── Layout Dimensions ──────────────────────────────────────────────── */
+  --spacing-header: 48px;
+  --spacing-footer: 40px;
+  --spacing-sidebar: 48px;
+  --spacing-drawer: 256px;
+}
+
+/* ============================================================
+   GOOGLE FONTS IMPORT
+   ============================================================ */
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap");
+
+/* ============================================================
+   BASE RESET
+   ============================================================ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-family-sans);
+    font-size: var(--font-size-base);
+    color: var(--color-text-primary);
+    background-color: var(--color-bg-page);
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button {
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  svg {
+    display: block;
+    flex-shrink: 0;
+  }
+}
+
+/* ============================================================
+   CUSTOM COMPONENTS
+   Only things that CANNOT be expressed as Tailwind utilities:
+   - Sidebar width transition (cubic-bezier easing + width animation)
+   - Grid column transition on the body shell
+   - Label opacity fade with delay
+   - Section divider show/hide
+   - Scrollbar styling
+   ============================================================ */
+
+@layer components {
+  /* ── App Shell Grid ──────────────────────────────────────────────── */
+  .app-shell {
+    display: grid;
+    grid-template-columns: var(--spacing-sidebar) 1fr;
+    grid-template-rows: 1fr var(--spacing-footer);
+    grid-template-areas:
+      "sidebar main"
+      "footer  footer";
+    min-height: 100vh;
+    transition: grid-template-columns 220ms cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .app-shell.sidebar-expanded {
+    grid-template-columns: var(--spacing-drawer) 1fr;
+  }
+
+  /* ── Sidebar Width Transition ────────────────────────────────────── */
+  .sidebar {
+    width: var(--spacing-sidebar);
+    transition: width 220ms cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .sidebar.is-expanded {
+    width: var(--spacing-drawer);
+  }
+
+  /* ── Footer Toggle Zone Width ────────────────────────────────────── */
+  .footer-toggle-zone {
+    width: var(--spacing-sidebar);
+    min-width: var(--spacing-sidebar);
+    transition:
+      width 220ms cubic-bezier(0.2, 0, 0, 1),
+      min-width 220ms cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .app-shell.sidebar-expanded .footer-toggle-zone {
+    width: var(--spacing-drawer);
+    min-width: var(--spacing-drawer);
+  }
+
+  /* ── Sidebar Label Fade (all text, labels, chevrons, badges) ─────── */
+  /*
+    Everything that hides in collapsed state and fades in on expand.
+    Applied as class="sidebar-label" alongside regular utility classes.
+  */
+  .sidebar-label {
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+    transition: opacity 150ms ease 0ms;
+  }
+
+  .sidebar.is-expanded .sidebar-label {
+    opacity: 1;
+    pointer-events: auto;
+    transition: opacity 150ms ease 60ms;
+  }
+
+  /* ── Section Divider: visible collapsed, hidden expanded ─────────── */
+  .section-divider {
+    height: 1px;
+    transition:
+      opacity 220ms cubic-bezier(0.2, 0, 0, 1),
+      height 220ms cubic-bezier(0.2, 0, 0, 1),
+      margin 220ms cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .sidebar.is-expanded .section-divider {
+    opacity: 0;
+    height: 0;
+    margin: 0;
+  }
+
+  /* ── Section Label: hidden collapsed, visible expanded ──────────── */
+  .section-label {
+    height: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      height 220ms cubic-bezier(0.2, 0, 0, 1),
+      opacity 150ms ease 0ms;
+  }
+
+  .sidebar.is-expanded .section-label {
+    height: 32px;
+    opacity: 1;
+    pointer-events: auto;
+    transition:
+      height 220ms cubic-bezier(0.2, 0, 0, 1),
+      opacity 150ms ease 60ms;
+  }
+
+  /* ── Chevron Rotation for Open details ───────────────────────────── */
+  details[open] > summary .chevron {
+    transform: rotate(90deg);
+  }
+
+  .chevron {
+    transition: transform 150ms ease;
+  }
+
+  /* ── Progress Bar Gradient ───────────────────────────────────────── */
+  .progress-gradient {
+    background: linear-gradient(
+      to right,
+      var(--color-progress-from),
+      var(--color-progress-to)
+    );
+  }
+
+  /* ── Sidebar Scrollbar ───────────────────────────────────────────── */
+  .sidebar-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-subtle) transparent;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .sidebar-scroll::-webkit-scrollbar-thumb {
+    background: var(--color-border-subtle);
+    border-radius: 9999px;
+  }
+
+  /* ── details/summary reset ──────────────────────────────────────── */
+  summary {
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+}

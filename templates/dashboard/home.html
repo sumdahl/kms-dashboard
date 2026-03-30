@@ -1,17 +1,17 @@
-{% extends "layout.html" %} {% block title %}Account Home — Dashboard{% endblock
-%} {% block content %}
+{% extends "layout.html" %} {% block title %}Account Home{% endblock %} {% block
+content %}
 
-<!-- ── Page Header ─────────────────────────────────────────────────────── -->
-<div class="page-header">
-  <p class="page-header__breadcrumb">Account home</p>
-  <div class="page-header__row">
-    <h1 class="page-header__title">{{ user_email }}'s Account</h1>
-    <div class="page-header__actions">
-      <!-- Overflow menu -->
+<!-- Page header -->
+<div class="mb-6">
+  <p class="text-xs text-text-helper mb-1">Account home</p>
+  <div class="flex items-center justify-between gap-4">
+    <h1 class="text-2xl font-semibold text-text-primary leading-tight">
+      {{ user_email }}'s Account
+    </h1>
+    <div class="flex items-center gap-2 shrink-0">
       <button
-        class="btn btn--ghost btn--icon"
+        class="flex items-center justify-center w-8 h-8 rounded-sm text-text-secondary hover:bg-surface-hover transition-colors"
         type="button"
-        aria-label="More options"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -29,8 +29,10 @@
           <circle cx="5" cy="12" r="1" />
         </svg>
       </button>
-      <!-- Primary Add button -->
-      <button class="btn btn--primary" type="button">
+      <button
+        class="flex items-center gap-2 px-3 h-8 rounded-sm bg-btn-primary text-white text-[13px] font-medium hover:bg-btn-primary-hover transition-colors"
+        type="button"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="14"
@@ -49,8 +51,11 @@
       </button>
     </div>
   </div>
-  <div class="page-header__meta">
-    <button class="time-range-btn" type="button">
+  <div class="flex justify-end mt-2">
+    <button
+      class="flex items-center gap-2 px-3 h-[30px] border border-border-subtle rounded-sm bg-surface-01 text-xs text-text-secondary hover:bg-surface-hover hover:border-border-strong transition-colors"
+      type="button"
+    >
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="13"
@@ -72,16 +77,18 @@
   </div>
 </div>
 
-<!-- ── Row 1: Stat Cards ───────────────────────────────────────────────── -->
-<div class="card-grid card-grid--3col" style="margin-bottom: var(--card-gap)">
-  <!-- Security Card -->
-  <div class="card">
-    <div class="card__header">
+<!-- Row 1: Stat cards -->
+<div class="grid grid-cols-3 gap-4 mb-4">
+  <!-- Security -->
+  <div
+    class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden flex flex-col"
+  >
+    <div
+      class="flex items-center gap-2 h-10 px-4 bg-surface-02 border-b border-border-subtle shrink-0"
+    >
       <svg
-        class="card__header-icon"
+        class="text-icon-secondary w-4 h-4"
         xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -91,17 +98,16 @@
       >
         <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
       </svg>
-      <span class="card__header-title">Security</span>
+      <span class="text-[13px] font-medium text-text-secondary">Security</span>
     </div>
-    <div class="card__body card__body--split">
-      <!-- Left cell: Security insights -->
-      <div class="card__cell">
-        <span class="card__cell-label">
+    <div class="flex flex-1">
+      <!-- Left cell -->
+      <div class="flex-1 p-4 flex flex-col gap-2">
+        <span class="flex items-center gap-1 text-xs text-text-secondary">
           Security insights
           <svg
+            class="text-icon-muted w-3 h-3"
             xmlns="http://www.w3.org/2000/svg"
-            width="12"
-            height="12"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -114,19 +120,22 @@
             <path d="M12 8h.01" />
           </svg>
         </span>
-        <div class="card__stat">
-          <span class="card__stat-value">2</span>
-          <span class="card__stat-secondary">1 high, 1 low</span>
+        <div class="flex items-baseline gap-2">
+          <span class="text-[28px] font-bold text-text-primary leading-none"
+            >2</span
+          >
+          <span class="text-[13px] text-text-helper">1 high, 1 low</span>
         </div>
       </div>
-      <!-- Right cell: Encrypted requests + progress bar -->
-      <div class="card__cell" style="position: relative; padding-bottom: 22px">
-        <span class="card__cell-label">
+      <!-- Right cell + progress bar -->
+      <div
+        class="flex-1 border-l border-border-subtle p-4 pb-3 flex flex-col gap-2 relative"
+      >
+        <span class="flex items-center gap-1 text-xs text-text-secondary">
           Encrypted requests
           <svg
+            class="text-icon-muted w-3 h-3"
             xmlns="http://www.w3.org/2000/svg"
-            width="12"
-            height="12"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -139,30 +148,32 @@
             <path d="M12 8h.01" />
           </svg>
         </span>
-        <div class="card__stat">
-          <span class="card__stat-value">100.0%</span>
-          <span
-            class="card__stat-secondary"
-            style="font-size: var(--font-size-sm); color: var(--cf-text-helper)"
-            >0.0%</span
+        <div class="flex items-baseline gap-2">
+          <span class="text-[28px] font-bold text-text-primary leading-none"
+            >100.0%</span
           >
+          <span class="text-xs text-text-helper">0.0%</span>
         </div>
-        <!-- Gradient progress bar pinned to bottom of cell -->
-        <div class="progress-bar-wrap">
-          <div class="progress-bar" style="width: 100%"></div>
+        <!-- Progress bar — pinned to bottom -->
+        <div
+          class="absolute bottom-0 left-0 right-0 h-1.5 bg-progress-track overflow-hidden"
+        >
+          <div class="h-full progress-gradient" style="width: 100%"></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Performance Card -->
-  <div class="card">
-    <div class="card__header">
+  <!-- Performance -->
+  <div
+    class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden flex flex-col"
+  >
+    <div
+      class="flex items-center gap-2 h-10 px-4 bg-surface-02 border-b border-border-subtle shrink-0"
+    >
       <svg
-        class="card__header-icon"
+        class="text-icon-secondary w-4 h-4"
         xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -172,79 +183,49 @@
       >
         <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
       </svg>
-      <span class="card__header-title">Performance</span>
+      <span class="text-[13px] font-medium text-text-secondary"
+        >Performance</span
+      >
     </div>
-    <div class="card__body card__body--split">
-      <!-- Cache rate -->
-      <div class="card__cell">
-        <span class="card__cell-label">
-          Cache rate
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <path d="M12 16v-4" />
-            <path d="M12 8h.01" />
-          </svg>
-        </span>
-        <div class="card__stat">
-          <span class="card__stat-value" style="font-size: var(--font-size-xl)"
+    <div class="flex flex-1">
+      <div class="flex-1 p-4 flex flex-col gap-2">
+        <span class="flex items-center gap-1 text-xs text-text-secondary"
+          >Cache rate</span
+        >
+        <div class="flex items-baseline gap-2">
+          <span class="text-xl font-bold text-text-primary leading-none"
             >1.4%</span
           >
-          <span class="card__stat-trend card__stat-trend--up">↑ 23.6%</span>
+          <span class="text-xs font-medium text-status-green">↑ 23.6%</span>
         </div>
-        <!-- Tiny sparkline placeholder -->
         <div
-          class="chart-placeholder"
-          style="height: 32px; margin-top: auto"
+          class="w-full h-8 mt-auto rounded-sm bg-gradient-to-b from-[rgba(59,130,246,0.08)] to-[rgba(59,130,246,0.02)]"
         ></div>
       </div>
-      <!-- CPU time -->
-      <div class="card__cell">
-        <span class="card__cell-label">
-          CPU time (90%)
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <path d="M12 16v-4" />
-            <path d="M12 8h.01" />
-          </svg>
-        </span>
-        <div class="card__stat">
-          <span class="card__stat-value" style="font-size: var(--font-size-xl)"
+      <div class="flex-1 border-l border-border-subtle p-4 flex flex-col gap-2">
+        <span class="flex items-center gap-1 text-xs text-text-secondary"
+          >CPU time (90%)</span
+        >
+        <div class="flex items-baseline gap-2">
+          <span class="text-xl font-bold text-text-primary leading-none"
             >—</span
           >
-          <span class="card__stat-secondary">ms</span>
+          <span class="text-[13px] text-text-helper">ms</span>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Activity Card -->
-  <div class="card">
-    <div class="card__header">
+  <!-- Activity -->
+  <div
+    class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden flex flex-col"
+  >
+    <div
+      class="flex items-center gap-2 h-10 px-4 bg-surface-02 border-b border-border-subtle shrink-0"
+    >
       <svg
-        class="card__header-icon"
+        class="text-icon-secondary w-4 h-4"
         xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -256,64 +237,43 @@
         <line x1="12" x2="12" y1="20" y2="4" />
         <line x1="6" x2="6" y1="20" y2="14" />
       </svg>
-      <span class="card__header-title">Activity</span>
+      <span class="text-[13px] font-medium text-text-secondary">Activity</span>
     </div>
-    <div class="card__body card__body--split">
-      <!-- Web traffic -->
-      <div class="card__cell">
-        <span class="card__cell-label">
-          Web traffic
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="12"
-            height="12"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <circle cx="12" cy="12" r="10" />
-            <path d="M12 16v-4" />
-            <path d="M12 8h.01" />
-          </svg>
-        </span>
-        <div class="card__stat">
-          <span class="card__stat-value" style="font-size: var(--font-size-xl)"
+    <div class="flex flex-1">
+      <div class="flex-1 p-4 flex flex-col gap-2">
+        <span class="flex items-center gap-1 text-xs text-text-secondary"
+          >Web traffic</span
+        >
+        <div class="flex items-baseline gap-2">
+          <span class="text-xl font-bold text-text-primary leading-none"
             >70</span
           >
-          <span class="card__stat-trend card__stat-trend--down">↓ 59.8%</span>
+          <span class="text-xs font-medium text-status-red">↓ 59.8%</span>
         </div>
-        <!-- Sparkline placeholder -->
         <div
-          class="chart-placeholder"
-          style="height: 32px; margin-top: auto"
+          class="w-full h-8 mt-auto rounded-sm bg-gradient-to-b from-[rgba(59,130,246,0.08)] to-[rgba(59,130,246,0.02)]"
         ></div>
       </div>
-      <!-- Workers invocations -->
-      <div class="card__cell">
-        <span class="card__cell-label">Workers invocations</span>
-        <div class="card__stat">
-          <span class="card__stat-value" style="font-size: var(--font-size-xl)"
-            >0</span
-          >
-        </div>
+      <div class="flex-1 border-l border-border-subtle p-4 flex flex-col gap-2">
+        <span class="text-xs text-text-secondary">Workers invocations</span>
+        <span class="text-xl font-bold text-text-primary leading-none">0</span>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ── Row 2: Domains / Workers & Pages / Zero Trust ──────────────────── -->
-<div class="card-grid card-grid--3col" style="margin-bottom: var(--card-gap)">
+<!-- Row 2: Domains / Workers / Zero Trust -->
+<div class="grid grid-cols-3 gap-4 mb-4">
   <!-- Domains -->
-  <div class="card">
-    <div class="card__header">
+  <div
+    class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden flex flex-col"
+  >
+    <div
+      class="flex items-center gap-2 h-10 px-4 bg-surface-02 border-b border-border-subtle shrink-0"
+    >
       <svg
-        class="card__header-icon"
+        class="text-icon-secondary w-4 h-4"
         xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -327,9 +287,12 @@
           d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
         />
       </svg>
-      <span class="card__header-title">Domains</span>
-      <div class="card__header-actions">
-        <button class="icon-btn" type="button" aria-label="Favourite">
+      <span class="text-[13px] font-medium text-text-secondary">Domains</span>
+      <div class="ml-auto flex items-center gap-0.5">
+        <button
+          class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-icon-secondary hover:bg-surface-active transition-colors"
+          type="button"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="14"
@@ -346,7 +309,10 @@
             />
           </svg>
         </button>
-        <button class="icon-btn" type="button" aria-label="Add domain">
+        <button
+          class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-icon-secondary hover:bg-surface-active transition-colors"
+          type="button"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="14"
@@ -364,84 +330,31 @@
         </button>
       </div>
     </div>
-    <div class="card__body" style="flex-direction: column">
-      <div class="list-card__row">
+    <div class="flex flex-col flex-1">
+      <div
+        class="group flex items-center gap-3 px-4 py-3 min-h-11 border-b border-surface-02 hover:bg-surface-02 transition-colors"
+      >
         <svg
-          class="list-card__row-icon"
+          class="w-4 h-4 shrink-0 text-status-green"
           xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
           stroke-width="2"
           stroke-linecap="round"
           stroke-linejoin="round"
-          style="color: var(--cf-status-green)"
         >
           <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
           <polyline points="22 4 12 14.01 9 11.01" />
         </svg>
-        <span class="list-card__row-name">yourdomain.com</span>
-        <div class="list-card__row-actions">
-          <button class="icon-btn" type="button" aria-label="Options">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="12" cy="12" r="1" />
-              <circle cx="19" cy="12" r="1" />
-              <circle cx="5" cy="12" r="1" />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Workers and Pages -->
-  <div class="card">
-    <div class="card__header">
-      <svg
-        class="card__header-icon"
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2" />
-      </svg>
-      <span class="card__header-title">Workers and Pages</span>
-      <div class="card__header-actions">
-        <button class="icon-btn" type="button" aria-label="Add worker">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M5 12h14" />
-            <path d="M12 5v14" />
-          </svg>
-        </button>
-        <button class="icon-btn" type="button" aria-label="More options">
+        <span
+          class="text-[13px] text-text-primary flex-1 overflow-hidden text-ellipsis whitespace-nowrap"
+          >yourdomain.com</span
+        >
+        <button
+          class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-icon-secondary hover:bg-surface-active transition-colors opacity-0 group-hover:opacity-100"
+          type="button"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="14"
@@ -460,55 +373,18 @@
         </button>
       </div>
     </div>
-    <div class="card__body" style="flex-direction: column">
-      <div class="list-card__row">
-        <svg
-          class="list-card__row-icon"
-          xmlns="http://www.w3.org/2000/svg"
-          width="16"
-          height="16"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2" />
-        </svg>
-        <span class="list-card__row-name">my-worker</span>
-        <span class="list-card__row-meta">3 days ago</span>
-        <div class="list-card__row-actions">
-          <button class="icon-btn" type="button" aria-label="Options">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <circle cx="12" cy="12" r="1" />
-              <circle cx="19" cy="12" r="1" />
-              <circle cx="5" cy="12" r="1" />
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 
-  <!-- Zero Trust Security -->
-  <div class="card">
-    <div class="card__header">
+  <!-- Workers and Pages -->
+  <div
+    class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden flex flex-col"
+  >
+    <div
+      class="flex items-center gap-2 h-10 px-4 bg-surface-02 border-b border-border-subtle shrink-0"
+    >
       <svg
-        class="card__header-icon"
+        class="text-icon-secondary w-4 h-4"
         xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -516,12 +392,16 @@
         stroke-linecap="round"
         stroke-linejoin="round"
       >
-        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
-        <path d="m9 12 2 2 4-4" />
+        <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2" />
       </svg>
-      <span class="card__header-title">Zero trust security</span>
-      <div class="card__header-actions">
-        <button class="icon-btn" type="button" aria-label="Add">
+      <span class="text-[13px] font-medium text-text-secondary"
+        >Workers and Pages</span
+      >
+      <div class="ml-auto flex items-center gap-0.5">
+        <button
+          class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-icon-secondary hover:bg-surface-active transition-colors"
+          type="button"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="14"
@@ -537,51 +417,172 @@
             <path d="M12 5v14" />
           </svg>
         </button>
-      </div>
-    </div>
-    <div class="card__body">
-      <!-- Onboarding / empty state -->
-      <div class="empty-state">
-        <div class="empty-state__illustration">
+        <button
+          class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-icon-secondary hover:bg-surface-active transition-colors"
+          type="button"
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            width="32"
-            height="32"
+            width="14"
+            height="14"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
-            stroke-width="1.5"
+            stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
           >
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            <circle cx="12" cy="12" r="1" />
+            <circle cx="19" cy="12" r="1" />
+            <circle cx="5" cy="12" r="1" />
           </svg>
-        </div>
-        <p class="empty-state__title">
-          Onboard private apps, networks, and users
-        </p>
-        <p class="empty-state__desc">
-          Protect internal users/devices and the private resources they access
-        </p>
-        <button class="btn btn--secondary" type="button">Get started</button>
+        </button>
       </div>
+    </div>
+    <div class="flex flex-col flex-1">
+      <div
+        class="group flex items-center gap-3 px-4 py-3 min-h-11 border-b border-surface-02 hover:bg-surface-02 transition-colors"
+      >
+        <svg
+          class="w-4 h-4 shrink-0 text-icon-secondary"
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5 12 2" />
+        </svg>
+        <span class="text-[13px] text-text-primary flex-1">my-worker</span>
+        <span class="text-xs text-text-helper">3 days ago</span>
+        <button
+          class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-icon-secondary hover:bg-surface-active transition-colors opacity-0 group-hover:opacity-100"
+          type="button"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <circle cx="12" cy="12" r="1" />
+            <circle cx="19" cy="12" r="1" />
+            <circle cx="5" cy="12" r="1" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zero Trust -->
+  <div
+    class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden flex flex-col"
+  >
+    <div
+      class="flex items-center gap-2 h-10 px-4 bg-surface-02 border-b border-border-subtle shrink-0"
+    >
+      <svg
+        class="text-icon-secondary w-4 h-4"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      >
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <path d="m9 12 2 2 4-4" />
+      </svg>
+      <span class="text-[13px] font-medium text-text-secondary"
+        >Zero trust security</span
+      >
+      <button
+        class="ml-auto flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-icon-secondary hover:bg-surface-active transition-colors"
+        type="button"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M5 12h14" />
+          <path d="M12 5v14" />
+        </svg>
+      </button>
+    </div>
+    <!-- Empty / onboarding state -->
+    <div
+      class="flex flex-col items-center justify-center text-center flex-1 px-6 py-8 gap-3"
+    >
+      <div
+        class="w-16 h-16 rounded-card bg-surface-02 flex items-center justify-center text-icon-muted mb-1"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="28"
+          height="28"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        </svg>
+      </div>
+      <p class="text-[13px] font-semibold text-text-primary">
+        Onboard private apps, networks, and users
+      </p>
+      <p class="text-xs text-text-helper max-w-[220px] leading-relaxed">
+        Protect internal users/devices and the private resources they access
+      </p>
+      <button
+        class="px-3 h-8 border border-border-subtle rounded-sm bg-surface-01 text-[13px] text-text-primary hover:bg-surface-hover transition-colors mt-1"
+        type="button"
+      >
+        Get started
+      </button>
     </div>
   </div>
 </div>
 
-<!-- ── Row 3: Next Steps ───────────────────────────────────────────────── -->
-<div style="max-width: calc(33.333% - var(--card-gap) * 2 / 3)">
-  <div class="card">
-    <div class="card__header">
-      <span class="card__header-title">Next steps</span>
+<!-- Row 3: Next steps (left-column width) -->
+<div class="w-[calc(33.333%-11px)]">
+  <div
+    class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden"
+  >
+    <div
+      class="flex items-center h-10 px-4 bg-surface-02 border-b border-border-subtle"
+    >
+      <span class="text-[13px] font-medium text-text-secondary"
+        >Next steps</span
+      >
     </div>
-    <div class="card__body" style="flex-direction: column">
-      <a href="#" class="next-steps__row">
-        <span class="next-steps__row-text"
+    <div class="flex flex-col">
+      <a
+        href="#"
+        class="group flex items-center justify-between gap-3 px-4 py-4 border-b border-surface-02 hover:bg-surface-02 transition-colors"
+      >
+        <span class="text-[13px] text-text-primary"
           >Enable single sign-on to improve login security</span
         >
         <svg
-          class="next-steps__row-arrow"
+          class="text-icon-muted shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:text-icon-secondary"
           xmlns="http://www.w3.org/2000/svg"
           width="16"
           height="16"
@@ -596,12 +597,15 @@
           <path d="m12 5 7 7-7 7" />
         </svg>
       </a>
-      <a href="#" class="next-steps__row">
-        <span class="next-steps__row-text"
+      <a
+        href="#"
+        class="group flex items-center justify-between gap-3 px-4 py-4 hover:bg-surface-02 transition-colors"
+      >
+        <span class="text-[13px] text-text-primary"
           >Get alerts for billing, attacks, and more</span
         >
         <svg
-          class="next-steps__row-arrow"
+          class="text-icon-muted shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:text-icon-secondary"
           xmlns="http://www.w3.org/2000/svg"
           width="16"
           height="16"
