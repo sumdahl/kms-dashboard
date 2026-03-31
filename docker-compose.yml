@@ -1,17 +1,17 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: cloudfare_db
+    container_name: kms-db
     environment:
-      POSTGRES_USER: cloudfare_user
-      POSTGRES_PASSWORD: cloudfare_password
-      POSTGRES_DB: cloudfare_db
+      POSTGRES_USER: kms_user
+      POSTGRES_PASSWORD: admin@123
+      POSTGRES_DB: kms_db
     ports:
       - "5432:5432"
     volumes:
       - finpos_db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U cloudfare_user -d cloudfare_db"]
+      test: ["CMD-SHELL", "pg_isready -U kms_user -d kms_db"]
       interval: 10s
       timeout: 5s
       retries: 5
