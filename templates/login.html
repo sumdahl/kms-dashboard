@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - KMS Dashboard</title>
+    <link rel="stylesheet" href="/static/css/output.css">
+    <script src="/static/js/htmx.min.js" defer></script>
+    <script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js" defer></script>
+</head>
+<body class="bg-bg-page flex items-center justify-center min-h-screen px-4">
+
+    <div class="w-full max-w-md">
+
+        <div class="flex items-center justify-center gap-2 mb-6">
+            <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+            <span class="text-[11px] text-text-helper tracking-widest uppercase font-medium">KMS Dashboard</span>
+        </div>
+
+        <div class="bg-surface-01 border border-border-subtle rounded-card shadow-sm overflow-hidden">
+
+            <div class="h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent"></div>
+
+            <div class="p-8">
+
+                <div class="flex flex-col items-center mb-8">
+                    <div class="w-11 h-11 bg-surface-02 border border-border-subtle rounded-md flex items-center justify-center mb-5">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-icon-secondary">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                    <h1 class="text-xl font-semibold text-text-primary tracking-tight">Welcome back</h1>
+                    <p class="text-[13px] text-text-helper mt-1.5">Log in to manage your keys and roles</p>
+                </div>
+
+                <form id="login-form" hx-post="/auth/login" hx-ext="json-enc" hx-swap="none" class="space-y-4">
+
+                    <!-- Email -->
+                    <div>
+                        <label for="email" class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase">Email address</label>
+                        <input type="email" name="email" id="email" autocomplete="email" placeholder="you@example.com"
+                            class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors">
+                        <p id="email-error" class="hidden mt-1.5 text-[11px] text-red-500 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            <span id="email-error-text"></span>
+                        </p>
+                    </div>
+
+                    <!-- Password -->
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label for="password" class="block text-[11px] font-medium text-text-secondary tracking-wider uppercase">Password</label>
+                            <a href="#" class="text-[11px] text-text-helper hover:text-text-secondary transition-colors">Forgot password?</a>
+                        </div>
+                        <div class="relative">
+                            <input type="password" name="password" id="password" autocomplete="current-password" placeholder="••••••••"
+                                class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors pr-10">
+                            <button type="button" id="toggle-password"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-icon-secondary hover:text-text-primary transition-colors focus:outline-none">
+                                <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                        <p id="password-error" class="hidden mt-1.5 text-[11px] text-red-500 flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            <span id="password-error-text"></span>
+                        </p>
+                    </div>
+
+                    <!-- Global error -->
+                    <p id="login-error" class="hidden text-[11px] text-red-500 text-center bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2"></p>
+
+                    <button type="submit" id="submit-btn"
+                        class="w-full h-9 bg-btn-primary text-white text-[13px] font-medium rounded-sm hover:bg-btn-primary-hover transition-colors mt-1">
+                        Sign in
+                    </button>
+
+                </form>
+
+                <div class="mt-6 text-center">
+                    <p class="text-[13px] text-text-helper">
+                        Don't have an account? 
+                        <a href="/signup" class="text-link-primary hover:underline font-medium">Sign up</a>
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="px-8 py-4 bg-surface-02 border-t border-border-subtle flex items-center justify-center gap-1.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-text-helper">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+                <span class="text-[11px] text-text-helper tracking-wide">End-to-end encrypted</span>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const emailInput  = document.getElementById('email');
+        const pwInput     = document.getElementById('password');
+        const emailErr    = document.getElementById('email-error');
+        const emailErrTxt = document.getElementById('email-error-text');
+        const pwErr       = document.getElementById('password-error');
+        const pwErrTxt    = document.getElementById('password-error-text');
+        const globalErr   = document.getElementById('login-error');
+        const submitBtn   = document.getElementById('submit-btn');
+
+        // ── Border state helpers ──
+        const BASE   = ['border-border-subtle'];
+        const RED    = ['border-red-500'];
+        const GREEN  = ['border-green-500'];
+
+        function setBorder(input, state) {
+            input.classList.remove(...BASE, ...RED, ...GREEN);
+            if (state === 'error')   input.classList.add(...RED);
+            else if (state === 'ok') input.classList.add(...GREEN);
+            else                     input.classList.add(...BASE);
+        }
+
+        function showErr(errEl, txtEl, msg) {
+            txtEl.textContent = msg;
+            errEl.classList.remove('hidden');
+        }
+        function clearErr(errEl, txtEl) {
+            txtEl.textContent = '';
+            errEl.classList.add('hidden');
+        }
+
+        // ── Rules ──
+        function checkEmail(val) {
+            if (!val) return 'Email is required.';
+            if (!val.includes('@')) return 'Email must contain @.';
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return 'Enter a valid email address.';
+            return '';
+        }
+        function checkPassword(val) {
+            if (!val) return 'Password is required.';
+            if (val.length < 6) return `Password must be at least 6 characters (${val.length}/6).`;
+            return '';
+        }
+
+        // ── Real-time validation on every keystroke ──
+        emailInput.addEventListener('input', () => {
+            const val = emailInput.value;
+            if (!val) { setBorder(emailInput, 'default'); clearErr(emailErr, emailErrTxt); return; }
+            const err = checkEmail(val);
+            if (err) { setBorder(emailInput, 'error');   showErr(emailErr, emailErrTxt, err); }
+            else     { setBorder(emailInput, 'ok');      clearErr(emailErr, emailErrTxt); }
+        });
+
+        pwInput.addEventListener('input', () => {
+            const val = pwInput.value;
+            if (!val) { setBorder(pwInput, 'default'); clearErr(pwErr, pwErrTxt); return; }
+            const err = checkPassword(val);
+            if (err) { setBorder(pwInput, 'error');   showErr(pwErr, pwErrTxt, err); }
+            else     { setBorder(pwInput, 'ok');      clearErr(pwErr, pwErrTxt); }
+        });
+
+        // Also fire on blur (tab through without typing)
+        emailInput.addEventListener('blur', () => {
+            if (!emailInput.value) return;
+            const err = checkEmail(emailInput.value);
+            if (err) { setBorder(emailInput, 'error');   showErr(emailErr, emailErrTxt, err); }
+            else     { setBorder(emailInput, 'ok');      clearErr(emailErr, emailErrTxt); }
+        });
+        pwInput.addEventListener('blur', () => {
+            if (!pwInput.value) return;
+            const err = checkPassword(pwInput.value);
+            if (err) { setBorder(pwInput, 'error');   showErr(pwErr, pwErrTxt, err); }
+            else     { setBorder(pwInput, 'ok');      clearErr(pwErr, pwErrTxt); }
+        });
+
+        // ── Password toggle ──
+        const eyeIcon = document.getElementById('eye-icon');
+        let pwVisible = false;
+        document.getElementById('toggle-password').addEventListener('click', () => {
+            pwVisible = !pwVisible;
+            pwInput.type = pwVisible ? 'text' : 'password';
+            eyeIcon.innerHTML = pwVisible
+                ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`
+                : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+        });
+
+        // ── Block submit if invalid ──
+        document.getElementById('login-form').addEventListener('htmx:beforeRequest', (evt) => {
+            globalErr.classList.add('hidden');
+            const eErr = checkEmail(emailInput.value);
+            const pErr = checkPassword(pwInput.value);
+
+            if (eErr) { setBorder(emailInput, 'error'); showErr(emailErr, emailErrTxt, eErr); }
+            if (pErr) { setBorder(pwInput, 'error');    showErr(pwErr, pwErrTxt, pErr); }
+
+            if (eErr || pErr) { evt.preventDefault(); return; }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing in…';
+        });
+
+        // ── Handle response ──
+        document.body.addEventListener('htmx:afterRequest', (evt) => {
+            if (evt.detail.elt.id !== 'login-form') return;
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign in';
+
+            const xhr = evt.detail.xhr;
+            try {
+                const res = JSON.parse(xhr.responseText);
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    if (res.token) {
+                        localStorage.setItem('kms_token', res.token);
+                        window.location.href = '/';
+                    }
+                } else {
+                    const msg = res.error || res.message || res.detail
+                        || (xhr.status === 401 ? 'Incorrect email or password.'
+                          : xhr.status === 422 ? 'Invalid email or password format.'
+                          : xhr.status === 429 ? 'Too many attempts. Try again later.'
+                          : 'Login failed. Please try again.');
+                    globalErr.textContent = msg;
+                    globalErr.classList.remove('hidden');
+                }
+            } catch {
+                globalErr.textContent = xhr.status === 0 ? 'Connection error. Check your network.' : 'Unexpected error.';
+                globalErr.classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

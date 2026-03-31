@@ -15,6 +15,8 @@ pub fn create_router(state: AppState) -> Router {
     Router::new()
         // Web / UI Routes
         .route("/", get(home))
+        .route("/login", get(login_page))
+        .route("/signup", get(signup_page))
         .route("/ui/sidebar/pin", post(sidebar_pin))
         .route("/ui/banner", delete(banner_dismiss))
         
@@ -27,6 +29,22 @@ pub fn create_router(state: AppState) -> Router {
 }
 
 // ── Web Handlers ──
+
+#[derive(askama::Template)]
+#[template(path = "login.html")]
+struct LoginTemplate {}
+
+async fn login_page() -> impl axum::response::IntoResponse {
+    LoginTemplate {}
+}
+
+#[derive(askama::Template)]
+#[template(path = "signup.html")]
+struct SignupTemplate {}
+
+async fn signup_page() -> impl axum::response::IntoResponse {
+    SignupTemplate {}
+}
 
 #[derive(askama::Template)]
 #[template(path = "dashboard/home.html")]
