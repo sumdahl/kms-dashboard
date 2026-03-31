@@ -16,8 +16,9 @@ use tower_http::services::ServeDir;
 use tower_livereload::LiveReloadLayer;
 
 use crate::db::{init_db, run_migrations, seed_admin};
-use crate::handlers::admin::create_role;
+use crate::handlers::admin::{create_role, list_roles, assign_role};
 use crate::handlers::auth::{login, signup};
+use crate::handlers::dashboard::inventory_status;
 
 #[derive(askama::Template)]
 #[template(path = "dashboard/home.html")]
@@ -64,7 +65,9 @@ async fn main() {
         .route("/", get(home))
         .route("/auth/login", post(login))
         .route("/auth/signup", post(signup))
-        .route("/admin/roles", post(create_role))
+        .route("/admin/roles", get(list_roles).post(create_role))
+        .route("/admin/assign", post(assign_role))
+        .route("/api/inventory", get(inventory_status))
         .route("/ui/sidebar/pin", post(sidebar_pin))
         .route("/ui/banner", delete(banner_dismiss))
         .nest_service("/static", ServeDir::new("static"))
