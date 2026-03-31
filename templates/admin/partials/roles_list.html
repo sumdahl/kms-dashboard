@@ -1,0 +1,37 @@
+{% if roles.is_empty() %}
+<div class="p-4 text-sm text-text-helper">No roles created yet.</div>
+{% else %}
+<div class="flex flex-col">
+  {% for role in roles %}
+  <div class="group flex flex-col border-b border-surface-02 last:border-b-0">
+    <div class="flex items-center gap-3 px-4 py-3 hover:bg-surface-02 transition-colors">
+      <div class="flex-1 min-w-0">
+        <span class="text-[13px] font-medium text-text-primary">{{ role.name }}</span>
+        <p class="text-xs text-text-helper truncate">{{ role.description }}</p>
+      </div>
+      {% if !role.permissions.is_empty() %}
+      <div class="flex flex-wrap gap-1">
+        {% for perm in role.permissions %}
+        <span class="px-1.5 py-0.5 rounded-sm text-[10px] font-medium bg-surface-02 text-text-secondary border border-border-subtle">
+          {{ perm.resource|capitalize }}:{{ perm.access|capitalize }}
+        </span>
+        {% endfor %}
+      </div>
+      {% endif %}
+      <button
+        hx-delete="/admin/roles/{{ role.role_id }}"
+        hx-target="#roles-list"
+        hx-swap="innerHTML"
+        hx-confirm="Delete role '{{ role.name }}'?"
+        class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-status-red hover:bg-surface-hover transition-colors opacity-0 group-hover:opacity-100"
+        type="button"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+        </svg>
+      </button>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}

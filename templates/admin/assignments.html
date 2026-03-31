@@ -1,0 +1,74 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Role Assignments{% endblock %}
+
+{% block admin_content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Assign role form -->
+  <div class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden">
+    <div class="flex items-center h-10 px-4 bg-surface-02 border-b border-border-subtle">
+      <span class="text-[13px] font-medium text-text-secondary">Assign Role</span>
+    </div>
+    <div class="p-4">
+      <div id="assign-role-error"></div>
+      <form hx-post="/admin/assignments/assign" hx-encoding="json" hx-target="#assignments-list" hx-swap="innerHTML" class="flex flex-col gap-4">
+        <div class="flex flex-col gap-1.5">
+          <label for="assign-email" class="text-xs font-medium text-text-secondary">User email</label>
+          <input
+            id="assign-email"
+            name="email"
+            type="email"
+            required
+            placeholder="user@example.com"
+            class="h-9 px-3 rounded-sm border border-border-subtle bg-surface-02 text-sm text-text-primary placeholder:text-text-helper focus:outline-none focus:ring-2 focus:ring-btn-primary focus:border-transparent transition-colors"
+          />
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="assign-role" class="text-xs font-medium text-text-secondary">Role</label>
+          <select
+            id="assign-role"
+            name="role_name"
+            required
+            class="h-9 px-3 rounded-sm border border-border-subtle bg-surface-02 text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-btn-primary"
+          >
+            <option value="">Select a role</option>
+            {% for role in roles %}
+            <option value="{{ role.name }}">{{ role.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <label for="assign-duration" class="text-xs font-medium text-text-secondary">Duration (hours, optional)</label>
+          <input
+            id="assign-duration"
+            name="duration_hours"
+            type="number"
+            min="1"
+            placeholder="Leave empty for no expiry"
+            class="h-9 px-3 rounded-sm border border-border-subtle bg-surface-02 text-sm text-text-primary placeholder:text-text-helper focus:outline-none focus:ring-2 focus:ring-btn-primary focus:border-transparent transition-colors"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="h-9 mt-1 rounded-sm bg-btn-primary text-white text-sm font-medium hover:bg-btn-primary-hover transition-colors disabled:opacity-50"
+        >
+          Assign role
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Assignments list -->
+  <div class="lg:col-span-2 bg-surface-01 border border-border-subtle rounded-card overflow-hidden">
+    <div class="flex items-center h-10 px-4 bg-surface-02 border-b border-border-subtle">
+      <span class="text-[13px] font-medium text-text-secondary">Current Assignments</span>
+    </div>
+    <div id="assignments-list" hx-get="/admin/assignments/list" hx-trigger="load" hx-swap="innerHTML">
+      <div class="p-4 text-sm text-text-helper">Loading assignments...</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

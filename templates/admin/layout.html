@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block head_scripts %}{% endblock %}
+
+{% block content %}
+<!-- Admin tab bar -->
+<div class="mb-6">
+  <div class="flex items-center gap-1 border-b border-border-subtle">
+    <a
+      href="/admin/roles"
+      class="px-4 py-2.5 text-sm font-medium border-b-2 {% if active_tab == "roles" %}border-btn-primary text-btn-primary{% else %}border-transparent text-text-secondary hover:text-text-primary hover:border-border-strong{% endif %} transition-colors"
+    >
+      Roles & Permissions
+    </a>
+    <a
+      href="/admin/assignments"
+      class="px-4 py-2.5 text-sm font-medium border-b-2 {% if active_tab == "assignments" %}border-btn-primary text-btn-primary{% else %}border-transparent text-text-secondary hover:text-text-primary hover:border-border-strong{% endif %} transition-colors"
+    >
+      Role Assignments
+    </a>
+  </div>
+</div>
+
+{% block admin_content %}{% endblock %}
+{% endblock %}

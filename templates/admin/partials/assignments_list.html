@@ -1,0 +1,53 @@
+{% if assignments.is_empty() %}
+<div class="p-4 text-sm text-text-helper">No role assignments found.</div>
+{% else %}
+<div class="overflow-x-auto">
+  <table class="w-full text-left">
+    <thead>
+      <tr class="border-b border-border-subtle">
+        <th class="px-4 py-2.5 text-xs font-medium text-text-secondary">User</th>
+        <th class="px-4 py-2.5 text-xs font-medium text-text-secondary">Role</th>
+        <th class="px-4 py-2.5 text-xs font-medium text-text-secondary">Assigned</th>
+        <th class="px-4 py-2.5 text-xs font-medium text-text-secondary">Expires</th>
+        <th class="px-4 py-2.5 text-xs font-medium text-text-secondary w-16"></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for a in assignments %}
+      <tr class="border-b border-surface-02 hover:bg-surface-02 transition-colors group">
+        <td class="px-4 py-3 text-[13px] text-text-primary">{{ a.user_email }}</td>
+        <td class="px-4 py-3">
+          <span class="px-1.5 py-0.5 rounded-sm text-[11px] font-medium bg-surface-02 text-text-secondary border border-border-subtle">
+            {{ a.role_name }}
+          </span>
+        </td>
+        <td class="px-4 py-3 text-xs text-text-helper">{{ a.assigned_at }}</td>
+        <td class="px-4 py-3 text-xs">
+          {% if a.is_expired %}
+          <span class="text-status-red">Expired</span>
+          {% elif a.expires_at.is_some() %}
+          <span class="text-text-helper">{{ a.expires_at.as_ref().unwrap() }}</span>
+          {% else %}
+          <span class="text-text-helper">Never</span>
+          {% endif %}
+        </td>
+        <td class="px-4 py-3">
+          <button
+            hx-delete="/admin/assignments/{{ a.assignment_id }}"
+            hx-target="#assignments-list"
+            hx-swap="innerHTML"
+            hx-confirm="Revoke this role assignment?"
+            class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-status-red hover:bg-surface-hover transition-colors opacity-0 group-hover:opacity-100"
+            type="button"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+            </svg>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}

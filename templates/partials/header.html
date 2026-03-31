@@ -97,13 +97,12 @@
     </button>
 
     <!-- Avatar -->
-    <div
-      class="w-7 h-7 rounded-full bg-surface-active border border-border-subtle flex items-center justify-center text-[11px] font-semibold text-text-secondary cursor-pointer select-none"
-      role="button"
-      tabindex="0"
-      aria-label="Account menu"
+    <a
+      href="/auth/logout"
+      class="w-7 h-7 rounded-full bg-surface-active border border-border-subtle flex items-center justify-center text-[11px] font-semibold text-text-secondary cursor-pointer select-none hover:border-border-strong transition-colors"
+      title="Sign out"
     >
       {{ user_email|truncate(1) }}
-    </div>
+    </a>
   </div>
 </header>

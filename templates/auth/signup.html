@@ -1,0 +1,80 @@
+{% extends "auth/layout.html" %}
+{% block title %}Create Account{% endblock %}
+
+{% block content %}
+<div class="w-full max-w-sm">
+  <div class="bg-surface-01 border border-border-subtle rounded-card p-8">
+    <h1 class="text-xl font-semibold text-text-primary text-center mb-1">
+      Create account
+    </h1>
+    <p class="text-sm text-text-helper text-center mb-6">
+      Fill in your details to get started
+    </p>
+
+    <div id="signup-error"></div>
+
+    <form hx-post="/auth/signup" hx-encoding="json" hx-target="#signup-error" hx-swap="innerHTML" class="flex flex-col gap-4">
+      <div class="flex flex-col gap-1.5">
+        <label for="full_name" class="text-xs font-medium text-text-secondary"
+          >Full name</label
+        >
+        <input
+          id="full_name"
+          name="full_name"
+          type="text"
+          required
+          autocomplete="name"
+          placeholder="Jane Doe"
+          class="h-9 px-3 rounded-sm border border-border-subtle bg-surface-02 text-sm text-text-primary placeholder:text-text-helper focus:outline-none focus:ring-2 focus:ring-btn-primary focus:border-transparent transition-colors"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="email" class="text-xs font-medium text-text-secondary"
+          >Email</label
+        >
+        <input
+          id="email"
+          name="email"
+          type="email"
+          required
+          autocomplete="email"
+          placeholder="you@example.com"
+          class="h-9 px-3 rounded-sm border border-border-subtle bg-surface-02 text-sm text-text-primary placeholder:text-text-helper focus:outline-none focus:ring-2 focus:ring-btn-primary focus:border-transparent transition-colors"
+        />
+      </div>
+
+      <div class="flex flex-col gap-1.5">
+        <label for="password" class="text-xs font-medium text-text-secondary"
+          >Password</label
+        >
+        <input
+          id="password"
+          name="password"
+          type="password"
+          required
+          autocomplete="new-password"
+          placeholder="Create a password"
+          class="h-9 px-3 rounded-sm border border-border-subtle bg-surface-02 text-sm text-text-primary placeholder:text-text-helper focus:outline-none focus:ring-2 focus:ring-btn-primary focus:border-transparent transition-colors"
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="h-9 mt-1 rounded-sm bg-btn-primary text-white text-sm font-medium hover:bg-btn-primary-hover transition-colors disabled:opacity-50"
+      >
+        Create account
+      </button>
+    </form>
+
+    <p class="text-xs text-text-helper text-center mt-6">
+      Already have an account?
+      <a
+        href="/auth/login"
+        class="text-btn-primary hover:underline"
+        >Sign in</a
+      >
+    </p>
+  </div>
+</div>
+{% endblock %}

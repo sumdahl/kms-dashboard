@@ -6,7 +6,7 @@ mod handlers;
 mod middleware;
 
 use axum::{
-    extract::Form,
+    extract::Json,
     response::Html,
     routing::{delete, get, post},
     Router,
@@ -16,35 +16,21 @@ use tower_http::services::ServeDir;
 use tower_livereload::LiveReloadLayer;
 
 use crate::db::{init_db, run_migrations, seed_admin};
-use crate::handlers::admin::{create_role, list_roles, assign_role};
-use crate::handlers::auth::{login, signup};
-use crate::handlers::dashboard::inventory_status;
-
-#[derive(askama::Template)]
-#[template(path = "dashboard/home.html")]
-struct HomeTemplate {
-    sidebar_pinned: bool,
-    user_email: String,
-    show_banner: bool,
-    css_version: &'static str, // <-- Add this
-}
-
-async fn home() -> impl axum::response::IntoResponse {
-    HomeTemplate {
-        sidebar_pinned: false,
-        user_email: "admin@example.com".to_string(),
-        show_banner: true,
-        // env!() pulls the value set in build.rs at compile time
-        css_version: env!("CSS_VERSION"),
-    }
-}
+use crate::handlers::admin::{
+    list_roles, create_role, assign_role,
+    roles_page, assignments_page,
+    roles_list, create_role_htmx, delete_role,
+    assignments_list, assign_role_htmx, revoke_assignment,
+};
+use crate::handlers::auth::{login, signup, login_page, signup_page, logout};
+use crate::handlers::dashboard::{dashboard_page, inventory_status};
 
 #[derive(Deserialize)]
 struct SidebarPinForm {
     pinned: String,
 }
 
-async fn sidebar_pin(Form(_form): Form<SidebarPinForm>) -> Html<&'static str> {
+async fn sidebar_pin(Json(_body): Json<SidebarPinForm>) -> Html<&'static str> {
     Html("")
 }
 
@@ -65,18 +51,36 @@ async fn main() {
 
     // 3. Build Router
     let app = Router::new()
-        .route("/", get(home))
-        .route("/auth/login", post(login))
-        .route("/auth/signup", post(signup))
-        .route("/admin/roles", get(list_roles).post(create_role))
-        .route("/admin/assign", post(assign_role))
+        // Page routes
+        .route("/", get(dashboard_page))
+        .route("/auth/login", get(login_page).post(login))
+        .route("/auth/signup", get(signup_page).post(signup))
+        .route("/auth/logout", get(logout).post(logout))
+
+        // Admin page routes
+        .route("/admin/roles", get(roles_page))
+        .route("/admin/assignments", get(assignments_page))
+
+        // Admin HTMX partial routes
+        .route("/admin/roles/list", get(roles_list))
+        .route("/admin/roles/create", post(create_role_htmx))
+        .route("/admin/roles/{role_id}", delete(delete_role))
+        .route("/admin/assignments/list", get(assignments_list))
+        .route("/admin/assignments/assign", post(assign_role_htmx))
+        .route("/admin/assignments/{assignment_id}", delete(revoke_assignment))
+
+        // API routes (JSON, unchanged)
         .route("/api/inventory", get(inventory_status))
+        .route("/api/admin/roles", get(list_roles).post(create_role))
+        .route("/api/admin/assign", post(assign_role))
+
+        // UI interaction routes
         .route("/ui/sidebar/pin", post(sidebar_pin))
         .route("/ui/banner", delete(banner_dismiss))
         .nest_service("/static", ServeDir::new("static"))
         .nest_service("/nm", ServeDir::new("node_modules"))
         .layer(LiveReloadLayer::new())
-        .with_state(pool); // Share DB pool with handlers
+        .with_state(pool);
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
         .await

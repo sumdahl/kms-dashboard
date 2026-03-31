@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Auth{% endblock %}</title>
+    <script>
+      (function () {
+        try {
+          const theme = localStorage.getItem("theme");
+          const systemDark = window.matchMedia(
+            "(prefers-color-scheme: dark)",
+          ).matches;
+
+          if (theme === "dark" || (!theme && systemDark)) {
+            document.documentElement.classList.add("dark");
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="stylesheet" href="/static/css/output.css?v={{ css_version }}" />
+    <script src="/static/js/htmx.min.js" defer></script>
+  </head>
+  <body
+    class="min-h-screen flex items-center justify-center bg-bg-page px-4"
+  >
+    {% block content %}{% endblock %}
+    {% block body_scripts %}{% endblock %}
+  </body>
+</html>
