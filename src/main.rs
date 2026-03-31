@@ -27,6 +27,7 @@ struct HomeTemplate {
     user_email: String,
     show_banner: bool,
     css_version: &'static str, // <-- Add this
+    is_admin: bool,
 }
 
 async fn home() -> impl axum::response::IntoResponse {
@@ -36,6 +37,7 @@ async fn home() -> impl axum::response::IntoResponse {
         show_banner: true,
         // env!() pulls the value set in build.rs at compile time
         css_version: env!("CSS_VERSION"),
+        is_admin: true,
     }
 }
 
