@@ -300,6 +300,9 @@
   .inline-flex {
     display: inline-flex;
   }
+  .table {
+    display: table;
+  }
   .h-1\.5 {
     height: calc(var(--spacing) * 1.5);
   }
@@ -708,6 +711,9 @@
   }
   .text-white {
     color: var(--color-white);
+  }
+  .lowercase {
+    text-transform: lowercase;
   }
   .opacity-0 {
     opacity: 0%;

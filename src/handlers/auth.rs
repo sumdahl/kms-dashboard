@@ -22,7 +22,7 @@ pub struct AuthResponse {
 #[derive(Deserialize)]
 pub struct SignupRequest {
     pub email: String,
-    pub full_name: String, // Added this
+    pub full_name: String,
     pub password: String,
 }
 
@@ -73,7 +73,7 @@ pub async fn signup(
     )
     .bind(user_id)
     .bind(&payload.email)
-    .bind(&payload.full_name) // Bind name
+    .bind(&payload.full_name)
     .bind(hashed)
     .execute(&pool)
     .await?;
