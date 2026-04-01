@@ -4,6 +4,7 @@ use crate::auth::jwt::create_jwt;
 use crate::db::Db;
 use crate::error::{AppError, AppResult};
 use crate::models::{Claims, User};
+use axum::response::Response;
 use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use serde::{Deserialize, Serialize};
@@ -28,10 +29,17 @@ pub struct SignupRequest {
     pub password: String,
 }
 
+#[derive(Serialize)]
+pub struct SigninResponse {
+    pub token: String,
+    pub user_id: String,
+    pub message: String,
+}
+
 pub async fn login(
     State(pool): State<Db>,
     Json(payload): Json<LoginRequest>,
-) -> AppResult<impl IntoResponse> {
+) -> AppResult<Response> {
     let user = sqlx::query_as::<_, User>("SELECT * FROM users WHERE email = $1")
         .bind(&payload.email)
         .fetch_optional(&pool)
@@ -44,7 +52,7 @@ pub async fn login(
 
     let token = create_jwt(&user.user_id.to_string(), &user.email, user.is_admin)?;
 
-    let cookie = Cookie::build(("token", token))
+    let cookie = Cookie::build(("token", token.clone()))
         .http_only(true)
         .same_site(SameSite::Lax)
         .path("/")
@@ -52,9 +60,19 @@ pub async fn login(
 
     let jar = CookieJar::new().add(cookie);
 
-    Ok((jar, [("HX-Redirect", "/")]))
-}
+    let body = Json(SigninResponse {
+        token,
+        user_id: user.user_id.to_string(),
+        message: "Login successful".into(),
+    });
 
+    let mut res = (jar, body).into_response();
+
+    res.headers_mut()
+        .insert("HX-Redirect", "/".parse().unwrap());
+
+    Ok(res)
+}
 pub async fn signup(
     State(pool): State<Db>,
     Json(payload): Json<SignupRequest>,
