@@ -1,11 +1,32 @@
-use axum::{extract::State, Json};
-use serde::Deserialize;
+use axum::{extract::{State, Path}, Json};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 use crate::db::Db;
 use crate::error::{AppResult, AppError};
 use crate::models::{Role, RolePermission};
 use crate::models::types::{AccessLevel, Resource};
 use crate::middleware::auth::AdminClaims;
+
+#[derive(Debug, Serialize, sqlx::FromRow)]
+pub struct UserSummary {
+    pub user_id:   Uuid,
+    pub email:     String,
+    pub full_name: String,
+    pub is_admin:  bool,
+}
+
+pub async fn list_users(
+    _admin: AdminClaims,
+    State(pool): State<Db>,
+) -> AppResult<Json<Vec<UserSummary>>> {
+    let users = sqlx::query_as::<_, UserSummary>(
+        "SELECT user_id, email, full_name, is_admin FROM users ORDER BY created_at DESC"
+    )
+    .fetch_all(&pool)
+    .await?;
+
+    Ok(Json(users))
+}
 
 #[derive(Deserialize)]
 pub struct CreateRoleRequest {

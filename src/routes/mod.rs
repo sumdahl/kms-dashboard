@@ -17,14 +17,16 @@ pub fn create_router(state: AppState) -> Router {
         .route("/", get(home))
         .route("/login", get(login_page))
         .route("/signup", get(signup_page))
+        .route("/roles", get(roles_page))
+        .route("/assign", get(assign_page))
         .route("/ui/sidebar/pin", post(sidebar_pin))
         .route("/ui/banner", delete(banner_dismiss))
-        
+
         // API Routes
         .nest("/auth", auth::router())
         .nest("/admin", admin::router())
         .nest("/api", api::router())
-        
+
         .with_state(state)
 }
 
@@ -58,8 +60,44 @@ struct HomeTemplate {
 async fn home() -> impl axum::response::IntoResponse {
     HomeTemplate {
         sidebar_pinned: false,
-        user_email: "admin@example.com".to_string(),
+        user_email: String::new(),
         show_banner: true,
+        css_version: env!("CSS_VERSION"),
+    }
+}
+
+#[derive(askama::Template)]
+#[template(path = "dashboard/roles.html")]
+struct RolesTemplate {
+    sidebar_pinned: bool,
+    user_email: String,
+    show_banner: bool,
+    css_version: &'static str,
+}
+
+async fn roles_page() -> impl axum::response::IntoResponse {
+    RolesTemplate {
+        sidebar_pinned: false,
+        user_email: String::new(),
+        show_banner: false,
+        css_version: env!("CSS_VERSION"),
+    }
+}
+
+#[derive(askama::Template)]
+#[template(path = "dashboard/assign.html")]
+struct AssignTemplate {
+    sidebar_pinned: bool,
+    user_email: String,
+    show_banner: bool,
+    css_version: &'static str,
+}
+
+async fn assign_page() -> impl axum::response::IntoResponse {
+    AssignTemplate {
+        sidebar_pinned: false,
+        user_email: String::new(),
+        show_banner: false,
         css_version: env!("CSS_VERSION"),
     }
 }
