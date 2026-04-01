@@ -514,6 +514,9 @@
   .max-w-\[260px\] {
     max-width: 260px;
   }
+  .max-w-\[280px\] {
+    max-width: 280px;
+  }
   .max-w-lg {
     max-width: var(--container-lg);
   }

@@ -20,14 +20,12 @@
                     >KMS Dashboard</span
                 >
             </div>
-
             <div
                 class="bg-surface-01 border border-border-subtle rounded-card shadow-sm overflow-hidden"
             >
                 <div
                     class="h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent"
                 ></div>
-
                 <div class="p-8">
                     <div class="flex flex-col items-center mb-8">
                         <div
@@ -58,6 +56,12 @@
                         <p class="text-[13px] text-text-helper mt-1.5">
                             Log in to manage your keys and roles
                         </p>
+
+                        <!-- Global error (moved here, directly below the subtitle) -->
+                        <p
+                            id="login-error"
+                            class="hidden text-[11px] text-red-500 text-center bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2 mt-4 w-full max-w-[280px]"
+                        ></p>
                     </div>
 
                     <form
@@ -102,7 +106,6 @@
                                 <span id="email-error-text"></span>
                             </p>
                         </div>
-
                         <!-- Password -->
                         <div>
                             <div
@@ -173,12 +176,6 @@
                             </p>
                         </div>
 
-                        <!-- Global error -->
-                        <p
-                            id="login-error"
-                            class="hidden text-[11px] text-red-500 text-center bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2"
-                        ></p>
-
                         <button
                             type="submit"
                             id="submit-btn"
@@ -199,7 +196,6 @@
                         </p>
                     </div>
                 </div>
-
                 <div
                     class="px-8 py-4 bg-surface-02 border-t border-border-subtle flex items-center justify-center gap-1.5"
                 >
@@ -246,14 +242,12 @@
             const BASE = ["border-border-subtle"];
             const RED = ["border-red-500"];
             const GREEN = ["border-green-500"];
-
             function setBorder(input, state) {
                 input.classList.remove(...BASE, ...RED, ...GREEN);
                 if (state === "error") input.classList.add(...RED);
                 else if (state === "ok") input.classList.add(...GREEN);
                 else input.classList.add(...BASE);
             }
-
             function showErr(errEl, txtEl, msg) {
                 txtEl.textContent = msg;
                 errEl.classList.remove("hidden");
@@ -325,6 +319,7 @@
                     clearErr(emailErr, emailErrTxt);
                 }
             });
+
             pwInput.addEventListener("blur", () => {
                 if (!pwInput.value) return;
                 const err = checkPassword(pwInput.value);
@@ -357,7 +352,6 @@
                     globalErr.classList.add("hidden");
                     const eErr = checkEmail(emailInput.value);
                     const pErr = checkPassword(pwInput.value);
-
                     if (eErr) {
                         setBorder(emailInput, "error");
                         showErr(emailErr, emailErrTxt, eErr);
@@ -366,12 +360,10 @@
                         setBorder(pwInput, "error");
                         showErr(pwErr, pwErrTxt, pErr);
                     }
-
                     if (eErr || pErr) {
                         evt.preventDefault();
                         return;
                     }
-
                     submitBtn.disabled = true;
                     submitBtn.textContent = "Signing in…";
                 });
@@ -379,10 +371,8 @@
             // ── Handle response ──
             document.body.addEventListener("htmx:afterRequest", (evt) => {
                 if (evt.detail.elt.id !== "login-form") return;
-
                 submitBtn.disabled = false;
                 submitBtn.textContent = "Sign in";
-
                 const xhr = evt.detail.xhr;
 
                 // Success — HTMX handles the HX-Redirect, nothing to do
