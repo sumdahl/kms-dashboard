@@ -1,322 +1,487 @@
-{% extends "layout.html" %}
-{% block title %}Roles — KMS Dashboard{% endblock %}
-
+{% extends "layout.html" %} {% block title %}Roles — KMS Dashboard{% endblock %}
 {% block head_scripts %}
-<script>
-  // Inject Authorization header for all HTMX requests on this page
-  document.addEventListener('DOMContentLoaded', function () {
-    const token = localStorage.getItem('kms_token');
-    if (!token) { window.location.href = '/login'; return; }
-
-    // Decode JWT payload to check is_admin (no crypto needed — just base64)
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      if (!payload.is_admin) { window.location.href = '/'; return; }
-    } catch (e) { window.location.href = '/login'; return; }
-
-    // Set global HTMX headers for this page
-    document.body.setAttribute('hx-headers', JSON.stringify({ Authorization: 'Bearer ' + token }));
-
-    // Load roles table
-    htmx.trigger('#roles-table-body', 'load-roles');
-  });
-</script>
-{% endblock %}
-
-{% block content %}
-<!-- Page header -->
+<style>
+    /* Custom scrollbar for the scrollable permissions list */
+    #permissions-list::-webkit-scrollbar {
+        width: 4px;
+    }
+    #permissions-list::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    #permissions-list::-webkit-scrollbar-thumb {
+        background: var(--color-border-subtle);
+        border-radius: 2px;
+    }
+</style>
+{% endblock %} {% block content %}
 <div class="mb-6">
-  <p class="text-xs text-text-helper mb-1">Admin</p>
-  <div class="flex items-center justify-between gap-4">
-    <h1 class="text-2xl font-semibold text-text-primary leading-tight">Roles</h1>
-    <button
-      id="open-create-modal"
-      onclick="document.getElementById('create-role-modal').classList.remove('hidden')"
-      class="flex items-center gap-2 px-3 h-8 rounded-sm bg-btn-primary text-white text-[13px] font-medium hover:bg-btn-primary-hover transition-colors"
+    <p class="text-xs text-text-helper mb-1">Admin</p>
+    <div class="flex items-center justify-between gap-4">
+        <h1 class="text-2xl font-semibold text-text-primary leading-tight">
+            Roles
+        </h1>
+        <button
+            id="open-create-modal"
+            onclick="openCreateModal()"
+            class="flex items-center gap-2 px-3 h-8 rounded-sm bg-btn-primary text-white text-[13px] font-medium hover:bg-btn-primary-hover transition-colors"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path d="M5 12h14" />
+                <path d="M12 5v14" />
+            </svg>
+            New Role
+        </button>
+    </div>
+</div>
+
+<div
+    class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden"
+>
+    <div
+        class="flex items-center gap-2 h-10 px-4 bg-surface-02 border-b border-border-subtle shrink-0"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M5 12h14"/><path d="M12 5v14"/>
-      </svg>
-      New Role
-    </button>
-  </div>
-</div>
-
-<!-- Roles Table -->
-<div class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden">
-  <!-- Table header -->
-  <div class="flex items-center gap-2 h-10 px-4 bg-surface-02 border-b border-border-subtle shrink-0">
-    <svg class="text-icon-secondary w-4 h-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-    </svg>
-    <span class="text-[13px] font-medium text-text-secondary">All Roles</span>
-    <span id="roles-count" class="ml-auto text-xs text-text-helper"></span>
-  </div>
-
-  <!-- Column headings -->
-  <div class="grid grid-cols-[2fr_3fr_3fr_2fr_1fr] gap-0 border-b border-border-subtle bg-surface-02/50">
-    <div class="px-4 py-2 text-[11px] font-medium text-text-helper uppercase tracking-wider">Name</div>
-    <div class="px-4 py-2 text-[11px] font-medium text-text-helper uppercase tracking-wider">Description</div>
-    <div class="px-4 py-2 text-[11px] font-medium text-text-helper uppercase tracking-wider">Permissions</div>
-    <div class="px-4 py-2 text-[11px] font-medium text-text-helper uppercase tracking-wider">Created</div>
-    <div class="px-4 py-2 text-[11px] font-medium text-text-helper uppercase tracking-wider"></div>
-  </div>
-
-  <!-- Rows (loaded via JS fetch) -->
-  <div id="roles-table-body"
-    class="flex flex-col"
-  >
-    <!-- loading skeleton — 3 static rows -->
-    <div class="grid grid-cols-[2fr_3fr_3fr_2fr_1fr] gap-0 border-b border-border-subtle animate-pulse">
-      <div class="px-4 py-3"><div class="h-4 bg-surface-02 rounded-sm w-24"></div></div>
-      <div class="px-4 py-3"><div class="h-4 bg-surface-02 rounded-sm w-40"></div></div>
-      <div class="px-4 py-3"><div class="h-4 bg-surface-02 rounded-sm w-32"></div></div>
-      <div class="px-4 py-3"><div class="h-4 bg-surface-02 rounded-sm w-20"></div></div>
-      <div class="px-4 py-3"></div>
-    </div>
-    <div class="grid grid-cols-[2fr_3fr_3fr_2fr_1fr] gap-0 border-b border-border-subtle animate-pulse">
-      <div class="px-4 py-3"><div class="h-4 bg-surface-02 rounded-sm w-32"></div></div>
-      <div class="px-4 py-3"><div class="h-4 bg-surface-02 rounded-sm w-48"></div></div>
-      <div class="px-4 py-3"><div class="h-4 bg-surface-02 rounded-sm w-28"></div></div>
-      <div class="px-4 py-3"><div class="h-4 bg-surface-02 rounded-sm w-20"></div></div>
-      <div class="px-4 py-3"></div>
-    </div>
-    <div class="grid grid-cols-[2fr_3fr_3fr_2fr_1fr] gap-0 border-b border-border-subtle animate-pulse">
-      <div class="px-4 py-3"><div class="h-4 bg-surface-02 rounded-sm w-20"></div></div>
-      <div class="px-4 py-3"><div class="h-4 bg-surface-02 rounded-sm w-36"></div></div>
-      <div class="px-4 py-3"><div class="h-4 bg-surface-02 rounded-sm w-24"></div></div>
-      <div class="px-4 py-3"><div class="h-4 bg-surface-02 rounded-sm w-20"></div></div>
-      <div class="px-4 py-3"></div>
-    </div>
-  </div>
-</div>
-
-<!-- ── CREATE ROLE MODAL ── -->
-<div id="create-role-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-  <div class="bg-surface-01 border border-border-subtle rounded-card shadow-xl w-full max-w-lg mx-4 overflow-hidden">
-
-    <!-- Modal header -->
-    <div class="flex items-center justify-between h-12 px-5 bg-surface-02 border-b border-border-subtle">
-      <span class="text-[13px] font-semibold text-text-primary">Create New Role</span>
-      <button onclick="closeCreateModal()" class="text-icon-muted hover:text-text-primary transition-colors">
-        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+        <svg
+            class="text-icon-secondary w-4 h-4"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
         </svg>
-      </button>
+        <span class="text-[13px] font-medium text-text-secondary"
+            >All Roles</span
+        >
+        <span id="roles-count" class="ml-auto text-xs text-text-helper"></span>
     </div>
 
-    <!-- Modal body -->
-    <div class="p-5 space-y-4">
-      <!-- Error banner -->
-      <p id="create-role-error" class="hidden text-[11px] text-red-500 bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2"></p>
-      <!-- Success banner -->
-      <p id="create-role-success" class="hidden text-[11px] text-green-500 bg-green-500/5 border border-green-500/20 rounded-sm px-3 py-2"></p>
-
-      <!-- Name -->
-      <div>
-        <label class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase">Role Name</label>
-        <input id="role-name" type="text" placeholder="e.g. InventoryManager"
-          class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors">
-      </div>
-
-      <!-- Description -->
-      <div>
-        <label class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase">Description</label>
-        <input id="role-desc" type="text" placeholder="Short description of this role"
-          class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors">
-      </div>
-
-      <!-- Permissions builder -->
-      <div>
-        <div class="flex items-center justify-between mb-2">
-          <label class="text-[11px] font-medium text-text-secondary tracking-wider uppercase">Permissions</label>
-          <button type="button" onclick="addPermissionRow()"
-            class="text-[11px] text-link-primary hover:underline flex items-center gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-            Add permission
-          </button>
+    <div
+        class="grid grid-cols-[2fr_3fr_3fr_2fr_1fr] gap-0 border-b border-border-subtle bg-surface-02/50"
+    >
+        <div
+            class="px-4 py-2 text-[11px] font-medium text-text-helper uppercase tracking-wider"
+        >
+            Name
         </div>
-        <div id="permissions-list" class="flex flex-col gap-2">
-          <!-- default row -->
+        <div
+            class="px-4 py-2 text-[11px] font-medium text-text-helper uppercase tracking-wider"
+        >
+            Description
         </div>
-      </div>
+        <div
+            class="px-4 py-2 text-[11px] font-medium text-text-helper uppercase tracking-wider"
+        >
+            Permissions
+        </div>
+        <div
+            class="px-4 py-2 text-[11px] font-medium text-text-helper uppercase tracking-wider"
+        >
+            Created
+        </div>
+        <div
+            class="px-4 py-2 text-[11px] font-medium text-text-helper uppercase tracking-wider"
+        ></div>
     </div>
 
-    <!-- Modal footer -->
-    <div class="flex items-center justify-end gap-2 px-5 py-4 bg-surface-02 border-t border-border-subtle">
-      <button onclick="closeCreateModal()"
-        class="px-4 h-8 border border-border-subtle rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover transition-colors">
-        Cancel
-      </button>
-      <button id="create-role-btn" onclick="submitCreateRole()"
-        class="px-4 h-8 bg-btn-primary text-white rounded-sm text-[13px] font-medium hover:bg-btn-primary-hover transition-colors">
-        Create Role
-      </button>
+    <div id="roles-table-body" class="flex flex-col">
+        <div
+            class="grid grid-cols-[2fr_3fr_3fr_2fr_1fr] gap-0 border-b border-border-subtle animate-pulse"
+        >
+            <div class="px-4 py-3">
+                <div class="h-4 bg-surface-02 rounded-sm w-24"></div>
+            </div>
+            <div class="px-4 py-3">
+                <div class="h-4 bg-surface-02 rounded-sm w-40"></div>
+            </div>
+            <div class="px-4 py-3">
+                <div class="h-4 bg-surface-02 rounded-sm w-32"></div>
+            </div>
+            <div class="px-4 py-3">
+                <div class="h-4 bg-surface-02 rounded-sm w-20"></div>
+            </div>
+            <div class="px-4 py-3"></div>
+        </div>
+        <div
+            class="grid grid-cols-[2fr_3fr_3fr_2fr_1fr] gap-0 border-b border-border-subtle animate-pulse"
+        >
+            <div class="px-4 py-3">
+                <div class="h-4 bg-surface-02 rounded-sm w-32"></div>
+            </div>
+            <div class="px-4 py-3">
+                <div class="h-4 bg-surface-02 rounded-sm w-48"></div>
+            </div>
+            <div class="px-4 py-3">
+                <div class="h-4 bg-surface-02 rounded-sm w-28"></div>
+            </div>
+            <div class="px-4 py-3">
+                <div class="h-4 bg-surface-02 rounded-sm w-20"></div>
+            </div>
+            <div class="px-4 py-3"></div>
+        </div>
+        <div
+            class="grid grid-cols-[2fr_3fr_3fr_2fr_1fr] gap-0 border-b border-border-subtle animate-pulse"
+        >
+            <div class="px-4 py-3">
+                <div class="h-4 bg-surface-02 rounded-sm w-20"></div>
+            </div>
+            <div class="px-4 py-3">
+                <div class="h-4 bg-surface-02 rounded-sm w-36"></div>
+            </div>
+            <div class="px-4 py-3">
+                <div class="h-4 bg-surface-02 rounded-sm w-24"></div>
+            </div>
+            <div class="px-4 py-3">
+                <div class="h-4 bg-surface-02 rounded-sm w-20"></div>
+            </div>
+            <div class="px-4 py-3"></div>
+        </div>
     </div>
-  </div>
 </div>
 
-<!-- Toast notification -->
-<div id="toast" class="hidden fixed bottom-6 right-6 z-[100] flex items-center gap-3 px-4 py-3 rounded-card border shadow-lg bg-surface-01 border-border-subtle text-[13px] text-text-primary min-w-[240px]">
-  <span id="toast-icon"></span>
-  <span id="toast-msg"></span>
+<div
+    id="create-role-modal"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+>
+    <div
+        class="bg-surface-01 border border-border-subtle rounded-card shadow-xl w-full max-w-lg mx-4 overflow-hidden"
+    >
+        <div
+            class="flex items-center justify-between h-12 px-5 bg-surface-02 border-b border-border-subtle"
+        >
+            <span class="text-[13px] font-semibold text-text-primary"
+                >Create New Role</span
+            >
+            <button
+                onclick="closeCreateModal()"
+                class="text-icon-muted hover:text-text-primary transition-colors"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="p-5 space-y-4">
+            <p
+                id="create-role-error"
+                class="hidden text-[11px] text-red-500 bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2"
+            ></p>
+            <p
+                id="create-role-success"
+                class="hidden text-[11px] text-green-500 bg-green-500/5 border border-green-500/20 rounded-sm px-3 py-2"
+            ></p>
+
+            <div>
+                <label
+                    class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase"
+                    >Role Name</label
+                >
+                <input
+                    id="role-name"
+                    type="text"
+                    placeholder="e.g. InventoryManager"
+                    class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors"
+                />
+            </div>
+
+            <div>
+                <label
+                    class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase"
+                    >Description</label
+                >
+                <input
+                    id="role-desc"
+                    type="text"
+                    placeholder="Short description of this role"
+                    class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors"
+                />
+            </div>
+
+            <div>
+                <div class="flex items-center justify-between mb-2">
+                    <label
+                        class="text-[11px] font-medium text-text-secondary tracking-wider uppercase"
+                        >Permissions</label
+                    >
+                    <button
+                        type="button"
+                        onclick="addPermissionRow()"
+                        class="text-[11px] text-link-primary hover:underline flex items-center gap-1"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="11"
+                            height="11"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="M5 12h14" />
+                            <path d="M12 5v14" />
+                        </svg>
+                        Add permission
+                    </button>
+                </div>
+                <div
+                    id="permissions-list"
+                    class="flex flex-col gap-2 max-h-[150px] overflow-y-auto pr-1"
+                ></div>
+            </div>
+        </div>
+
+        <div
+            class="flex items-center justify-end gap-2 px-5 py-4 bg-surface-02 border-t border-border-subtle"
+        >
+            <button
+                onclick="closeCreateModal()"
+                class="px-4 h-8 border border-border-subtle rounded-sm text-[13px] text-text-secondary hover:bg-surface-hover transition-colors"
+            >
+                Cancel
+            </button>
+            <button
+                id="create-role-btn"
+                onclick="submitCreateRole()"
+                class="px-4 h-8 bg-btn-primary text-white rounded-sm text-[13px] font-medium hover:bg-btn-primary-hover transition-colors"
+            >
+                Create Role
+            </button>
+        </div>
+    </div>
 </div>
 
-{% endblock %}
-
-{% block body_scripts %}
+<div
+    id="toast"
+    class="hidden fixed bottom-6 right-6 z-[100] flex items-center gap-3 px-4 py-3 rounded-card border shadow-lg bg-surface-01 border-border-subtle text-[13px] text-text-primary min-w-[240px]"
+>
+    <span id="toast-icon"></span>
+    <span id="toast-msg"></span>
+</div>
+{% endblock %} {% block body_scripts %}
 <script>
-  const RESOURCES = ['orders', 'customers', 'reports', 'inventory', 'admin_panel'];
-  const ACCESS_LEVELS = ['read', 'write', 'admin'];
+    const RESOURCES = [
+        "orders",
+        "customers",
+        "reports",
+        "inventory",
+        "admin_panel",
+    ];
+    const ACCESS_LEVELS = ["read", "write", "admin"];
 
-  function addPermissionRow(resource = '', access = '') {
-    const list = document.getElementById('permissions-list');
-    const row = document.createElement('div');
-    row.className = 'flex items-center gap-2';
-    row.innerHTML = `
-      <select class="perm-resource flex-1 px-2 h-9 bg-surface-02 border border-border-subtle rounded-sm text-[13px] text-text-primary focus:border-border-strong focus:outline-none">
-        ${RESOURCES.map(r => `<option value="${r}" ${r === resource ? 'selected' : ''}>${r}</option>`).join('')}
-      </select>
-      <select class="perm-access w-28 px-2 h-9 bg-surface-02 border border-border-subtle rounded-sm text-[13px] text-text-primary focus:border-border-strong focus:outline-none">
-        ${ACCESS_LEVELS.map(a => `<option value="${a}" ${a === access ? 'selected' : ''}>${a}</option>`).join('')}
-      </select>
-      <button type="button" onclick="this.parentElement.remove()" class="text-icon-muted hover:text-red-500 transition-colors shrink-0">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    `;
-    list.appendChild(row);
-  }
-
-  // Start with one empty row
-  addPermissionRow('inventory', 'read');
-
-  function closeCreateModal() {
-    document.getElementById('create-role-modal').classList.add('hidden');
-    document.getElementById('permissions-list').innerHTML = '';
-    document.getElementById('role-name').value = '';
-    document.getElementById('role-desc').value = '';
-    document.getElementById('create-role-error').classList.add('hidden');
-    document.getElementById('create-role-success').classList.add('hidden');
-    addPermissionRow('inventory', 'read');
-  }
-
-  function showToast(msg, ok = true) {
-    const toast = document.getElementById('toast');
-    document.getElementById('toast-msg').textContent = msg;
-    document.getElementById('toast-icon').innerHTML = ok
-      ? `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-500"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
-      : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-500"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
-    toast.classList.remove('hidden');
-    setTimeout(() => toast.classList.add('hidden'), 3000);
-  }
-
-  async function submitCreateRole() {
-    const token = localStorage.getItem('kms_token');
-    const name = document.getElementById('role-name').value.trim();
-    const description = document.getElementById('role-desc').value.trim();
-    const errEl = document.getElementById('create-role-error');
-    const succEl = document.getElementById('create-role-success');
-    const btn = document.getElementById('create-role-btn');
-
-    errEl.classList.add('hidden');
-    succEl.classList.add('hidden');
-
-    if (!name) { errEl.textContent = 'Role name is required.'; errEl.classList.remove('hidden'); return; }
-
-    const permissions = [...document.querySelectorAll('#permissions-list > div')].map(row => ({
-      resource: row.querySelector('.perm-resource').value,
-      access: row.querySelector('.perm-access').value,
-    }));
-
-    btn.disabled = true;
-    btn.textContent = 'Creating…';
-
-    try {
-      const res = await fetch('/admin/roles', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-        body: JSON.stringify({ name, description, permissions }),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        errEl.textContent = data.error || data.message || 'Failed to create role.';
-        errEl.classList.remove('hidden');
-      } else {
-        closeCreateModal();
-        showToast(`Role "${name}" created successfully.`);
-        // Reload the table
-        htmx.trigger('#roles-table-body', 'load-roles');
-      }
-    } catch (e) {
-      errEl.textContent = 'Network error. Please try again.';
-      errEl.classList.remove('hidden');
-    } finally {
-      btn.disabled = false;
-      btn.textContent = 'Create Role';
-    }
-  }
-
-  // ── Render roles returned by HTMX (JSON → HTML rows) ──
-  // HTMX will fetch JSON from /admin/roles, but we need HTML rows.
-  // Override: use fetch directly and render rows ourselves on page load.
-  document.addEventListener('DOMContentLoaded', async function () {
-    const token = localStorage.getItem('kms_token');
-    await loadRolesTable(token);
-  });
-
-  async function loadRolesTable(token) {
-    const tbody = document.getElementById('roles-table-body');
-    tbody.innerHTML = '<div class="px-4 py-6 text-[13px] text-text-helper text-center">Loading…</div>';
-    try {
-      const res = await fetch('/admin/roles', {
-        headers: { 'Authorization': 'Bearer ' + token }
-      });
-      const roles = await res.json();
-      document.getElementById('roles-count').textContent = `${roles.length} role${roles.length !== 1 ? 's' : ''}`;
-      if (roles.length === 0) {
-        tbody.innerHTML = `
-          <div class="flex flex-col items-center justify-center py-12 gap-3 text-center">
-            <div class="w-12 h-12 rounded-card bg-surface-02 flex items-center justify-center text-icon-muted">
-              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-            </div>
-            <p class="text-[13px] font-medium text-text-primary">No roles yet</p>
-            <p class="text-xs text-text-helper">Click "New Role" to create the first one.</p>
-          </div>`;
-        return;
-      }
-      tbody.innerHTML = roles.map(role => {
-        const permBadges = role.permissions.map(p =>
-          `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm bg-surface-02 border border-border-subtle text-[10px] text-text-secondary font-medium">${p.resource}:${p.access}</span>`
-        ).join(' ') || '<span class="text-xs text-text-helper">—</span>';
-        const date = new Date(role.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    // ── Native Select HTML Generator (Solves the clipping issue!) ──
+    function makeSelectHTML(id) {
         return `
-          <div class="group grid grid-cols-[2fr_3fr_3fr_2fr_1fr] gap-0 border-b border-border-subtle hover:bg-surface-02 transition-colors items-center" data-role-id="${role.role_id}">
-            <div class="px-4 py-3 text-[13px] font-medium text-text-primary">${escHtml(role.name)}</div>
-            <div class="px-4 py-3 text-[13px] text-text-secondary truncate">${escHtml(role.description)}</div>
-            <div class="px-4 py-3 flex flex-wrap gap-1">${permBadges}</div>
-            <div class="px-4 py-3 text-xs text-text-helper">${date}</div>
-            <div class="px-4 py-3 flex items-center justify-end">
-              <a href="/assign?role=${encodeURIComponent(role.name)}" title="Assign this role"
-                class="opacity-0 group-hover:opacity-100 flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-link-primary hover:bg-surface-active transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
-              </a>
-            </div>
-          </div>`;
-      }).join('');
-    } catch (e) {
-      tbody.innerHTML = '<div class="px-4 py-6 text-[13px] text-red-500 text-center">Failed to load roles. Are you logged in as admin?</div>';
+            <div class="flex-1">
+                <select id="${id}" class="w-full px-3 h-9 bg-surface-02 border border-border-subtle rounded-sm text-[13px] text-text-primary focus:border-border-strong focus:outline-none transition-colors appearance-none cursor-pointer"
+                        style="background-image: url('data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'13\' height=\'13\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%23a3a3a3\' stroke-width=\'2\'><path d=\'m6 9 6 6 6-6\'/></svg>'); background-repeat: no-repeat; background-position: right 8px center; background-size: 12px;">
+                </select>
+            </div>`;
     }
-  }
 
-  function escHtml(str) {
-    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-  }
+    function addPermissionRow(resource = "inventory", access = "read") {
+        const list = document.getElementById("permissions-list");
+        const row = document.createElement("div");
+        row.className = "flex items-center gap-2 relative";
+        const rid = "ps-res-" + Date.now();
+        const aid = "ps-acc-" + (Date.now() + 1);
+        row.innerHTML =
+            makeSelectHTML(rid) +
+            makeSelectHTML(aid) +
+            `
+            <button type="button" onclick="this.parentElement.remove()"
+                class="text-icon-muted hover:text-red-500 transition-colors shrink-0 mt-0.5">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>`;
+        list.appendChild(row);
 
-  // Re-load table when triggered (after create)
-  document.addEventListener('htmx:trigger', function(e) {
-    if (e.detail && e.detail.type === 'load-roles') {
-      loadRolesTable(localStorage.getItem('kms_token'));
+        // Populate Native Dropdown Options
+        const resSelect = row.querySelector(`#${rid}`);
+        resSelect.innerHTML = RESOURCES.map(
+            (r) =>
+                `<option value="${r}" ${r === resource ? "selected" : ""}>${r}</option>`,
+        ).join("");
+
+        const accSelect = row.querySelector(`#${aid}`);
+        accSelect.innerHTML = ACCESS_LEVELS.map(
+            (a) =>
+                `<option value="${a}" ${a === access ? "selected" : ""}>${a}</option>`,
+        ).join("");
     }
-  });
+
+    addPermissionRow("inventory", "read");
+
+    function openCreateModal() {
+        document.getElementById("create-role-modal").classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
+    }
+
+    function closeCreateModal() {
+        document.getElementById("create-role-modal").classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
+
+        document.getElementById("permissions-list").innerHTML = "";
+        document.getElementById("role-name").value = "";
+        document.getElementById("role-desc").value = "";
+        document.getElementById("create-role-error").classList.add("hidden");
+        document.getElementById("create-role-success").classList.add("hidden");
+        addPermissionRow("inventory", "read");
+    }
+
+    function showToast(msg, ok = true) {
+        const toast = document.getElementById("toast");
+        document.getElementById("toast-msg").textContent = msg;
+        document.getElementById("toast-icon").innerHTML = ok
+            ? `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-green-500"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`
+            : `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-red-500"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+        toast.classList.remove("hidden");
+        setTimeout(() => toast.classList.add("hidden"), 3000);
+    }
+
+    async function submitCreateRole() {
+        const name = document.getElementById("role-name").value.trim();
+        const description = document.getElementById("role-desc").value.trim();
+        const errEl = document.getElementById("create-role-error");
+        const btn = document.getElementById("create-role-btn");
+
+        errEl.classList.add("hidden");
+        if (!name) {
+            errEl.textContent = "Role name is required.";
+            errEl.classList.remove("hidden");
+            return;
+        }
+
+        const permissions = [
+            ...document.querySelectorAll("#permissions-list > div"),
+        ]
+            .map((row) => {
+                const selects = row.querySelectorAll("select");
+                return {
+                    resource: selects[0]?.value || "",
+                    access: selects[1]?.value || "",
+                };
+            })
+            .filter((p) => p.resource && p.access);
+
+        btn.disabled = true;
+        btn.textContent = "Creating…";
+
+        try {
+            const res = await fetch("/admin/roles", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, description, permissions }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                errEl.textContent =
+                    data.error || data.message || "Failed to create role.";
+                errEl.classList.remove("hidden");
+            } else {
+                closeCreateModal();
+                showToast(`Role "${name}" created successfully.`);
+                await loadRolesTable();
+            }
+        } catch {
+            errEl.textContent = "Network error. Please try again.";
+            errEl.classList.remove("hidden");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Create Role";
+        }
+    }
+
+    async function loadRolesTable() {
+        const tbody = document.getElementById("roles-table-body");
+        tbody.innerHTML =
+            '<div class="px-4 py-6 text-[13px] text-text-helper text-center">Loading…</div>';
+        try {
+            const res = await fetch("/admin/roles");
+            const roles = await res.json();
+            document.getElementById("roles-count").textContent =
+                `${roles.length} role${roles.length !== 1 ? "s" : ""}`;
+
+            if (roles.length === 0) {
+                tbody.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-12 gap-3 text-center">
+                        <div class="w-12 h-12 rounded-card bg-surface-02 flex items-center justify-center text-icon-muted">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                        </div>
+                        <p class="text-[13px] font-medium text-text-primary">No roles yet</p>
+                        <p class="text-xs text-text-helper">Click "New Role" to create the first one.</p>
+                    </div>`;
+                return;
+            }
+
+            tbody.innerHTML = roles
+                .map((role) => {
+                    const permBadges =
+                        role.permissions
+                            .map(
+                                (p) =>
+                                    `<span class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-sm bg-surface-02 border border-border-subtle text-[10px] text-text-secondary font-medium">${p.resource}:${p.access}</span>`,
+                            )
+                            .join(" ") ||
+                        '<span class="text-xs text-text-helper">—</span>';
+                    const date = new Date(role.created_at).toLocaleDateString(
+                        "en-US",
+                        { month: "short", day: "numeric", year: "numeric" },
+                    );
+                    return `
+                    <div class="group grid grid-cols-[2fr_3fr_3fr_2fr_1fr] gap-0 border-b border-border-subtle hover:bg-surface-02 transition-colors items-center">
+                        <div class="px-4 py-3 text-[13px] font-medium text-text-primary">${escHtml(role.name)}</div>
+                        <div class="px-4 py-3 text-[13px] text-text-secondary truncate">${escHtml(role.description)}</div>
+                        <div class="px-4 py-3 flex flex-wrap gap-1">${permBadges}</div>
+                        <div class="px-4 py-3 text-xs text-text-helper">${date}</div>
+                        <div class="px-4 py-3 flex items-center justify-end">
+                            <a href="/assign?role=${encodeURIComponent(role.name)}" title="Assign this role"
+                                class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-link-primary hover:bg-surface-active transition-all">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                            </a>
+                        </div>
+                    </div>`;
+                })
+                .join("");
+        } catch {
+            tbody.innerHTML =
+                '<div class="px-4 py-6 text-[13px] text-red-500 text-center">Failed to load roles.</div>';
+        }
+    }
+
+    function escHtml(str) {
+        if (!str) return "";
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;");
+    }
+
+    document.addEventListener("DOMContentLoaded", loadRolesTable);
 </script>
 {% endblock %}
