@@ -4,7 +4,8 @@ use crate::auth::jwt::create_jwt;
 use crate::db::Db;
 use crate::error::{AppError, AppResult};
 use crate::models::{Claims, User};
-use axum::{extract::State, Json};
+use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
+use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -30,7 +31,7 @@ pub struct SignupRequest {
 pub async fn login(
     State(pool): State<Db>,
     Json(payload): Json<LoginRequest>,
-) -> AppResult<Json<AuthResponse>> {
+) -> AppResult<impl IntoResponse> {
     let user = sqlx::query_as::<_, User>("SELECT * FROM users WHERE email = $1")
         .bind(&payload.email)
         .fetch_optional(&pool)
@@ -42,16 +43,22 @@ pub async fn login(
     }
 
     let token = create_jwt(&user.user_id.to_string(), &user.email, user.is_admin)?;
-    Ok(Json(AuthResponse {
-        token,
-        user_id: user.user_id.to_string(),
-    }))
+
+    let cookie = Cookie::build(("token", token))
+        .http_only(true)
+        .same_site(SameSite::Lax)
+        .path("/")
+        .build();
+
+    let jar = CookieJar::new().add(cookie);
+
+    Ok((jar, [("HX-Redirect", "/")]))
 }
 
 pub async fn signup(
     State(pool): State<Db>,
     Json(payload): Json<SignupRequest>,
-) -> AppResult<Json<serde_json::Value>> {
+) -> AppResult<impl IntoResponse> {
     let exists = sqlx::query("SELECT user_id FROM users WHERE email = $1")
         .bind(&payload.email)
         .fetch_optional(&pool)
@@ -74,17 +81,20 @@ pub async fn signup(
     .execute(&pool)
     .await?;
 
-    Ok(Json(serde_json::json!({
-        "status": "success",
-        "user_id": user_id
-    })))
+    Ok((StatusCode::OK, [("HX-Redirect", "/login")]))
 }
 
-pub async fn logout(State(pool): State<Db>, claims: Claims) -> AppResult<Json<serde_json::Value>> {
+pub async fn logout(
+    State(pool): State<Db>,
+    claims: Claims,
+    jar: CookieJar,
+) -> AppResult<impl IntoResponse> {
     let expires_at = chrono::DateTime::<chrono::Utc>::from_timestamp(claims.exp as i64, 0)
         .ok_or_else(|| AppError::Internal("Invalid token expiry".into()))?;
 
     blocklist_token(&pool, &claims.jti, expires_at).await?;
 
-    Ok(Json(serde_json::json!({ "status": "logged out" })))
+    let jar = jar.remove(Cookie::build(("token", "")).path("/"));
+
+    Ok((jar, [("HX-Redirect", "/login")]))
 }

@@ -11,7 +11,6 @@
     --color-red-500: oklch(63.7% 0.237 25.331);
     --color-yellow-500: oklch(79.5% 0.184 86.047);
     --color-green-500: oklch(72.3% 0.219 149.579);
-    --color-green-700: oklch(52.7% 0.154 150.069);
     --color-indigo-400: oklch(67.3% 0.182 276.935);
     --color-indigo-500: oklch(58.5% 0.233 277.117);
     --color-black: #000;
@@ -261,6 +260,9 @@
   .top-1\/2 {
     top: calc(1 / 2 * 100%);
   }
+  .top-9 {
+    top: calc(var(--spacing) * 9);
+  }
   .right-0 {
     right: calc(var(--spacing) * 0);
   }
@@ -485,6 +487,9 @@
   }
   .w-48 {
     width: calc(var(--spacing) * 48);
+  }
+  .w-56 {
+    width: calc(var(--spacing) * 56);
   }
   .w-\[14px\] {
     width: 14px;

@@ -1,19 +1,21 @@
-pub mod auth;
 pub mod admin;
 pub mod api;
+pub mod auth;
+pub mod logout_partial;
 
+use crate::app_state::AppState;
+use crate::handlers::logout_partial::account_menu;
+use crate::models::Claims;
 use axum::{
     extract::Form,
-    response::Html,
+    response::{Html, IntoResponse, Redirect, Response},
     routing::{delete, get, post},
     Router,
 };
 use serde::Deserialize;
-use crate::app_state::AppState;
 
 pub fn create_router(state: AppState) -> Router {
     Router::new()
-        // Web / UI Routes
         .route("/", get(home))
         .route("/login", get(login_page))
         .route("/signup", get(signup_page))
@@ -21,22 +23,18 @@ pub fn create_router(state: AppState) -> Router {
         .route("/assign", get(assign_page))
         .route("/ui/sidebar/pin", post(sidebar_pin))
         .route("/ui/banner", delete(banner_dismiss))
-
-        // API Routes
+        .route("/account-menu", get(account_menu))
         .nest("/auth", auth::router())
         .nest("/admin", admin::router())
         .nest("/api", api::router())
-
         .with_state(state)
 }
-
-// ── Web Handlers ──
 
 #[derive(askama::Template)]
 #[template(path = "login.html")]
 struct LoginTemplate {}
 
-async fn login_page() -> impl axum::response::IntoResponse {
+async fn login_page() -> impl IntoResponse {
     LoginTemplate {}
 }
 
@@ -44,7 +42,7 @@ async fn login_page() -> impl axum::response::IntoResponse {
 #[template(path = "signup.html")]
 struct SignupTemplate {}
 
-async fn signup_page() -> impl axum::response::IntoResponse {
+async fn signup_page() -> impl IntoResponse {
     SignupTemplate {}
 }
 
@@ -57,12 +55,16 @@ struct HomeTemplate {
     css_version: &'static str,
 }
 
-async fn home() -> impl axum::response::IntoResponse {
-    HomeTemplate {
-        sidebar_pinned: false,
-        user_email: String::new(),
-        show_banner: true,
-        css_version: env!("CSS_VERSION"),
+async fn home(claims: Option<Claims>) -> Response {
+    match claims {
+        None => Redirect::to("/login").into_response(),
+        Some(c) => HomeTemplate {
+            sidebar_pinned: false,
+            user_email: c.email,
+            show_banner: true,
+            css_version: env!("CSS_VERSION"),
+        }
+        .into_response(),
     }
 }
 
@@ -75,12 +77,16 @@ struct RolesTemplate {
     css_version: &'static str,
 }
 
-async fn roles_page() -> impl axum::response::IntoResponse {
-    RolesTemplate {
-        sidebar_pinned: false,
-        user_email: String::new(),
-        show_banner: false,
-        css_version: env!("CSS_VERSION"),
+async fn roles_page(claims: Option<Claims>) -> Response {
+    match claims {
+        None => Redirect::to("/login").into_response(),
+        Some(c) => RolesTemplate {
+            sidebar_pinned: false,
+            user_email: c.email,
+            show_banner: false,
+            css_version: env!("CSS_VERSION"),
+        }
+        .into_response(),
     }
 }
 
@@ -93,12 +99,16 @@ struct AssignTemplate {
     css_version: &'static str,
 }
 
-async fn assign_page() -> impl axum::response::IntoResponse {
-    AssignTemplate {
-        sidebar_pinned: false,
-        user_email: String::new(),
-        show_banner: false,
-        css_version: env!("CSS_VERSION"),
+async fn assign_page(claims: Option<Claims>) -> Response {
+    match claims {
+        None => Redirect::to("/login").into_response(),
+        Some(c) => AssignTemplate {
+            sidebar_pinned: false,
+            user_email: c.email,
+            show_banner: false,
+            css_version: env!("CSS_VERSION"),
+        }
+        .into_response(),
     }
 }
 

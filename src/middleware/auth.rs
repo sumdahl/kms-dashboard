@@ -8,6 +8,7 @@ use axum::{
     extract::{FromRef, FromRequestParts},
     http::request::Parts,
 };
+use axum_extra::extract::CookieJar;
 
 #[async_trait]
 impl<S> FromRequestParts<S> for Claims
@@ -18,23 +19,17 @@ where
     type Rejection = AppError;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        // 1. Get the Authorization header
-        let auth_header = parts
-            .headers
-            .get(axum::http::header::AUTHORIZATION)
-            .and_then(|value| value.to_str().ok())
+        // 1. Read token from cookie
+        let jar = CookieJar::from_headers(&parts.headers);
+        let token = jar
+            .get("token")
+            .map(|c| c.value().to_owned())
             .ok_or(AppError::Unauthorized)?;
 
-        // 2. Check Bearer prefix
-        if !auth_header.starts_with("Bearer ") {
-            return Err(AppError::Unauthorized);
-        }
+        // 2. Verify JWT
+        let claims = verify_jwt(&token)?;
 
-        // 3. Verify JWT signature and expiry
-        let token = &auth_header[7..];
-        let claims = verify_jwt(token)?;
-
-        // 4. Check blocklist
+        // 3. Check blocklist
         let pool = Db::from_ref(state);
         if is_blocklisted(&pool, &claims.jti).await? {
             return Err(AppError::Unauthorized);
