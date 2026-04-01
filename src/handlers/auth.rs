@@ -1,11 +1,11 @@
+use crate::auth::hashing::{hash_password, verify_password};
+use crate::auth::jwt::create_jwt;
+use crate::db::Db;
+use crate::error::{AppError, AppResult};
+use crate::models::User;
 use axum::{extract::State, Json};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use crate::db::Db;
-use crate::error::{AppResult, AppError};
-use crate::auth::hashing::{verify_password, hash_password};
-use crate::auth::jwt::create_jwt;
-use crate::models::User;
 
 #[derive(Deserialize)]
 pub struct LoginRequest {
@@ -14,9 +14,19 @@ pub struct LoginRequest {
 }
 
 #[derive(Serialize)]
-pub struct AuthResponse {
+pub struct SigninResponse {
+    pub status: String,
+    pub message: String,
     pub token: String,
     pub user_id: String,
+}
+
+#[derive(Serialize)]
+pub struct SignupResponse {
+    pub status: String,
+    pub user_id: String,
+    pub token: String,
+    pub message: String,
 }
 
 #[derive(Deserialize)]
@@ -29,9 +39,9 @@ pub struct SignupRequest {
 pub async fn login(
     State(pool): State<Db>,
     Json(payload): Json<LoginRequest>,
-) -> AppResult<Json<AuthResponse>> {
+) -> AppResult<Json<SigninResponse>> {
     let user = sqlx::query_as::<_, User>(
-        "SELECT * FROM users WHERE email = $1"
+       "SELECT * FROM users WHERE email = $1",
     )
     .bind(&payload.email)
     .fetch_optional(&pool)
@@ -44,7 +54,9 @@ pub async fn login(
 
     let token = create_jwt(&user.user_id.to_string(), &user.email, user.is_admin)?;
 
-    Ok(Json(AuthResponse {
+    Ok(Json(SigninResponse {
+        message: "Login successful".to_string(),
+        status: "success".to_string(),
         token,
         user_id: user.user_id.to_string(),
     }))
@@ -53,7 +65,7 @@ pub async fn login(
 pub async fn signup(
     State(pool): State<Db>,
     Json(payload): Json<SignupRequest>,
-) -> AppResult<Json<serde_json::Value>> {
+) -> AppResult<Json<SignupResponse>> {
     // 1. Check if user already exists
     let exists = sqlx::query("SELECT user_id FROM users WHERE email = $1")
         .bind(&payload.email)
@@ -69,7 +81,7 @@ pub async fn signup(
     let user_id = Uuid::new_v4();
 
     sqlx::query(
-        "INSERT INTO users (user_id, email, full_name, password_hash) VALUES ($1, $2, $3, $4)"
+        "INSERT INTO users (user_id, email, full_name, password_hash) VALUES ($1, $2, $3, $4)",
     )
     .bind(user_id)
     .bind(&payload.email)
@@ -78,8 +90,11 @@ pub async fn signup(
     .execute(&pool)
     .await?;
 
-    Ok(Json(serde_json::json!({
-        "status": "success",
-        "user_id": user_id
-    })))
+    let token = create_jwt(&user_id.to_string(), &payload.email, false)?;
+    Ok(Json(SignupResponse {
+        status: "success".to_string(),
+        user_id: user_id.to_string(),
+        token,
+        message: "Signup successful".to_string(),
+    }))
 }

@@ -1,9 +1,15 @@
+mod app_state;
 mod auth;
+mod config;
 mod db;
 mod error;
-mod models;
 mod handlers;
 mod middleware;
+<<<<<<< Updated upstream
+=======
+mod models;
+mod routes;
+>>>>>>> Stashed changes
 
 use axum::{
     extract::Form,
@@ -15,6 +21,7 @@ use serde::Deserialize;
 use tower_http::services::ServeDir;
 use tower_livereload::LiveReloadLayer;
 
+<<<<<<< Updated upstream
 use crate::db::{init_db, run_migrations, seed_admin};
 use crate::handlers::admin::{create_role, list_roles, assign_role};
 use crate::handlers::auth::{login, signup};
@@ -53,6 +60,12 @@ async fn sidebar_pin(Form(_form): Form<SidebarPinForm>) -> Html<&'static str> {
 async fn banner_dismiss() -> Html<&'static str> {
     Html("")
 }
+=======
+use crate::app_state::AppState;
+use crate::config::Config;
+use crate::db::{init_db, run_migrations, seed_admin};
+use crate::routes::create_router;
+>>>>>>> Stashed changes
 
 #[tokio::main]
 async fn main() {
@@ -60,9 +73,17 @@ async fn main() {
     dotenvy::dotenv().ok();
     let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
 
+<<<<<<< Updated upstream
     // 2. Initialize Database & Seed Admin
     let pool = init_db(&database_url).await;
     run_migrations(&pool).await.expect("Failed to run migrations");
+=======
+    // 2. Initialize Database
+    let pool = init_db(&config.database_url).await;
+    run_migrations(&pool)
+        .await
+        .expect("Failed to run migrations");
+>>>>>>> Stashed changes
     seed_admin(&pool).await.expect("Failed to seed admin");
 
     // 3. Build Router
