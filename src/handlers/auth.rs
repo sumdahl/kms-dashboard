@@ -1,8 +1,9 @@
+use crate::auth::blocklist::blocklist_token;
 use crate::auth::hashing::{hash_password, verify_password};
 use crate::auth::jwt::create_jwt;
 use crate::db::Db;
 use crate::error::{AppError, AppResult};
-use crate::models::User;
+use crate::models::{Claims, User};
 use axum::{extract::State, Json};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -41,7 +42,6 @@ pub async fn login(
     }
 
     let token = create_jwt(&user.user_id.to_string(), &user.email, user.is_admin)?;
-
     Ok(Json(AuthResponse {
         token,
         user_id: user.user_id.to_string(),
@@ -52,7 +52,6 @@ pub async fn signup(
     State(pool): State<Db>,
     Json(payload): Json<SignupRequest>,
 ) -> AppResult<Json<serde_json::Value>> {
-    // 1. Check if user already exists
     let exists = sqlx::query("SELECT user_id FROM users WHERE email = $1")
         .bind(&payload.email)
         .fetch_optional(&pool)
@@ -62,7 +61,6 @@ pub async fn signup(
         return Err(AppError::EmailTaken);
     }
 
-    // 2. Hash password and insert
     let hashed = hash_password(&payload.password)?;
     let user_id = Uuid::new_v4();
 
@@ -80,4 +78,13 @@ pub async fn signup(
         "status": "success",
         "user_id": user_id
     })))
+}
+
+pub async fn logout(State(pool): State<Db>, claims: Claims) -> AppResult<Json<serde_json::Value>> {
+    let expires_at = chrono::DateTime::<chrono::Utc>::from_timestamp(claims.exp as i64, 0)
+        .ok_or_else(|| AppError::Internal("Invalid token expiry".into()))?;
+
+    blocklist_token(&pool, &claims.jti, expires_at).await?;
+
+    Ok(Json(serde_json::json!({ "status": "logged out" })))
 }

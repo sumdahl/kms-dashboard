@@ -1,43 +1,39 @@
-use crate::auth::blocklist::is_blocklisted;
+use crate::auth::blocklist::is_token_blocklisted;
 use crate::auth::jwt::verify_jwt;
 use crate::db::Db;
 use crate::error::AppError;
 use crate::models::Claims;
 use axum::{
     async_trait,
-    extract::{FromRef, FromRequestParts},
+    extract::{FromRequestParts, State},
     http::request::Parts,
 };
 
 #[async_trait]
 impl<S> FromRequestParts<S> for Claims
 where
-    Db: FromRef<S>,
-    S: Send + Sync,
+    S: Send + Sync + AsRef<Db>,
 {
     type Rejection = AppError;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        // 1. Get the Authorization header
         let auth_header = parts
             .headers
             .get(axum::http::header::AUTHORIZATION)
-            .and_then(|value| value.to_str().ok())
+            .and_then(|v| v.to_str().ok())
             .ok_or(AppError::Unauthorized)?;
 
-        // 2. Check Bearer prefix
         if !auth_header.starts_with("Bearer ") {
             return Err(AppError::Unauthorized);
         }
 
-        // 3. Verify JWT signature and expiry
-        let token = &auth_header[7..];
-        let claims = verify_jwt(token)?;
+        let raw_token = &auth_header[7..];
 
-        // 4. Check blocklist
-        let pool = Db::from_ref(state);
-        if is_blocklisted(&pool, &claims.jti).await? {
-            return Err(AppError::Unauthorized);
+        let claims = verify_jwt(raw_token)?;
+
+        let pool = state.as_ref();
+        if is_token_blocklisted(pool, raw_token).await? {
+            return Err(AppError::TokenRevoked);
         }
 
         Ok(claims)
@@ -49,8 +45,7 @@ pub struct AdminClaims(pub Claims);
 #[async_trait]
 impl<S> FromRequestParts<S> for AdminClaims
 where
-    Db: FromRef<S>,
-    S: Send + Sync,
+    S: Send + Sync + AsRef<Db>,
 {
     type Rejection = AppError;
 

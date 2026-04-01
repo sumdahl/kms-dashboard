@@ -1,11 +1,12 @@
-use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
+use crate::error::{AppError, AppResult};
 use crate::models::auth::Claims;
-use crate::error::{AppResult, AppError};
-use chrono::{Utc, Duration};
+use chrono::{Duration, Utc};
+use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
+use uuid::Uuid;
 
 pub fn create_jwt(user_id: &str, email: &str, is_admin: bool) -> AppResult<String> {
     let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
-    
+
     let exp = Utc::now() + Duration::hours(24);
     let claims = Claims {
         sub: user_id.to_string(),
@@ -13,6 +14,7 @@ pub fn create_jwt(user_id: &str, email: &str, is_admin: bool) -> AppResult<Strin
         is_admin,
         exp: exp.timestamp() as usize,
         iat: Utc::now().timestamp() as usize,
+        jti: Uuid::new_v4().to_string(), // ← new
     };
 
     encode(
@@ -25,7 +27,7 @@ pub fn create_jwt(user_id: &str, email: &str, is_admin: bool) -> AppResult<Strin
 
 pub fn verify_jwt(token: &str) -> AppResult<Claims> {
     let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
-    
+
     decode::<Claims>(
         token,
         &DecodingKey::from_secret(secret.as_bytes()),

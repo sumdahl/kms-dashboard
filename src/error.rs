@@ -16,6 +16,8 @@ pub enum AppError {
     Unauthorized,
     #[error("Token expired")]
     TokenExpired,
+    #[error("Token has been revoked")] // ← new
+    TokenRevoked,
     #[error("No active assignment for this resource")]
     NoPermission,
     #[error("Insufficient access level")]
@@ -24,7 +26,7 @@ pub enum AppError {
     RoleNotFound,
     #[error("User not found")]
     UserNotFound,
-    #[error("{0}")] // ← message comes from the call site
+    #[error("{0}")]
     Conflict(String),
     #[error("Internal error: {0}")]
     Internal(String),
@@ -49,13 +51,15 @@ impl IntoResponse for AppError {
             AppError::BadCredentials => StatusCode::UNAUTHORIZED,
             AppError::Unauthorized => StatusCode::UNAUTHORIZED,
             AppError::TokenExpired => StatusCode::UNAUTHORIZED,
+            AppError::TokenRevoked => StatusCode::UNAUTHORIZED, // ← new
             AppError::NoPermission => StatusCode::FORBIDDEN,
             AppError::InsufficientAccess => StatusCode::FORBIDDEN,
             AppError::RoleNotFound => StatusCode::NOT_FOUND,
             AppError::UserNotFound => StatusCode::NOT_FOUND,
-            AppError::Conflict(_) => StatusCode::CONFLICT, // ← 409
+            AppError::Conflict(_) => StatusCode::CONFLICT,
             AppError::Internal(_) => StatusCode::INTERNAL_SERVER_ERROR,
         };
+
         (status, Json(json!({ "error": self.to_string() }))).into_response()
     }
 }
