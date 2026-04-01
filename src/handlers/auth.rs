@@ -1,11 +1,11 @@
+use crate::auth::hashing::{hash_password, verify_password};
+use crate::auth::jwt::create_jwt;
+use crate::db::Db;
+use crate::error::{AppError, AppResult};
+use crate::models::User;
 use axum::{extract::State, Json};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use crate::db::Db;
-use crate::error::{AppResult, AppError};
-use crate::auth::hashing::{verify_password, hash_password};
-use crate::auth::jwt::create_jwt;
-use crate::models::User;
 
 #[derive(Deserialize)]
 pub struct LoginRequest {
@@ -22,7 +22,7 @@ pub struct AuthResponse {
 #[derive(Deserialize)]
 pub struct SignupRequest {
     pub email: String,
-    pub full_name: String, // Added this
+    pub full_name: String,
     pub password: String,
 }
 
@@ -30,13 +30,11 @@ pub async fn login(
     State(pool): State<Db>,
     Json(payload): Json<LoginRequest>,
 ) -> AppResult<Json<AuthResponse>> {
-    let user = sqlx::query_as::<_, User>(
-        "SELECT * FROM users WHERE email = $1"
-    )
-    .bind(&payload.email)
-    .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::BadCredentials)?;
+    let user = sqlx::query_as::<_, User>("SELECT * FROM users WHERE email = $1")
+        .bind(&payload.email)
+        .fetch_optional(&pool)
+        .await?
+        .ok_or(AppError::BadCredentials)?;
 
     if !verify_password(&payload.password, &user.password_hash) {
         return Err(AppError::BadCredentials);
@@ -69,11 +67,11 @@ pub async fn signup(
     let user_id = Uuid::new_v4();
 
     sqlx::query(
-        "INSERT INTO users (user_id, email, full_name, password_hash) VALUES ($1, $2, $3, $4)"
+        "INSERT INTO users (user_id, email, full_name, password_hash) VALUES ($1, $2, $3, $4)",
     )
     .bind(user_id)
     .bind(&payload.email)
-    .bind(&payload.full_name) // Bind name
+    .bind(&payload.full_name)
     .bind(hashed)
     .execute(&pool)
     .await?;

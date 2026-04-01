@@ -5,17 +5,11 @@ mod models;
 mod handlers;
 mod middleware;
 
-use axum::{
-    extract::Form,
-    response::Html,
-    routing::{delete, get, post},
-    Router,
-};
-use serde::Deserialize;
 use tower_http::services::ServeDir;
 use tower_livereload::LiveReloadLayer;
 
 use crate::db::{init_db, run_migrations, seed_admin};
+<<<<<<< HEAD
 use crate::handlers::admin::{create_role, list_roles, assign_role};
 use crate::handlers::auth::{login, signup};
 use crate::handlers::dashboard::inventory_status;
@@ -53,38 +47,38 @@ async fn sidebar_pin(Form(_form): Form<SidebarPinForm>) -> Html<&'static str> {
 async fn banner_dismiss() -> Html<&'static str> {
     Html("")
 }
+=======
+use crate::config::Config;
+use crate::app_state::AppState;
+use crate::routes::create_router;
+>>>>>>> feat/overall_flow
 
 #[tokio::main]
 async fn main() {
-    // 1. Load environment variables
-    dotenvy::dotenv().ok();
-    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    // 1. Load Config
+    let config = Config::from_env();
 
-    // 2. Initialize Database & Seed Admin
-    let pool = init_db(&database_url).await;
+    // 2. Initialize Database
+    let pool = init_db(&config.database_url).await;
     run_migrations(&pool).await.expect("Failed to run migrations");
     seed_admin(&pool).await.expect("Failed to seed admin");
 
-    // 3. Build Router
-    let app = Router::new()
-        .route("/", get(home))
-        .route("/auth/login", post(login))
-        .route("/auth/signup", post(signup))
-        .route("/admin/roles", get(list_roles).post(create_role))
-        .route("/admin/assign", post(assign_role))
-        .route("/api/inventory", get(inventory_status))
-        .route("/ui/sidebar/pin", post(sidebar_pin))
-        .route("/ui/banner", delete(banner_dismiss))
+    // 3. Initialize App State
+    let state = AppState { db: pool };
+
+    // 4. Build Router
+    let app = create_router(state)
         .nest_service("/static", ServeDir::new("static"))
         .nest_service("/nm", ServeDir::new("node_modules"))
-        .layer(LiveReloadLayer::new())
-        .with_state(pool); // Share DB pool with handlers
+        .layer(LiveReloadLayer::new());
 
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000")
+    // 5. Start Server
+    let addr = format!("0.0.0.0:{}", config.port);
+    let listener = tokio::net::TcpListener::bind(&addr)
         .await
-        .expect("Failed to bind port 3000");
+        .expect("Failed to bind port");
 
-    println!("→  Dashboard running at http://localhost:3000");
+    println!("→  Dashboard running at http://{}", addr);
 
     axum::serve(listener, app).await.expect("Server error");
 }
