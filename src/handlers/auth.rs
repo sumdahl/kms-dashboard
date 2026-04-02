@@ -16,12 +16,6 @@ pub struct LoginRequest {
     pub password: String,
 }
 
-#[derive(Serialize)]
-pub struct AuthResponse {
-    pub token: String,
-    pub user_id: String,
-}
-
 #[derive(Deserialize)]
 pub struct SignupRequest {
     pub email: String,
@@ -33,6 +27,17 @@ pub struct SignupRequest {
 pub struct SigninResponse {
     pub token: String,
     pub user_id: String,
+    pub message: String,
+}
+
+#[derive(Serialize)]
+pub struct SignupResponse {
+    pub user_id: String,
+    pub message: String,
+}
+
+#[derive(Serialize)]
+pub struct LogoutResponse {
     pub message: String,
 }
 
@@ -57,7 +62,6 @@ pub async fn login(
         .same_site(SameSite::Lax)
         .path("/")
         .build();
-
     let jar = CookieJar::new().add(cookie);
 
     let body = Json(SigninResponse {
@@ -67,16 +71,15 @@ pub async fn login(
     });
 
     let mut res = (jar, body).into_response();
-
     res.headers_mut()
         .insert("HX-Redirect", "/".parse().unwrap());
-
     Ok(res)
 }
+
 pub async fn signup(
     State(pool): State<Db>,
     Json(payload): Json<SignupRequest>,
-) -> AppResult<impl IntoResponse> {
+) -> AppResult<Response> {
     let exists = sqlx::query("SELECT user_id FROM users WHERE email = $1")
         .bind(&payload.email)
         .fetch_optional(&pool)
@@ -99,14 +102,18 @@ pub async fn signup(
     .execute(&pool)
     .await?;
 
-    Ok((StatusCode::OK, [("HX-Redirect", "/login")]))
+    let body = Json(SignupResponse {
+        user_id: user_id.to_string(),
+        message: "Account created".into(),
+    });
+
+    let mut res = (StatusCode::CREATED, body).into_response();
+    res.headers_mut()
+        .insert("HX-Redirect", "/login".parse().unwrap());
+    Ok(res)
 }
 
-pub async fn logout(
-    State(pool): State<Db>,
-    claims: Claims,
-    jar: CookieJar,
-) -> AppResult<impl IntoResponse> {
+pub async fn logout(State(pool): State<Db>, claims: Claims, jar: CookieJar) -> AppResult<Response> {
     let expires_at = chrono::DateTime::<chrono::Utc>::from_timestamp(claims.exp as i64, 0)
         .ok_or_else(|| AppError::Internal("Invalid token expiry".into()))?;
 
@@ -114,5 +121,12 @@ pub async fn logout(
 
     let jar = jar.remove(Cookie::build(("token", "")).path("/"));
 
-    Ok((jar, [("HX-Redirect", "/login")]))
+    let body = Json(LogoutResponse {
+        message: "Logged out".into(),
+    });
+
+    let mut res = (jar, body).into_response();
+    res.headers_mut()
+        .insert("HX-Redirect", "/login".parse().unwrap());
+    Ok(res)
 }

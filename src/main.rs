@@ -39,6 +39,7 @@ async fn main() {
     let app = create_router(state)
         .nest_service("/static", ServeDir::new("static"))
         .nest_service("/nm", ServeDir::new("node_modules"))
+        .nest_service("/public", ServeDir::new("public"))
         .layer(LiveReloadLayer::new());
 
     // 6. Start Server

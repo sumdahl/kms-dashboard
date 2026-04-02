@@ -259,194 +259,179 @@ endblock %} {% block head_scripts %}
 </script>
 {% endblock %} {% block content %}
 
-<div class="mb-6">
-    <a
-        href="/roles"
-        class="flex items-center gap-2 px-3 h-8 w-fit border border-border-subtle rounded-sm bg-surface-01 text-xs text-text-secondary hover:bg-surface-hover hover:border-border-strong transition-colors mb-4"
-    >
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="13"
-            height="13"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-        >
-            <path d="M5 12h14" />
-            <path d="m12 5-7 7 7 7" />
-        </svg>
-        Back to Roles
-    </a>
-    <p class="text-xs text-text-helper mb-1">Admin</p>
-    <h1 class="text-2xl font-semibold text-text-primary leading-tight">
-        Assign Role
-    </h1>
-</div>
+<div class="w-full max-w-md mx-auto">
+    <div class="mb-6">
+        <p class="text-xs text-text-helper mb-1">Admin</p>
+        <h1 class="text-2xl font-semibold text-text-primary leading-tight">
+            Assign Role
+        </h1>
+        <p class="mt-1 text-[13px] text-text-secondary">
+            Assign users roles with duration that may expire.
+        </p>
+    </div>
 
-<div class="max-w-lg">
-    <div
-        class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden"
-    >
-        <!-- Card header -->
+    <div>
         <div
-            class="flex items-center gap-2 h-10 px-4 bg-surface-02 border-b border-border-subtle"
+            class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden"
         >
-            <svg
-                class="text-icon-secondary w-4 h-4"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+            <!-- Card header -->
+            <div
+                class="flex items-center gap-2 h-10 px-4 bg-surface-02 border-b border-border-subtle"
             >
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                <circle cx="9" cy="7" r="4" />
-                <line x1="19" y1="8" x2="19" y2="14" />
-                <line x1="22" y1="11" x2="16" y2="11" />
-            </svg>
-            <span class="text-[13px] font-medium text-text-secondary"
-                >Grant a role to a user</span
-            >
-        </div>
-
-        <form id="assign-form" class="p-5 space-y-4">
-            <!-- Error / Success -->
-            <p
-                id="assign-error"
-                class="hidden text-[11px] text-red-500 bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2"
-            ></p>
-            <p
-                id="assign-success"
-                class="hidden text-[11px] text-green-500 bg-green-500/5 border border-green-500/20 rounded-sm px-3 py-2"
-            ></p>
-
-            <!-- User select -->
-            <div>
-                <label
-                    class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase"
-                    >User</label
+                <svg
+                    class="text-icon-secondary w-4 h-4"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
                 >
-                <input type="hidden" id="user-value" />
-                <div
-                    id="user-select-wrapper"
-                    class="custom-select"
-                    tabindex="0"
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <line x1="19" y1="8" x2="19" y2="14" />
+                    <line x1="22" y1="11" x2="16" y2="11" />
+                </svg>
+                <span class="text-[13px] font-medium text-text-secondary"
+                    >Grant a role to a user</span
                 >
-                    <div
-                        class="custom-select-trigger w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-helper focus:border-border-strong transition-colors"
+            </div>
+
+            <form id="assign-form" class="p-5 space-y-4">
+                <!-- Error / Success -->
+                <p
+                    id="assign-error"
+                    class="hidden text-[11px] text-red-500 bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2"
+                ></p>
+                <p
+                    id="assign-success"
+                    class="hidden text-[11px] text-green-500 bg-green-500/5 border border-green-500/20 rounded-sm px-3 py-2"
+                ></p>
+
+                <!-- User select -->
+                <div>
+                    <label
+                        class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase"
+                        >User</label
                     >
-                        <span class="custom-select-label"
-                            >— Select a user —</span
-                        >
-                        <svg
-                            class="custom-select-chevron text-icon-muted transition-transform duration-150"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <path d="m6 9 6 6 6-6" />
-                        </svg>
-                    </div>
+                    <input type="hidden" id="user-value" />
                     <div
-                        class="custom-select-dropdown hidden bg-surface-01 border border-border-subtle rounded-sm shadow-lg overflow-y-auto"
+                        id="user-select-wrapper"
+                        class="custom-select"
+                        tabindex="0"
                     >
-                        <div class="px-3 py-2 text-[11px] text-text-muted">
-                            Loading users…
+                        <div
+                            class="custom-select-trigger w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-helper focus:border-border-strong transition-colors"
+                        >
+                            <span class="custom-select-label"
+                                >— Select a user —</span
+                            >
+                            <svg
+                                class="custom-select-chevron text-icon-muted transition-transform duration-150"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="m6 9 6 6 6-6" />
+                            </svg>
+                        </div>
+                        <div
+                            class="custom-select-dropdown hidden bg-surface-01 border border-border-subtle rounded-sm shadow-lg overflow-y-auto"
+                        >
+                            <div class="px-3 py-2 text-[11px] text-text-muted">
+                                Loading users…
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Role select -->
-            <div>
-                <label
-                    class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase"
-                    >Role</label
-                >
-                <input type="hidden" id="role-value" />
-                <div
-                    id="role-select-wrapper"
-                    class="custom-select"
-                    tabindex="0"
-                >
-                    <div
-                        class="custom-select-trigger w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-helper focus:border-border-strong transition-colors"
+                <!-- Role select -->
+                <div>
+                    <label
+                        class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase"
+                        >Role</label
                     >
-                        <span class="custom-select-label"
-                            >— Select a role —</span
-                        >
-                        <svg
-                            class="custom-select-chevron text-icon-muted transition-transform duration-150"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                        >
-                            <path d="m6 9 6 6 6-6" />
-                        </svg>
-                    </div>
+                    <input type="hidden" id="role-value" />
                     <div
-                        class="custom-select-dropdown hidden bg-surface-01 border border-border-subtle rounded-sm shadow-lg overflow-y-auto"
+                        id="role-select-wrapper"
+                        class="custom-select"
+                        tabindex="0"
                     >
-                        <div class="px-3 py-2 text-[11px] text-text-muted">
-                            Loading roles…
+                        <div
+                            class="custom-select-trigger w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-helper focus:border-border-strong transition-colors"
+                        >
+                            <span class="custom-select-label"
+                                >— Select a role —</span
+                            >
+                            <svg
+                                class="custom-select-chevron text-icon-muted transition-transform duration-150"
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="m6 9 6 6 6-6" />
+                            </svg>
+                        </div>
+                        <div
+                            class="custom-select-dropdown hidden bg-surface-01 border border-border-subtle rounded-sm shadow-lg overflow-y-auto"
+                        >
+                            <div class="px-3 py-2 text-[11px] text-text-muted">
+                                Loading roles…
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Duration -->
-            <div>
-                <label
-                    for="duration-hours"
-                    class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase"
-                >
-                    Duration
-                    <span class="normal-case font-normal text-text-helper"
-                        >(hours, optional — leave blank for permanent)</span
+                <!-- Duration -->
+                <div>
+                    <label
+                        for="duration-hours"
+                        class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase"
                     >
-                </label>
-                <input
-                    id="duration-hours"
-                    type="number"
-                    min="1"
-                    placeholder="e.g. 24"
-                    class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors"
-                />
+                        Duration
+                        <span class="normal-case font-normal text-text-helper"
+                            >(hours, optional — leave blank for permanent)</span
+                        >
+                    </label>
+                    <input
+                        id="duration-hours"
+                        type="number"
+                        min="1"
+                        placeholder="e.g. 24"
+                        class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors"
+                    />
+                </div>
+
+                <button
+                    id="assign-btn"
+                    type="submit"
+                    class="w-full h-9 bg-btn-primary text-white text-[13px] font-medium rounded-sm hover:bg-btn-primary-hover transition-colors"
+                >
+                    Assign Role
+                </button>
+            </form>
+
+            <!-- Info note -->
+            <div class="px-5 pb-5">
+                <p class="text-[11px] text-text-helper leading-relaxed">
+                    Assigning a role grants the user all permissions associated
+                    with it. If the user already has this role, the assignment
+                    will be updated with the new expiry.
+                </p>
             </div>
-
-            <button
-                id="assign-btn"
-                type="submit"
-                class="w-full h-9 bg-btn-primary text-white text-[13px] font-medium rounded-sm hover:bg-btn-primary-hover transition-colors"
-            >
-                Assign Role
-            </button>
-        </form>
-
-        <!-- Info note -->
-        <div class="px-5 pb-5">
-            <p class="text-[11px] text-text-helper leading-relaxed">
-                Assigning a role grants the user all permissions associated with
-                it. If the user already has this role, the assignment will be
-                updated with the new expiry.
-            </p>
         </div>
     </div>
 </div>
