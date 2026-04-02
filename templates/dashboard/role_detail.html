@@ -1,0 +1,118 @@
+{% extends "layout.html" %} {% block title %}{{ role_name }} — KMS Dashboard{% endblock %}
+{% block content %}
+
+<!-- Back link -->
+<div class="mb-6">
+    <a href="/roles" class="inline-flex items-center gap-1.5 text-[13px] text-text-secondary hover:text-text-primary transition-colors">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m15 18-6-6 6-6"/>
+        </svg>
+        Back to Roles
+    </a>
+</div>
+
+<!-- Page Header -->
+<div class="flex items-start justify-between gap-4 mb-6">
+    <div>
+        <h1 class="text-2xl font-semibold text-text-primary leading-tight">{{ role_name }}</h1>
+        <p class="mt-1 text-[13px] text-text-secondary">{{ role_description }}</p>
+    </div>
+    <span class="text-[12px] text-text-helper shrink-0 mt-1">
+        Created {{ created_at_display }}
+    </span>
+</div>
+
+<div class="flex items-start gap-6">
+    <!-- LEFT: Permissions + Assignments -->
+    <div class="flex-1 min-w-0 space-y-4">
+
+        <!-- Permissions card -->
+        <div class="bg-surface-01 border border-border-subtle rounded-sm overflow-hidden">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-border-subtle">
+                <span class="text-[13px] font-semibold text-text-primary">Permissions</span>
+                <span class="text-xs text-text-helper">{{ permissions_len }} total</span>
+            </div>
+            {% if permissions.is_empty() %}
+            <div class="px-4 py-8 text-center text-[13px] text-text-helper">
+                No permissions assigned to this role.
+            </div>
+            {% else %}
+            <div class="flex flex-col divide-y divide-border-subtle">
+                {% for p in permissions %}
+                <div class="flex items-center justify-between px-4 py-3">
+                    <div class="flex items-center gap-2">
+                        <svg class="text-icon-muted shrink-0" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                            <line x1="7" y1="7" x2="7.01" y2="7"/>
+                        </svg>
+                        <span class="text-[13px] text-text-primary">{{ p.0 }}</span>
+                    </div>
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded-sm bg-badge-bg text-badge-text text-[11px] font-medium">{{ p.1 }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Assignments card -->
+        <div class="bg-surface-01 border border-border-subtle rounded-sm overflow-hidden">
+            <div class="flex items-center justify-between px-4 py-3 border-b border-border-subtle">
+                <span class="text-[13px] font-semibold text-text-primary">Assigned Users</span>
+                <span class="text-xs text-text-helper">{{ assignments_len }} total</span>
+            </div>
+            {% if assignments.is_empty() %}
+            <div class="px-4 py-8 text-center text-[13px] text-text-helper">
+                No users have been assigned this role.
+            </div>
+            {% else %}
+            <div class="flex flex-col divide-y divide-border-subtle">
+                {% for a in assignments %}
+                <div class="flex items-center justify-between px-4 py-3">
+                    <div>
+                        <p class="text-[13px] text-text-primary">{{ a.0 }}</p>
+                        <p class="text-[11px] text-text-helper">
+                            Assigned {{ a.1 }}
+                            {% if a.3 %}
+                            · Expires {{ a.2 }}
+                            {% else %}
+                            · No expiry
+                            {% endif %}
+                        </p>
+                    </div>
+                    {% if a.3 %}
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded-sm bg-green-500/10 text-green-500 text-[11px] font-medium">Active</span>
+                    {% else %}
+                    <span class="inline-flex items-center px-1.5 py-0.5 rounded-sm bg-red-500/10 text-red-500 text-[11px] font-medium">Expired</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- RIGHT: Summary sidebar -->
+    <div class="w-64 shrink-0 space-y-4">
+        <div class="bg-surface-01 border border-border-subtle rounded-sm overflow-hidden">
+            <div class="px-4 py-3 border-b border-border-subtle">
+                <span class="text-[13px] font-semibold text-text-primary">Overview</span>
+            </div>
+            <div class="flex flex-col divide-y divide-border-subtle">
+                <div class="flex items-center justify-between px-4 py-3">
+                    <span class="text-[13px] text-text-secondary">Permissions</span>
+                    <span class="text-[13px] font-medium text-text-primary">{{ permissions_len }}</span>
+                </div>
+                <div class="flex items-center justify-between px-4 py-3">
+                    <span class="text-[13px] text-text-secondary">Assignments</span>
+                    <span class="text-[13px] font-medium text-text-primary">{{ assignments_len }}</span>
+                </div>
+                <div class="flex items-center justify-between px-4 py-3">
+                    <span class="text-[13px] text-text-secondary">Role ID</span>
+                    <span class="text-[11px] font-mono text-text-helper">{{ role_id_short }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

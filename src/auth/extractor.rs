@@ -1,38 +1,39 @@
-use crate::auth::blocklist::is_blocklisted;
+use crate::auth::blocklist::is_token_blocklisted;
 use crate::auth::jwt::verify_jwt;
 use crate::db::Db;
 use crate::error::AppError;
 use crate::models::Claims;
 use axum::{
     async_trait,
-    extract::{FromRef, FromRequestParts},
+    extract::{FromRequestParts, State},
     http::request::Parts,
 };
-use axum_extra::extract::CookieJar;
 
 #[async_trait]
 impl<S> FromRequestParts<S> for Claims
 where
-    Db: FromRef<S>,
-    S: Send + Sync,
+    S: Send + Sync + AsRef<Db>,
 {
     type Rejection = AppError;
 
     async fn from_request_parts(parts: &mut Parts, state: &S) -> Result<Self, Self::Rejection> {
-        // 1. Read token from cookie
-        let jar = CookieJar::from_headers(&parts.headers);
-        let token = jar
-            .get("token")
-            .map(|c| c.value().to_owned())
+        let auth_header = parts
+            .headers
+            .get(axum::http::header::AUTHORIZATION)
+            .and_then(|v| v.to_str().ok())
             .ok_or(AppError::Unauthorized)?;
 
-        // 2. Verify JWT
-        let claims = verify_jwt(&token)?;
-
-        // 3. Check blocklist
-        let pool = Db::from_ref(state);
-        if is_blocklisted(&pool, &claims.jti).await? {
+        if !auth_header.starts_with("Bearer ") {
             return Err(AppError::Unauthorized);
+        }
+
+        let raw_token = &auth_header[7..];
+
+        let claims = verify_jwt(raw_token)?;
+
+        let pool = state.as_ref();
+        if is_token_blocklisted(pool, raw_token).await? {
+            return Err(AppError::TokenRevoked);
         }
 
         Ok(claims)
@@ -44,8 +45,7 @@ pub struct AdminClaims(pub Claims);
 #[async_trait]
 impl<S> FromRequestParts<S> for AdminClaims
 where
-    Db: FromRef<S>,
-    S: Send + Sync,
+    S: Send + Sync + AsRef<Db>,
 {
     type Rejection = AppError;
 
