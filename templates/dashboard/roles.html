@@ -715,7 +715,7 @@
                 <!-- Date + view icon + ⋯ action menu -->
                 <div class="flex items-center gap-2.5 shrink-0">
                     <span class="text-[12px] text-text-helper">${date}</span>
-                    <a href="/roles/${encodeURIComponent(role.name)}"
+                    <a href="/roles/${encodeURIComponent(role.role_id)}"
                        title="View role details"
                        class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-text-primary hover:bg-surface-active transition-colors">
                         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
@@ -726,8 +726,9 @@
                         </svg>
                     </a>
                     <button
-                        data-role="${escHtml(role.name)}"
-                        onclick="toggleRoleMenu(this.dataset.role, event)"
+                        data-role-name="${escHtml(role.name)}"
+                        data-role-id="${escHtml(role.role_id)}"
+                        onclick="toggleRoleMenu(this.dataset.roleName, this.dataset.roleId, event)"
                         title="More actions"
                         class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-text-primary hover:bg-surface-active transition-colors"
                     >
@@ -820,13 +821,13 @@
     }
 
     // ── Role row ⋯ menu helpers (portal pattern — immune to overflow:hidden) ──
-    function toggleRoleMenu(roleName, e) {
+    function toggleRoleMenu(roleName, roleId, e) {
         e.stopPropagation();
         const menu = document.getElementById("role-action-menu");
         const btn = e.currentTarget;
 
         // Clicking the same button while open → close
-        if (menu._activeRole === roleName && !menu.classList.contains("hidden")) {
+        if (menu._activeRole === roleId && !menu.classList.contains("hidden")) {
             menu.classList.add("hidden");
             menu._activeRole = null;
             return;
@@ -836,7 +837,7 @@
         const encoded = encodeURIComponent(roleName);
         const safe = escHtml(roleName);
         menu.innerHTML = `
-            <a href="/roles/${encoded}"
+            <a href="/roles/${escHtml(roleId)}"
                class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
                      viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -869,7 +870,7 @@
                 Copy name
             </button>
             <div class="border-t border-border-subtle my-1"></div>
-            <button data-name="${encodeURIComponent(roleName)}" onclick="openDeleteConfirm(decodeURIComponent(this.dataset.name))"
+            <button data-name="${encodeURIComponent(roleName)}" data-role-id="${escHtml(roleId)}" onclick="openDeleteConfirm(this.dataset.roleId, decodeURIComponent(this.dataset.name))"
                     class="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] text-red-500 hover:bg-red-500/8 transition-colors text-left">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
                      viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -882,7 +883,7 @@
                 Delete role
             </button>`;
 
-        menu._activeRole = roleName;
+        menu._activeRole = roleId;
 
         // ── Position: right-align under the button, flip up if near viewport bottom ──
         const rect = btn.getBoundingClientRect();
@@ -916,12 +917,14 @@
 
     // ── Delete role confirmation ───────────────────────────────────────────
     let _pendingDeleteRole = null;
+    let _pendingDeleteRoleId = null;
 
-    function openDeleteConfirm(roleName) {
+    function openDeleteConfirm(roleId, roleName) {
         const menu = document.getElementById("role-action-menu");
         menu.classList.add("hidden");
         menu._activeRole = null;
 
+        _pendingDeleteRoleId = roleId;
         _pendingDeleteRole = roleName;
         document.getElementById("delete-role-name").textContent = `"${roleName}"`;
         document.getElementById("delete-confirm-modal").classList.remove("hidden");
@@ -930,6 +933,7 @@
 
     function closeDeleteConfirm() {
         _pendingDeleteRole = null;
+        _pendingDeleteRoleId = null;
         document.getElementById("delete-confirm-modal").classList.add("hidden");
         document.body.classList.remove("overflow-hidden");
         const btn = document.getElementById("delete-confirm-btn");
@@ -938,7 +942,7 @@
     }
 
     async function confirmDeleteRole() {
-        if (!_pendingDeleteRole) return;
+        if (!_pendingDeleteRoleId) return;
         const btn = document.getElementById("delete-confirm-btn");
         btn.disabled = true;
         btn.textContent = "Deleting…";
@@ -946,8 +950,8 @@
         let deleteOk = false;
         let errMsg = "";
         try {
-            const url = `/admin/roles/${encodeURIComponent(_pendingDeleteRole)}`;
-            console.log("[delete] URL:", url, "Role:", _pendingDeleteRole);
+            const url = `/admin/roles/${encodeURIComponent(_pendingDeleteRoleId)}`;
+            console.log("[delete] URL:", url, "Role ID:", _pendingDeleteRoleId);
             const res = await fetch(url, {
                 method: "DELETE",
                 headers: { "Content-Type": "application/json" },
