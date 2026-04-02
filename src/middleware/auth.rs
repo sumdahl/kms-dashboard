@@ -1,13 +1,16 @@
+use crate::app_state::AppState;
 use crate::auth::blocklist::is_blocklisted;
 use crate::auth::jwt::verify_jwt;
 use crate::db::Db;
 use crate::error::AppError;
 use crate::models::Claims;
+use axum::extract::State;
 use axum::{
     async_trait,
     extract::{FromRef, FromRequestParts},
     http::request::Parts,
 };
+use axum::{extract::Request, middleware::Next, response::Response};
 use axum_extra::extract::CookieJar;
 
 #[async_trait]
@@ -58,4 +61,15 @@ where
 
         Ok(AdminClaims(claims))
     }
+}
+pub async fn require_admin_mw(
+    State(state): axum::extract::State<AppState>,
+    mut req: Request,
+    next: Next,
+) -> Result<Response, AppError> {
+    let (mut parts, body) = req.into_parts();
+    // Reuse the existing AdminClaims extractor — handles JWT + blocklist + is_admin
+    AdminClaims::from_request_parts(&mut parts, &state).await?;
+    req = Request::from_parts(parts, body);
+    Ok(next.run(req).await)
 }

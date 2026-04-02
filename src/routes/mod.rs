@@ -6,8 +6,10 @@ pub mod logout_partial;
 use crate::app_state::AppState;
 use crate::db::Db;
 use crate::handlers::logout_partial::account_menu;
+use crate::middleware::auth::require_admin_mw;
 use crate::models::types::{AccessLevel, Resource};
 use crate::models::{Claims, Role, RolePermission};
+use axum::middleware;
 use axum::{
     extract::{Form, Path, State},
     http::StatusCode,
@@ -15,6 +17,7 @@ use axum::{
     routing::{delete, get, post},
     Router,
 };
+
 use serde::Deserialize;
 
 pub fn create_router(state: AppState) -> Router {
@@ -29,7 +32,13 @@ pub fn create_router(state: AppState) -> Router {
         .route("/ui/banner", delete(banner_dismiss))
         .route("/account-menu", get(account_menu))
         .nest("/auth", auth::router())
-        .nest("/admin", admin::router())
+        .nest(
+            "/admin",
+            admin::router().layer(middleware::from_fn_with_state(
+                state.clone(),
+                require_admin_mw,
+            )),
+        )
         .nest("/api", api::router())
         .fallback(not_found_handler)
         .with_state(state)
@@ -156,22 +165,25 @@ async fn role_detail_page(
     {
         Ok(Some(r)) => r,
         _ => {
-            return error_page(404, "Not Found", "The role you are looking for does not exist.")
-                .into_response()
+            return error_page(
+                404,
+                "Not Found",
+                "The role you are looking for does not exist.",
+            )
+            .into_response()
         }
     };
 
     // Load permissions
-    let perms = match sqlx::query(
-        "SELECT resource, access_level FROM role_permissions WHERE role_id = $1",
-    )
-    .bind(role.role_id)
-    .fetch_all(&pool)
-    .await
-    {
-        Ok(rows) => rows,
-        Err(_) => vec![],
-    };
+    let perms =
+        match sqlx::query("SELECT resource, access_level FROM role_permissions WHERE role_id = $1")
+            .bind(role.role_id)
+            .fetch_all(&pool)
+            .await
+        {
+            Ok(rows) => rows,
+            Err(_) => vec![],
+        };
 
     use sqlx::Row;
     role.permissions = perms
@@ -279,7 +291,11 @@ fn error_page(code: u16, title: &str, message: &str) -> impl IntoResponse {
 }
 
 async fn not_found_handler() -> impl IntoResponse {
-    error_page(404, "Page Not Found", "The page you are looking for does not exist or has been moved.")
+    error_page(
+        404,
+        "Page Not Found",
+        "The page you are looking for does not exist or has been moved.",
+    )
 }
 
 #[derive(Deserialize)]
