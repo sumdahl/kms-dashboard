@@ -145,7 +145,11 @@ pub async fn list_roles(
             .collect();
     }
 
-    let pages = if total == 0 { 1 } else { (total + size - 1) / size };
+    let pages = if total == 0 {
+        1
+    } else {
+        (total + size - 1) / size
+    };
 
     Ok(Json(PaginatedRoles {
         roles,
@@ -296,12 +300,12 @@ pub async fn assign_role(
 pub async fn delete_role(
     _admin: AdminClaims,
     State(pool): State<Db>,
-    Path(role_name): Path<String>,
+    Path(role_id): Path<Uuid>,
 ) -> AppResult<Json<serde_json::Value>> {
-    eprintln!("[delete_role] Attempting to delete role: {:?}", role_name);
+    eprintln!("[delete_role] Deleting role_id: {:?}", role_id);
 
-    let result = sqlx::query("DELETE FROM roles WHERE name = $1")
-        .bind(&role_name)
+    let result = sqlx::query("DELETE FROM roles WHERE role_id = $1")
+        .bind(role_id)
         .execute(&pool)
         .await?;
 
@@ -313,10 +317,9 @@ pub async fn delete_role(
 
     Ok(Json(serde_json::json!({
         "status": "success",
-        "message": format!("Role '{}' deleted.", role_name)
+        "message": "Role deleted."
     })))
 }
-
 #[derive(Debug, Serialize, sqlx::FromRow)]
 pub struct RoleAssignmentRow {
     pub email: String,
@@ -332,28 +335,23 @@ pub struct RoleDetailResponse {
 }
 
 pub async fn get_role_detail(
-    claims: Option<crate::models::Claims>,
+    _admin: AdminClaims,
     State(pool): State<Db>,
-    Path(role_name): Path<String>,
+    Path(role_id): Path<Uuid>,
 ) -> AppResult<Json<RoleDetailResponse>> {
     use sqlx::Row;
 
-    // Require login
-    let _c = claims.ok_or(AppError::Unauthorized)?;
-
-    // Fetch role
     let mut role = sqlx::query_as::<_, Role>(
-        "SELECT role_id, name, description, created_at FROM roles WHERE name = $1",
+        "SELECT role_id, name, description, created_at FROM roles WHERE role_id = $1",
     )
-    .bind(&role_name)
+    .bind(role_id)
     .fetch_optional(&pool)
     .await?
     .ok_or(AppError::RoleNotFound)?;
 
-    // Load permissions
     let perms =
         sqlx::query("SELECT resource, access_level FROM role_permissions WHERE role_id = $1")
-            .bind(role.role_id)
+            .bind(role_id)
             .fetch_all(&pool)
             .await?;
 
@@ -370,7 +368,6 @@ pub async fn get_role_detail(
         })
         .collect();
 
-    // Load assignments with user email
     let assignment_rows = sqlx::query(
         "SELECT u.email, ra.assigned_at, ra.expires_at,
                 CASE WHEN ra.expires_at IS NULL OR ra.expires_at > NOW() THEN true ELSE false END AS is_active
@@ -379,7 +376,7 @@ pub async fn get_role_detail(
          WHERE ra.role_id = $1
          ORDER BY ra.assigned_at DESC",
     )
-    .bind(role.role_id)
+    .bind(role_id)
     .fetch_all(&pool)
     .await?;
 
