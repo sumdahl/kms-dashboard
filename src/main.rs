@@ -9,6 +9,7 @@ mod models;
 mod routes;
 
 use tower_http::services::ServeDir;
+use tower_http::catch_panic::CatchPanicLayer;
 use tower_livereload::LiveReloadLayer;
 use tracing::{error, info};
 
@@ -16,6 +17,18 @@ use crate::app_state::AppState;
 use crate::config::Config;
 use crate::db::{init_db, run_migrations, seed_admin};
 use crate::routes::create_router;
+
+fn internal_error_response(_panic_info: Box<dyn std::any::Any + Send>) -> axum::http::Response<axum::body::Body> {
+    use axum::http::{StatusCode, header};
+
+    let body = serde_json::json!({ "error": "Internal server error" });
+
+    axum::http::Response::builder()
+        .status(StatusCode::INTERNAL_SERVER_ERROR)
+        .header(header::CONTENT_TYPE, "application/json")
+        .body(axum::body::Body::from(body.to_string()))
+        .unwrap()
+}
 
 #[tokio::main]
 async fn main() {
@@ -40,6 +53,7 @@ async fn main() {
         .nest_service("/static", ServeDir::new("static"))
         .nest_service("/nm", ServeDir::new("node_modules"))
         .nest_service("/public", ServeDir::new("public"))
+        .layer(CatchPanicLayer::custom(internal_error_response))
         .layer(LiveReloadLayer::new());
 
     // 6. Start Server

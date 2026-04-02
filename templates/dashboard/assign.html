@@ -146,7 +146,8 @@ endblock %} {% block head_scripts %}
                 fetch("/admin/roles"),
             ]);
             const users = await usersRes.json();
-            const roles = await rolesRes.json();
+            const rolesData = await rolesRes.json();
+            const roles = Array.isArray(rolesData) ? rolesData : (rolesData.roles || []);
 
             userSelect.setOptions(
                 users,

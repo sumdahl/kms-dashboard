@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ code }} {{ title }} — KMS Dashboard</title>
+    <script>
+      (function () {
+        try {
+          const theme = localStorage.getItem("theme");
+          const systemDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+          if (theme === "dark" || (!theme && systemDark)) {
+            document.documentElement.classList.add("dark");
+          }
+        } catch (e) {}
+      })();
+    </script>
+    <link rel="stylesheet" href="/static/css/output.css" />
+  </head>
+  <body class="flex items-center justify-center min-h-screen bg-bg-page">
+    <div class="flex flex-col items-center text-center max-w-md px-6">
+      <div class="flex items-center justify-center w-16 h-16 rounded-full bg-surface-02 text-icon-muted mb-6">
+        {% if code == 404 %}
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="m21 21-4.35-4.35"/>
+          <path d="M8 11h6"/>
+        </svg>
+        {% else %}
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        {% endif %}
+      </div>
+
+      <p class="text-4xl font-bold text-text-primary mb-2">{{ code }}</p>
+      <h1 class="text-lg font-semibold text-text-primary mb-2">{{ title }}</h1>
+      <p class="text-[13px] text-text-secondary mb-8">{{ message }}</p>
+
+      <div class="flex items-center gap-3">
+        <a href="/" class="inline-flex items-center px-4 h-9 rounded-sm bg-btn-primary text-text-on-primary text-[13px] font-medium hover:bg-btn-primary-hover transition-colors">
+          Go Home
+        </a>
+        <button onclick="history.back()" class="inline-flex items-center px-4 h-9 rounded-sm border border-border-subtle bg-surface-01 text-[13px] font-medium text-text-secondary hover:bg-surface-hover transition-colors">
+          Go Back
+        </button>
+      </div>
+    </div>
+  </body>
+</html>
