@@ -211,94 +211,91 @@
             </div>
         </div>
     </div>
-
-    <!-- ── RIGHT: Summary Sidebar ─────────────────────────────────────── -->
+    <!-- ── RIGHT: Summary Sidebar (FLAT STYLE) ───────────────────────────── -->
     <div class="w-72 shrink-0 space-y-4">
-        <!-- Summary card (mirrors CF "Usage" card) -->
-        <div
-            class="bg-surface-01 border border-border-subtle rounded-sm overflow-hidden"
-        >
-            <div
-                class="flex items-center justify-between px-4 py-3 border-b border-border-subtle"
-            >
-                <span class="text-base font-semibold text-text-primary"
-                    >Summary</span
-                >
-                <span id="summary-date" class="text-xs text-text-helper"
-                    >—</span
-                >
+
+        <!-- Summary -->
+        <div class="bg-surface-01 border border-border-subtle rounded-sm overflow-hidden">
+
+            <!-- Header -->
+            <div class="flex items-center justify-between px-4 py-3 border-b border-border-subtle">
+                <span class="text-[13px] font-semibold text-text-primary">Summary</span>
+                <span id="summary-date" class="text-xs text-text-helper">—</span>
             </div>
-            <div class="px-4 py-3">
-                <div class="flex items-center justify-between mb-1">
-                    <span class="text-[13px] text-text-secondary"
-                        >Total roles</span
-                    >
-                    <span
-                        id="sum-total"
-                        class="text-[13px] font-semibold text-text-primary"
-                        >—</span
-                    >
-                </div>
-                <div
-                    class="h-1.5 rounded-full bg-surface-02 overflow-hidden mb-4"
-                >
-                    <div
-                        id="sum-bar"
-                        class="h-full rounded-full bg-btn-primary transition-all duration-500"
-                        style="width: 0%"
-                    ></div>
+
+            <!-- Body -->
+            <div class="px-4 py-3 space-y-4">
+
+                <!-- Total roles -->
+                <div>
+                    <div class="flex items-center justify-between">
+                        <span class="text-[13px] text-text-secondary">Total roles</span>
+                        <span id="sum-total" class="text-[13px] font-medium text-text-primary">—</span>
+                    </div>
+
+                    <div class="h-1.5 rounded-full bg-surface-02 overflow-hidden mt-2">
+                        <div id="sum-bar"
+                            class="h-full rounded-full bg-btn-primary transition-all duration-500"
+                            style="width: 0%">
+                        </div>
+                    </div>
                 </div>
 
-                <!-- 4 stat tiles (mirrors CF's Requests / CPU time / etc.) -->
-                <div class="grid grid-cols-2 gap-2">
-                    <div class="border border-border-subtle rounded-sm p-3">
-                        <p class="text-[11px] text-text-helper mb-1">
-                            Permissions
-                        </p>
-                        <p
-                            id="sum-perms"
-                            class="text-xl font-semibold text-text-primary"
-                        >
-                            0
-                        </p>
+                <!-- Flat stats (NO boxes) -->
+                <div class="flex flex-col divide-y divide-border-subtle">
+
+                    <div class="flex items-center justify-between py-2">
+                        <span class="text-[13px] text-text-secondary">Permissions</span>
+                        <span id="sum-perms" class="text-[13px] font-medium text-text-primary">0</span>
                     </div>
-                    <div class="border border-border-subtle rounded-sm p-3">
-                        <p class="text-[11px] text-text-helper mb-1">
-                            Resources
-                        </p>
-                        <p
-                            id="sum-res"
-                            class="text-xl font-semibold text-text-primary"
-                        >
-                            0
-                        </p>
+
+                    <div class="flex items-center justify-between py-2">
+                        <span class="text-[13px] text-text-secondary">Resources</span>
+                        <span id="sum-res" class="text-[13px] font-medium text-text-primary">0</span>
                     </div>
-                    <div class="border border-border-subtle rounded-sm p-3">
-                        <p class="text-[11px] text-text-helper mb-1">
-                            Write access
-                        </p>
-                        <p
-                            id="sum-write"
-                            class="text-xl font-semibold text-text-primary"
-                        >
-                            0
-                        </p>
+
+                    <div class="flex items-center justify-between py-2">
+                        <span class="text-[13px] text-text-secondary">Write access</span>
+                        <span id="sum-write" class="text-[13px] font-medium text-text-primary">0</span>
                     </div>
-                    <div class="border border-border-subtle rounded-sm p-3">
-                        <p class="text-[11px] text-text-helper mb-1">
-                            Admin access
-                        </p>
-                        <p
-                            id="sum-admin"
-                            class="text-xl font-semibold text-text-primary"
-                        >
-                            0
-                        </p>
+
+                    <div class="flex items-center justify-between py-2">
+                        <span class="text-[13px] text-text-secondary">Admin access</span>
+                        <span id="sum-admin" class="text-[13px] font-medium text-text-primary">0</span>
                     </div>
+
                 </div>
             </div>
         </div>
 
+        <!-- Role Details -->
+        <div class="bg-surface-01 border border-border-subtle rounded-sm overflow-hidden">
+
+            <!-- Header -->
+            <div class="flex items-center px-4 py-3 border-b border-border-subtle">
+                <span class="text-[13px] font-semibold text-text-primary">Role Details</span>
+            </div>
+
+            <!-- Body -->
+            <div class="flex flex-col divide-y divide-border-subtle">
+
+                <div class="flex items-center justify-between px-4 py-3">
+                    <span class="text-[13px] text-text-secondary">Total roles</span>
+                    <span id="det-total" class="text-[13px] font-medium text-text-primary">—</span>
+                </div>
+
+                <div class="flex items-start justify-between px-4 py-3 gap-3">
+                    <span class="text-[13px] text-text-secondary">Resources</span>
+                    <span id="det-resources"
+                          class="text-[13px] font-medium text-text-primary text-right break-all">
+                        —
+                    </span>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
         <!-- Role Details card (mirrors CF "Account Details") -->
         <div
             class="bg-surface-01 border border-border-subtle rounded-sm overflow-hidden"
@@ -337,6 +334,12 @@
     <!-- /right sidebar -->
 </div>
 <!-- /two-column -->
+
+<!-- ── Shared role action menu (portal — positioned by JS, never clipped) ── -->
+<div
+    id="role-action-menu"
+    class="hidden fixed z-50 w-44 bg-surface-01 border border-border-subtle rounded-sm shadow-lg py-1 overflow-hidden"
+></div>
 
 <!-- ── Create Role Modal ────────────────────────────────────────────────── -->
 <div
@@ -627,6 +630,7 @@
 
     // ── Render a single role row (CF-style card row) ──────────────────────
     function renderRoleRow(role, isLast) {
+        const menuId = "role-" + role.name.replace(/\W+/g, "-");
         const date = new Date(role.created_at).toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",
@@ -662,21 +666,23 @@
                         ${escHtml(role.description) || "No description"}
                     </p>
                 </div>
-                <!-- Date + assign action -->
+                <!-- Date + ⋯ action menu -->
                 <div class="flex items-center gap-2.5 shrink-0">
                     <span class="text-[12px] text-text-helper">${date}</span>
-                    <a href="/assign?role=${encodeURIComponent(role.name)}"
-                       title="Assign this role to a user"
-                       class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-text-link hover:bg-surface-active opacity-0 group-hover:opacity-100 transition-all">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                    <button
+                        data-role="${escHtml(role.name)}"
+                        onclick="toggleRoleMenu(this.dataset.role, event)"
+                        title="More actions"
+                        class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-text-primary hover:bg-surface-active transition-colors"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
                              viewBox="0 0 24 24" fill="none" stroke="currentColor"
                              stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                            <circle cx="9" cy="7" r="4"/>
-                            <line x1="19" y1="8" x2="19" y2="14"/>
-                            <line x1="22" y1="11" x2="16" y2="11"/>
+                            <circle cx="5"  cy="12" r="1"/>
+                            <circle cx="12" cy="12" r="1"/>
+                            <circle cx="19" cy="12" r="1"/>
                         </svg>
-                    </a>
+                    </button>
                 </div>
             </div>
             <!-- Permissions sub-row (mirrors CF's commit info row) -->
@@ -753,6 +759,90 @@
             pgCtrl.classList.add("hidden");
         }
     }
+
+    // ── Role row ⋯ menu helpers (portal pattern — immune to overflow:hidden) ──
+    function toggleRoleMenu(roleName, e) {
+        e.stopPropagation();
+        const menu = document.getElementById("role-action-menu");
+        const btn = e.currentTarget;
+
+        // Clicking the same button while open → close
+        if (menu._activeRole === roleName && !menu.classList.contains("hidden")) {
+            menu.classList.add("hidden");
+            menu._activeRole = null;
+            return;
+        }
+
+        // Build menu content using data attributes to avoid inline quoting issues
+        const encoded = encodeURIComponent(roleName);
+        const safe = escHtml(roleName);
+        menu.innerHTML = `
+            <a href="/assign?role=${encoded}"
+               class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                    <circle cx="9" cy="7" r="4"/>
+                    <line x1="19" y1="8" x2="19" y2="14"/>
+                    <line x1="22" y1="11" x2="16" y2="11"/>
+                </svg>
+                Assign role
+            </a>
+            <button data-name="${safe}" onclick="copyRoleName(this.dataset.name)"
+                    class="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors text-left">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                </svg>
+                Copy name
+            </button>`;
+
+        menu._activeRole = roleName;
+
+        // ── Position: right-align under the button, flip up if near viewport bottom ──
+        const rect = btn.getBoundingClientRect();
+        const menuW = 176; // w-44 = 11rem
+        const menuH = menu.scrollHeight || 84;
+
+        let top = rect.bottom + 4;
+        let left = rect.right - menuW;
+
+        // Flip upward when overflowing viewport bottom
+        if (top + menuH > window.innerHeight - 8) {
+            top = rect.top - menuH - 4;
+        }
+        // Clamp horizontally within viewport
+        if (left < 8) left = 8;
+        if (left + menuW > window.innerWidth - 8) left = window.innerWidth - menuW - 8;
+
+        menu.style.top = top + "px";
+        menu.style.left = left + "px";
+        menu.classList.remove("hidden");
+    }
+
+    function copyRoleName(name) {
+        navigator.clipboard.writeText(name).then(() => {
+            const menu = document.getElementById("role-action-menu");
+            menu.classList.add("hidden");
+            menu._activeRole = null;
+            showToast(`Copied "${name}" to clipboard.`);
+        });
+    }
+
+    // Close portal menu on outside click or Escape
+    document.addEventListener("click", () => {
+        const menu = document.getElementById("role-action-menu");
+        if (menu) { menu.classList.add("hidden"); menu._activeRole = null; }
+    });
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            const menu = document.getElementById("role-action-menu");
+            if (menu) { menu.classList.add("hidden"); menu._activeRole = null; }
+        }
+    });
 
     // ── Pagination helper ─────────────────────────────────────────────────
     function goPage(n) {
