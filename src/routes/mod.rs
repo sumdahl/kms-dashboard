@@ -76,6 +76,7 @@ struct HomeTemplate {
     user_email: String,
     show_banner: bool,
     css_version: &'static str,
+    is_admin: bool,
 }
 
 async fn home(claims: Option<Claims>) -> Response {
@@ -86,6 +87,7 @@ async fn home(claims: Option<Claims>) -> Response {
             user_email: c.email,
             show_banner: true,
             css_version: env!("CSS_VERSION"),
+            is_admin: c.is_admin,
         }
         .into_response(),
     }
@@ -98,6 +100,7 @@ struct RolesTemplate {
     user_email: String,
     show_banner: bool,
     css_version: &'static str,
+    is_admin: bool,
 }
 
 async fn roles_page(claims: Option<Claims>) -> Response {
@@ -108,6 +111,7 @@ async fn roles_page(claims: Option<Claims>) -> Response {
             user_email: c.email,
             show_banner: false,
             css_version: env!("CSS_VERSION"),
+            is_admin: c.is_admin,
         }
         .into_response(),
     }
@@ -120,6 +124,7 @@ struct AssignTemplate {
     user_email: String,
     show_banner: bool,
     css_version: &'static str,
+    is_admin: bool,
 }
 
 async fn assign_page(claims: Option<Claims>) -> Response {
@@ -130,6 +135,7 @@ async fn assign_page(claims: Option<Claims>) -> Response {
             user_email: c.email,
             show_banner: false,
             css_version: env!("CSS_VERSION"),
+            is_admin: c.is_admin,
         }
         .into_response(),
     }
@@ -144,6 +150,7 @@ struct RoleDetailTemplate {
     user_email: String,
     show_banner: bool,
     css_version: &'static str,
+    is_admin: bool,
     role_name: String,
     role_description: String,
     role_id_short: String,
@@ -266,6 +273,7 @@ async fn role_detail_page(
         user_email: c.email,
         show_banner: false,
         css_version: env!("CSS_VERSION"),
+        is_admin: c.is_admin,
         role_name: role.name,
         role_description: role.description,
         role_id_short: role.role_id.to_string()[..8].to_string(),

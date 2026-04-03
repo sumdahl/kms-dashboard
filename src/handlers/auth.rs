@@ -28,6 +28,7 @@ pub struct SigninResponse {
     pub token: String,
     pub user_id: String,
     pub message: String,
+    pub is_admin: bool,
 }
 
 #[derive(Serialize)]
@@ -68,6 +69,7 @@ pub async fn login(
         token,
         user_id: user.user_id.to_string(),
         message: "Login successful".into(),
+        is_admin: user.is_admin,
     });
 
     let mut res = (jar, body).into_response();
