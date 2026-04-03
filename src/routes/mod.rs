@@ -30,6 +30,8 @@ pub fn create_router(state: AppState) -> Router {
         .route("/assign", get(assign_page))
         .route("/ui/sidebar/pin", post(sidebar_pin))
         .route("/ui/banner", delete(banner_dismiss))
+        .route("/forgot-password", get(forgot_password_page))
+        .route("/reset-password", get(reset_password_page))
         //to simulate 500 server error.
         .route(
             "/test-panic",
@@ -69,6 +71,21 @@ async fn signup_page() -> impl IntoResponse {
     SignupTemplate {}
 }
 
+#[derive(askama::Template)]
+#[template(path = "forgot_password.html")]
+struct ForgotPasswordTemplate {}
+
+async fn forgot_password_page() -> impl IntoResponse {
+    ForgotPasswordTemplate {}
+}
+
+#[derive(askama::Template)]
+#[template(path = "reset_password.html")]
+struct ResetPasswordTemplate {}
+
+async fn reset_password_page() -> impl IntoResponse {
+    ResetPasswordTemplate {}
+}
 #[derive(askama::Template)]
 #[template(path = "dashboard/home.html")]
 struct HomeTemplate {

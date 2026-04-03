@@ -25,3 +25,4 @@ hex  = "0.4"
 headers    = "0.4"
 tracing = "0.1.44"
 axum-extra = { version = "0.9", features = ["typed-header", "cookie"] }
+resend-rs = "0.22.0"

@@ -4,10 +4,12 @@ mod config;
 mod db;
 mod error;
 mod handlers;
+mod mailer;
 mod middleware;
 mod models;
 mod routes;
 
+use resend_rs::Resend;
 use tower_http::catch_panic::CatchPanicLayer;
 use tower_http::services::ServeDir;
 use tower_livereload::LiveReloadLayer;
@@ -44,7 +46,10 @@ async fn main() {
     let cleanup_pool = pool.clone();
 
     // 4. Initialize App State
-    let state = AppState { db: pool };
+    let state = AppState {
+        db: pool,
+        resend: Resend::default(),
+    };
 
     // 5. Build Router
     let app = create_router(state)

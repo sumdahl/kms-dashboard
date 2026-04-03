@@ -30,6 +30,8 @@ pub enum AppError {
     Conflict(String),
     #[error("Internal error: {0}")]
     Internal(String),
+    #[error("Bad request: {0}")]
+    BadRequest(String),
 }
 
 impl From<sqlx::Error> for AppError {
@@ -58,6 +60,7 @@ impl IntoResponse for AppError {
             AppError::UserNotFound => StatusCode::NOT_FOUND,
             AppError::Conflict(_) => StatusCode::CONFLICT,
             AppError::Internal(_) => StatusCode::INTERNAL_SERVER_ERROR,
+            AppError::BadRequest(_) => StatusCode::BAD_REQUEST,
         };
 
         (status, Json(json!({ "error": self.to_string() }))).into_response()
