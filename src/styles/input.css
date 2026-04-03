@@ -246,6 +246,29 @@
         transition: opacity 150ms ease 60ms;
     }
 
+    /* ── Logo dynamic width (hides text when collapsed) ───────── */
+    .sidebar-logo-wrapper {
+        width: 18px;
+        transition: width 150ms ease;
+    }
+    .sidebar.is-expanded .sidebar-logo-wrapper {
+        width: 80px;
+    }
+
+    /* ── Search Box dynamic styling ───────── */
+    .sidebar-search-btn {
+        background-color: transparent;
+        border-color: transparent;
+        box-shadow: none;
+        transition: all 150ms ease;
+    }
+    .sidebar.is-expanded .sidebar-search-btn {
+        background-color: var(--color-surface-02);
+        border-color: var(--color-border-strong);
+        /* shadow-sm in tailwind maps to 0 1px 2px 0 rgb(0 0 0 / 0.05) */
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    }
+
     /* ── Section Divider: visible collapsed, hidden expanded ─────────── */
     .section-divider {
         height: 1px;

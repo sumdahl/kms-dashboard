@@ -26,7 +26,7 @@ pub fn create_router(state: AppState) -> Router {
         .route("/login", get(login_page))
         .route("/signup", get(signup_page))
         .route("/roles", get(roles_page))
-        .route("/roles/{name}", get(role_detail_page))
+        .route("/roles/:name", get(role_detail_page))
         .route("/assign", get(assign_page))
         .route("/ui/sidebar/pin", post(sidebar_pin))
         .route("/ui/banner", delete(banner_dismiss))
