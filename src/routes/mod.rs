@@ -30,6 +30,15 @@ pub fn create_router(state: AppState) -> Router {
         .route("/assign", get(assign_page))
         .route("/ui/sidebar/pin", post(sidebar_pin))
         .route("/ui/banner", delete(banner_dismiss))
+        //to simulate 500 server error.
+        .route(
+            "/test-panic",
+            get(|| async {
+                panic!("Test 500 error");
+                #[allow(unreachable_code)]
+                axum::http::StatusCode::INTERNAL_SERVER_ERROR
+            }),
+        )
         .route("/account-menu", get(account_menu))
         .nest("/auth", auth::router())
         .nest(
@@ -277,6 +286,34 @@ struct ErrorTemplate {
     code: u16,
     title: String,
     message: String,
+}
+
+pub fn error_page_response(
+    code: u16,
+    title: &str,
+    message: &str,
+) -> axum::http::Response<axum::body::Body> {
+    use askama::Template;
+    use axum::http::{header, StatusCode};
+
+    let template = ErrorTemplate {
+        code,
+        title: title.to_string(),
+        message: message.to_string(),
+    };
+
+    let body = template.render().unwrap_or_else(|_| {
+        format!(
+            "<html><body><h1>{} {}</h1><p>{}</p></body></html>",
+            code, title, message
+        )
+    });
+
+    axum::http::Response::builder()
+        .status(StatusCode::from_u16(code).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR))
+        .header(header::CONTENT_TYPE, "text/html")
+        .body(axum::body::Body::from(body))
+        .unwrap()
 }
 
 fn error_page(code: u16, title: &str, message: &str) -> impl IntoResponse {
