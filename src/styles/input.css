@@ -196,7 +196,8 @@
         grid-template-areas:
             "sidebar main"
             "footer  footer";
-        min-height: 100vh;
+        height: 100vh;
+        overflow: hidden;
         transition: grid-template-columns 220ms cubic-bezier(0.2, 0, 0, 1);
     }
 

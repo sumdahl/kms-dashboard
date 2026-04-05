@@ -73,7 +73,7 @@ async fn home(claims: Option<Claims>) -> Response {
     match claims {
         None => Redirect::to("/login").into_response(),
         Some(c) => HomeTemplate {
-            sidebar_pinned: false,
+            sidebar_pinned: true,
             user_email: c.email,
             show_banner: true,
             css_version: env!("CSS_VERSION"),
@@ -95,7 +95,7 @@ async fn roles_page(claims: Option<Claims>) -> Response {
     match claims {
         None => Redirect::to("/login").into_response(),
         Some(c) => RolesTemplate {
-            sidebar_pinned: false,
+            sidebar_pinned: true,
             user_email: c.email,
             show_banner: false,
             css_version: env!("CSS_VERSION"),
@@ -117,7 +117,7 @@ async fn assign_page(claims: Option<Claims>) -> Response {
     match claims {
         None => Redirect::to("/login").into_response(),
         Some(c) => AssignTemplate {
-            sidebar_pinned: false,
+            sidebar_pinned: true,
             user_email: c.email,
             show_banner: false,
             css_version: env!("CSS_VERSION"),
@@ -253,7 +253,7 @@ async fn role_detail_page(
     let assignments_len = assignments.len();
 
     RoleDetailTemplate {
-        sidebar_pinned: false,
+        sidebar_pinned: true,
         user_email: c.email,
         show_banner: false,
         css_version: env!("CSS_VERSION"),

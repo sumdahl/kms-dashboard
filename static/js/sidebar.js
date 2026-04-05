@@ -1,28 +1,21 @@
 /**
- * SIDEBAR — Three-Zone Hover Model + Pin Toggle
+ * SIDEBAR — Click-Only Toggle
  *
- * Zone A: #sidebar-hover-zone  — mouseenter/mouseleave triggers expand/collapse
- * Zone B: implicit gap         — natural dead zone (nothing triggers here)
- * Zone C: #sidebar-toggle      — click-only in footer bar, never triggers hover expand
- *
- * The footer toggle (#sidebar-toggle) is a completely separate DOM element
- * outside the sidebar. Hovering over it cannot trigger Zone A's hover events.
- * This is the key architectural choice that makes the three-zone model work
- * without any complex pointer detection logic.
+ * The sidebar defaults to expanded (server sends pinned=true).
+ * It does NOT react to mouse hover at all.
+ * The ONLY way to compress/expand it is via the toggle button (#sidebar-toggle).
  */
 
 (function () {
   'use strict';
 
-  const sidebar      = document.getElementById('sidebar');
-  const hoverZone    = document.getElementById('sidebar-hover-zone');
-  const toggleBtn    = document.getElementById('sidebar-toggle');
+  const sidebar = document.getElementById('sidebar');
+  const toggleBtn = document.getElementById('sidebar-toggle');
 
-  if (!sidebar || !hoverZone || !toggleBtn) return;
+  if (!sidebar || !toggleBtn) return;
 
-  // Read initial pin state from the data attribute set by the server.
-  // The server reads a cookie and renders the correct initial state.
-  let pinned = sidebar.dataset.pinned === 'true';
+  // Read initial state from the server-rendered data attribute.
+  let expanded = sidebar.dataset.pinned === 'true';
 
   // ── State Mutations ────────────────────────────────────────────────────
 
@@ -36,61 +29,33 @@
     document.body.classList.remove('sidebar-expanded');
   }
 
+  // Apply initial state immediately on page load
+  if (expanded) {
+    expand();
+  }
+
   function syncWithServer(isPinned) {
-    // Notify the Axum backend to persist the pin state (e.g. in a cookie).
-    // hx-boost or manual fetch — either works. Using fetch here to avoid
-    // requiring HTMX on this script.
     fetch('/ui/sidebar/pin', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: 'pinned=' + isPinned,
-    }).catch(function () {
-      // Non-critical — the UI is already in the correct state.
-    });
+    }).catch(function () {});
   }
 
-  // ── Zone A: Hover Zone ─────────────────────────────────────────────────
-  // Only fires when cursor enters/leaves the nav items area of the sidebar.
-  // The footer toggle is outside this element so it is never affected.
-
-  hoverZone.addEventListener('mouseenter', function () {
-    if (!pinned) expand();
-  });
-
-  hoverZone.addEventListener('mouseleave', function () {
-    if (!pinned) collapse();
-  });
-
-  // ── Zone C: Toggle Button (footer) ─────────────────────────────────────
-  // Click-only. Hovering here does NOT expand the sidebar.
+  // ── Toggle Button ──────────────────────────────────────────────────────
+  // The ONLY control. Click to expand or compress.
 
   toggleBtn.addEventListener('click', function () {
-    pinned = !pinned;
-    sidebar.dataset.pinned = String(pinned);
+    expanded = !expanded;
+    sidebar.dataset.pinned = String(expanded);
 
-    if (pinned) {
+    if (expanded) {
       expand();
     } else {
       collapse();
     }
 
-    syncWithServer(pinned);
-  });
-
-  // ── Accordion: Nav Groups (details/summary) ────────────────────────────
-  // Collapse all open groups when sidebar collapses so state is clean
-  // when user hovers again.
-
-  sidebar.addEventListener('transitionend', function (e) {
-    if (e.propertyName !== 'width') return;
-    if (!sidebar.classList.contains('is-expanded')) {
-      var groups = sidebar.querySelectorAll('details.sidebar__group[open]');
-      groups.forEach(function (g) {
-        // Don't remove open from groups that were open before collapse —
-        // they should re-open when sidebar expands again.
-        // So we only visually hide sub-items via CSS, not remove [open].
-      });
-    }
+    syncWithServer(expanded);
   });
 
 })();
