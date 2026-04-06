@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Key Management System Dashboard",
   "scripts": {
+    "copy-lucide": "cp node_modules/lucide/dist/esm/lucide.js static/js/lucide.esm.js",
     "copy-htmx": "cp node_modules/htmx.org/dist/htmx.min.js static/js/htmx.min.js",
     "build:css": "postcss src/styles/input.css -o static/css/output.css",
     "watch:css": "postcss src/styles/input.css -o static/css/output.css --watch",

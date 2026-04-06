@@ -1,10 +1,10 @@
-import { createIcons, icons } from 'https://esm.sh/lucide@0.475.0';
+import { createIcons, icons } from "/static/js/lucide.esm.js";
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener("DOMContentLoaded", () => {
   createIcons({
     icons,
-    nameAttr: 'data-lucide',
-    className: 'lucide',
+    nameAttr: "data-lucide",
+    className: "lucide",
   });
 });
 
