@@ -5,7 +5,7 @@ use crate::{
     mailer::send_reset_email,
 };
 use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
-use chrono::Utc;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -23,6 +23,14 @@ pub struct ResetPasswordRequest {
 #[derive(Serialize)]
 pub struct MessageResponse {
     pub message: String,
+}
+
+// Struct to help SQLx infer types for the password reset record
+pub struct PasswordResetToken {
+    pub id: Uuid,
+    pub user_id: Uuid,
+    pub expires_at: DateTime<Utc>,
+    pub used_at: Option<DateTime<Utc>>,
 }
 
 pub async fn forgot_password(
@@ -73,8 +81,10 @@ pub async fn reset_password(
     let token = Uuid::parse_str(&payload.token)
         .map_err(|_| AppError::BadRequest("Invalid token format".into()))?;
 
-    let record = sqlx::query!(
-        "SELECT id, user_id, expires_at, used_at
+    // Use query_as! to map to our struct and solve the type inference issue
+    let record = sqlx::query_as!(
+        PasswordResetToken,
+        "SELECT id, user_id, expires_at, used_at as \"used_at: _\"
          FROM password_reset_tokens
          WHERE token = $1",
         token
