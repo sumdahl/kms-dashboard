@@ -132,5 +132,9 @@
         document.addEventListener("keydown", (e) => {
             if (e.key === "Escape") closeMenu();
         });
+
+        dropdown.addEventListener("click", (e) => {
+            if (e.target.closest('[role="menuitem"]')) closeMenu();
+        });
     })();
 </script>
