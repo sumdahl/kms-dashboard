@@ -81,6 +81,7 @@
     --color-icon-primary: #161616;
     --color-btn-primary: #046dff;
     --color-btn-primary-hover: #0057d9;
+    --color-btn-primary-press: #0043b0;
     --color-status-green: #24a148;
     --color-status-red: #da1e28;
     --color-banner-bg: #dbeafe;
@@ -916,6 +917,9 @@
   .bg-\[\#0051c3\] {
     background-color: #0051c3;
   }
+  .bg-\[var\(--color-btn-primary\)\] {
+    background-color: var(--color-btn-primary);
+  }
   .bg-amber-500\/10 {
     background-color: color-mix(in srgb, oklch(76.9% 0.188 70.08) 10%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
@@ -1542,6 +1546,13 @@
       }
     }
   }
+  .hover\:bg-\[var\(--color-btn-primary-hover\)\] {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-btn-primary-hover);
+      }
+    }
+  }
   .hover\:bg-black\/10 {
     &:hover {
       @media (hover: hover) {
@@ -1678,6 +1689,11 @@
     &:focus {
       --tw-outline-style: none;
       outline-style: none;
+    }
+  }
+  .active\:bg-\[var\(--color-btn-primary-press\)\] {
+    &:active {
+      background-color: var(--color-btn-primary-press);
     }
   }
   .disabled\:cursor-not-allowed {

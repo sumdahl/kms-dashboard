@@ -15,26 +15,71 @@
 {% endblock %} {% block content %}
 
 <!-- ── LIGHT THEME OVERRIDE WRAPPER ────────────────────────────────────────── -->
-<div style="--color-bg-page:#fafafa;--color-surface-01:#ffffff;--color-surface-02:#f9fafb;--color-surface-active:#e5e7eb;--color-surface-hover:#f3f4f6;--color-text-primary:#171717;--color-text-secondary:#525252;--color-text-helper:#737373;--color-text-placeholder:#a3a3a3;--color-border-subtle:#e5e7eb;--color-border-strong:#d4d4d8;--color-icon-muted:#a3a3a3;--color-icon-secondary:#525252;--color-icon-primary:#171717;--color-btn-primary:#0051c3;--color-btn-primary-hover:#003681;--color-badge-bg:#f3f4f6;--color-badge-text:#525252;"
-     class="bg-bg-page text-text-primary font-sans transition-none">
+<div
+    style="
+        --color-bg-page: #fafafa;
+        --color-surface-01: #ffffff;
+        --color-surface-02: #f9fafb;
+        --color-surface-active: #e5e7eb;
+        --color-surface-hover: #f3f4f6;
+        --color-text-primary: #171717;
+        --color-text-secondary: #525252;
+        --color-text-helper: #737373;
+        --color-text-placeholder: #a3a3a3;
+        --color-border-subtle: #e5e7eb;
+        --color-border-strong: #d4d4d8;
+        --color-icon-muted: #a3a3a3;
+        --color-icon-secondary: #525252;
+        --color-icon-primary: #171717;
+        --color-btn-primary: #046dff;
+        --color-btn-primary-hover: #0057d9;
+        --color-badge-bg: #f3f4f6;
+        --color-badge-text: #525252;
+    "
+    class="bg-bg-page text-text-primary font-sans transition-none"
+>
     <!-- ── Header ── -->
     <div class="flex flex-col gap-6 mb-8 max-w-[1200px] w-full mx-auto">
         <div class="flex items-start justify-between">
             <div class="flex items-start gap-3">
                 <div class="text-icon-secondary mt-1">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <polyline points="16 18 22 12 16 6"/>
-                        <polyline points="8 6 2 12 8 18"/>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <polyline points="16 18 22 12 16 6" />
+                        <polyline points="8 6 2 12 8 18" />
                     </svg>
                 </div>
                 <div>
-                    <h1 class="text-[22px] font-bold text-text-primary">Roles & Access</h1>
-                    <p class="text-[13px] text-text-secondary mt-0.5">Manage permissions, user assignment, and access control.</p>
+                    <h1 class="text-[22px] font-bold text-text-primary">
+                        Roles & Access
+                    </h1>
+                    <p class="text-[13px] text-text-secondary mt-0.5">
+                        Manage permissions, user assignment, and access control.
+                    </p>
                 </div>
             </div>
             <div class="flex items-center gap-3 shrink-0">
-                <a href="/docs" target="_blank" class="px-3.5 h-[32px] border border-border-strong rounded-md text-[13px] font-medium bg-surface-01 hover:bg-surface-hover text-text-primary flex items-center justify-center transition-colors shadow-sm">Documentation</a>
-                <button onclick="openCreateModal()" class="px-3.5 h-[32px] bg-btn-primary hover:bg-btn-primary-hover text-white rounded-md text-[13px] font-medium flex items-center justify-center transition-colors shadow-sm">Create application</button>
+                <a
+                    href="/docs"
+                    target="_blank"
+                    class="px-3.5 h-[32px] border border-border-strong rounded-md text-[13px] font-medium bg-surface-01 hover:bg-surface-hover text-text-primary flex items-center justify-center transition-colors shadow-sm"
+                    >Documentation</a
+                >
+                <button
+                    onclick="openCreateModal()"
+                    class="px-3.5 h-[32px] bg-[var(--color-btn-primary)] hover:bg-[var(--color-btn-primary-hover)] active:bg-[var(--color-btn-primary-press)] text-white rounded-md text-[13px] font-medium flex items-center justify-center transition-colors shadow-sm"
+                >
+                    Create application
+                </button>
             </div>
         </div>
 
@@ -44,18 +89,84 @@
                 <!-- Toolbar -->
                 <div class="flex items-center gap-2 mb-4">
                     <div class="relative flex-1">
-                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-icon-muted" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                        <input id="role-search" oninput="filterRoles()" type="text" placeholder="Search applications" class="w-full pl-9 pr-3 h-[34px] border border-border-strong rounded-md bg-surface-01 text-[13px] placeholder:text-text-placeholder focus:outline-none focus:border-btn-primary transition-colors">
+                        <svg
+                            class="absolute left-3 top-1/2 -translate-y-1/2 text-icon-muted"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.35-4.35" />
+                        </svg>
+                        <input
+                            id="role-search"
+                            oninput="filterRoles()"
+                            type="text"
+                            placeholder="Search applications"
+                            class="w-full pl-9 pr-3 h-[34px] border border-border-strong rounded-md bg-surface-01 text-[13px] placeholder:text-text-placeholder focus:outline-none focus:border-btn-primary transition-colors"
+                        />
                     </div>
                     <!-- Mock dropdowns -->
-                    <button class="h-[34px] px-3 flex items-center gap-2.5 border border-border-strong rounded-md bg-surface-01 text-[13px] text-text-primary hover:bg-surface-hover transition-colors shadow-sm"><span>Show all</span> <svg class="text-icon-muted" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
-                    <button class="h-[34px] px-3 flex items-center gap-2.5 border border-border-strong rounded-md bg-surface-01 text-[13px] text-text-primary hover:bg-surface-hover transition-colors shadow-sm"><span>Last modified</span> <svg class="text-icon-muted" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+                    <button
+                        class="h-[34px] px-3 flex items-center gap-2.5 border border-border-strong rounded-md bg-surface-01 text-[13px] text-text-primary hover:bg-surface-hover transition-colors shadow-sm"
+                    >
+                        <span>Show all</span>
+                        <svg
+                            class="text-icon-muted"
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
+                    </button>
+                    <button
+                        class="h-[34px] px-3 flex items-center gap-2.5 border border-border-strong rounded-md bg-surface-01 text-[13px] text-text-primary hover:bg-surface-hover transition-colors shadow-sm"
+                    >
+                        <span>Last modified</span>
+                        <svg
+                            class="text-icon-muted"
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path d="m6 9 6 6 6-6" />
+                        </svg>
+                    </button>
                     <!-- Refresh tool -->
-                    <button onclick="loadRoles()" class="h-[34px] w-[34px] shrink-0 flex items-center justify-center border border-border-strong rounded-md bg-surface-01 text-icon-secondary hover:bg-surface-hover transition-colors shadow-sm">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                    <button
+                        onclick="loadRoles()"
+                        class="h-[34px] w-[34px] shrink-0 flex items-center justify-center border border-border-strong rounded-md bg-surface-01 text-icon-secondary hover:bg-surface-hover transition-colors shadow-sm"
+                    >
+                        <svg
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                        >
+                            <path
+                                d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+                            />
+                            <path d="M21 3v5h-5" />
+                            <path
+                                d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+                            />
+                            <path d="M8 16H3v5" />
+                        </svg>
                     </button>
                 </div>
-                
+
                 <!-- Cards Container -->
                 <div id="roles-list" class="flex flex-col gap-3">
                     <!-- Skeletons... -->
@@ -63,45 +174,166 @@
 
                 <!-- Pagination -->
                 <div class="flex items-center justify-between mt-4">
-                    <span id="showing-text" class="text-[12px] text-text-secondary"></span>
-                    <div id="pagination-controls" class="hidden flex items-center shadow-sm">
-                        <button id="pg-first" onclick="goPage(1)" class="w-8 h-[30px] flex items-center justify-center border border-border-strong rounded-l-md bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-50">«</button>
-                        <button id="pg-prev" onclick="goPage(_page-1)" class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-50">‹</button>
-                        <span id="pg-num" class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-text-primary text-[13px] font-medium">1</span>
-                        <button id="pg-next" onclick="goPage(_page+1)" class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-50">›</button>
-                        <button id="pg-last" class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong rounded-r-md bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-50">»</button>
+                    <span
+                        id="showing-text"
+                        class="text-[12px] text-text-secondary"
+                    ></span>
+                    <div
+                        id="pagination-controls"
+                        class="hidden flex items-center shadow-sm"
+                    >
+                        <button
+                            id="pg-first"
+                            onclick="goPage(1)"
+                            class="w-8 h-[30px] flex items-center justify-center border border-border-strong rounded-l-md bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-50"
+                        >
+                            «
+                        </button>
+                        <button
+                            id="pg-prev"
+                            onclick="goPage(_page - 1)"
+                            class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-50"
+                        >
+                            ‹
+                        </button>
+                        <span
+                            id="pg-num"
+                            class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-text-primary text-[13px] font-medium"
+                            >1</span
+                        >
+                        <button
+                            id="pg-next"
+                            onclick="goPage(_page + 1)"
+                            class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-50"
+                        >
+                            ›
+                        </button>
+                        <button
+                            id="pg-last"
+                            class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong rounded-r-md bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-50"
+                        >
+                            »
+                        </button>
                     </div>
                 </div>
             </div>
 
             <!-- ── Right Column: Summary & Account Details ── -->
             <div class="w-[300px] shrink-0 flex flex-col gap-6">
-                
                 <!-- Usage / Summary Card -->
                 <div>
                     <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-[16px] font-bold text-text-primary">Summary</h2>
-                        <span id="summary-date" class="text-[11px] text-text-secondary uppercase"></span>
+                        <h2 class="text-[16px] font-bold text-text-primary">
+                            Summary
+                        </h2>
+                        <span
+                            id="summary-date"
+                            class="text-[11px] text-text-secondary uppercase"
+                        ></span>
                     </div>
-                    <div class="bg-surface-01 border border-border-strong rounded-[8px] shadow-sm overflow-hidden flex flex-col">
-                        <div class="grid grid-cols-2 border-b border-border-subtle">
+                    <div
+                        class="bg-surface-01 border border-border-strong rounded-[8px] shadow-sm overflow-hidden flex flex-col"
+                    >
+                        <div
+                            class="grid grid-cols-2 border-b border-border-subtle"
+                        >
                             <div class="p-3 border-r border-border-subtle">
-                                <span class="flex items-center gap-1 text-[11px] text-text-secondary">Requests today <svg class="text-icon-muted" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
-                                <div id="sum-total" class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight">—</div>
+                                <span
+                                    class="flex items-center gap-1 text-[11px] text-text-secondary"
+                                    >Requests today
+                                    <svg
+                                        class="text-icon-muted"
+                                        width="10"
+                                        height="10"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <circle cx="12" cy="12" r="10" />
+                                        <path d="M12 16v-4" />
+                                        <path d="M12 8h.01" /></svg
+                                ></span>
+                                <div
+                                    id="sum-total"
+                                    class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight"
+                                >
+                                    —
+                                </div>
                             </div>
                             <div class="p-3">
-                                <span class="flex items-center gap-1 text-[11px] text-text-secondary">Permissions <svg class="text-icon-muted" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
-                                <div id="sum-perms" class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight">—</div>
+                                <span
+                                    class="flex items-center gap-1 text-[11px] text-text-secondary"
+                                    >Permissions
+                                    <svg
+                                        class="text-icon-muted"
+                                        width="10"
+                                        height="10"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <circle cx="12" cy="12" r="10" />
+                                        <path d="M12 16v-4" />
+                                        <path d="M12 8h.01" /></svg
+                                ></span>
+                                <div
+                                    id="sum-perms"
+                                    class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight"
+                                >
+                                    —
+                                </div>
                             </div>
                         </div>
                         <div class="grid grid-cols-2">
                             <div class="p-3 border-r border-border-subtle">
-                                <span class="flex items-center gap-1 text-[11px] text-text-secondary">Resources <svg class="text-icon-muted" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
-                                <div id="sum-res" class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight">—</div>
+                                <span
+                                    class="flex items-center gap-1 text-[11px] text-text-secondary"
+                                    >Resources
+                                    <svg
+                                        class="text-icon-muted"
+                                        width="10"
+                                        height="10"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <circle cx="12" cy="12" r="10" />
+                                        <path d="M12 16v-4" />
+                                        <path d="M12 8h.01" /></svg
+                                ></span>
+                                <div
+                                    id="sum-res"
+                                    class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight"
+                                >
+                                    —
+                                </div>
                             </div>
                             <div class="p-3">
-                                <span class="flex items-center gap-1 text-[11px] text-text-secondary">Admins <svg class="text-icon-muted" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
-                                <div id="sum-admin" class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight">—</div>
+                                <span
+                                    class="flex items-center gap-1 text-[11px] text-text-secondary"
+                                    >Admins
+                                    <svg
+                                        class="text-icon-muted"
+                                        width="10"
+                                        height="10"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                    >
+                                        <circle cx="12" cy="12" r="10" />
+                                        <path d="M12 16v-4" />
+                                        <path d="M12 8h.01" /></svg
+                                ></span>
+                                <div
+                                    id="sum-admin"
+                                    class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight"
+                                >
+                                    —
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -109,10 +341,18 @@
 
                 <!-- Account Details Panel -->
                 <div id="role-detail-panel">
-                    <h2 class="text-[16px] font-bold text-text-primary mb-2">Account Details</h2>
-                    <div class="bg-surface-01 border border-border-strong rounded-[8px] shadow-sm p-4 flex flex-col gap-3.5">
+                    <h2 class="text-[16px] font-bold text-text-primary mb-2">
+                        Account Details
+                    </h2>
+                    <div
+                        class="bg-surface-01 border border-border-strong rounded-[8px] shadow-sm p-4 flex flex-col gap-3.5"
+                    >
                         <div class="flex items-center justify-center py-6">
-                            <span class="text-[12px] text-text-secondary text-center">Click an application to view account mapping details.</span>
+                            <span
+                                class="text-[12px] text-text-secondary text-center"
+                                >Click an application to view account mapping
+                                details.</span
+                            >
                         </div>
                     </div>
                 </div>
@@ -133,28 +373,52 @@
     id="delete-confirm-modal"
     class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]"
 >
-    <div class="w-full max-w-sm mx-4 bg-surface-01 border border-border-subtle rounded-card shadow-xl overflow-hidden">
+    <div
+        class="w-full max-w-sm mx-4 bg-surface-01 border border-border-subtle rounded-card shadow-xl overflow-hidden"
+    >
         <!-- Header -->
         <div class="flex items-center gap-3 px-5 py-4">
-            <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-500/10 text-red-500 shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                    <line x1="10" y1="11" x2="10" y2="17"/>
-                    <line x1="14" y1="11" x2="14" y2="17"/>
+            <div
+                class="flex items-center justify-center w-10 h-10 rounded-full bg-red-500/10 text-red-500 shrink-0"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <polyline points="3 6 5 6 21 6" />
+                    <path
+                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                    />
+                    <line x1="10" y1="11" x2="10" y2="17" />
+                    <line x1="14" y1="11" x2="14" y2="17" />
                 </svg>
             </div>
             <div>
-                <p class="text-[14px] font-semibold text-text-primary">Delete Role</p>
+                <p class="text-[14px] font-semibold text-text-primary">
+                    Delete Role
+                </p>
                 <p class="text-[12px] text-text-secondary mt-0.5">
                     Are you sure you want to delete
-                    <span id="delete-role-name" class="font-medium text-text-primary"></span>?
-                    This will remove all associated permissions and assignments.
+                    <span
+                        id="delete-role-name"
+                        class="font-medium text-text-primary"
+                    ></span
+                    >? This will remove all associated permissions and
+                    assignments.
                 </p>
             </div>
         </div>
         <!-- Footer -->
-        <div class="flex items-center justify-end gap-2 px-5 py-3.5 bg-surface-02 border-t border-border-subtle">
+        <div
+            class="flex items-center justify-end gap-2 px-5 py-3.5 bg-surface-02 border-t border-border-subtle"
+        >
             <button
                 onclick="closeDeleteConfirm()"
                 class="px-4 h-8 border border-border-subtle rounded-sm text-[13px] text-text-secondary bg-surface-01 hover:bg-surface-hover transition-colors"
@@ -462,7 +726,8 @@
     // ── Utility: Generate deterministic color from name ──────────
     function roleColor(name) {
         let hash = 0;
-        for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        for (let i = 0; i < name.length; i++)
+            hash = name.charCodeAt(i) + ((hash << 5) - hash);
         const hue = Math.abs(hash) % 360;
         return [`hsl(${hue}, 70%, 30%)`, `hsl(${hue}, 80%, 90%)`];
     }
@@ -486,9 +751,9 @@
         const [fg, bg] = roleColor(role.name);
 
         const permBadges = role.permissions.length
-            ? role.permissions.map(p => p.resource).join(", ")
+            ? role.permissions.map((p) => p.resource).join(", ")
             : "No permissions assigned";
-            
+
         let commitIco = `<svg class="text-icon-muted" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>`;
 
         return `
@@ -499,7 +764,7 @@
             <div class="p-4 flex items-center justify-between">
                 <div class="flex items-center gap-4 flex-1 min-w-0 pr-4">
                     <!-- Icon -->
-                    <div style="background:${bg};color:${fg};box-shadow:inset 0 0 0 1px rgba(0,0,0,0.1)" 
+                    <div style="background:${bg};color:${fg};box-shadow:inset 0 0 0 1px rgba(0,0,0,0.1)"
                          class="w-10 h-10 rounded shrink-0 flex items-center justify-center text-[15px] font-bold select-none">
                         ${roleInitial(role.name)}
                     </div>
@@ -509,7 +774,7 @@
                         <div class="flex items-center gap-1.5 mt-0.5 text-[12px] text-text-secondary truncate">
                             <span class="truncate">${escHtml(role.description) || "No description"}</span>
                             <span class="text-text-placeholder">•</span>
-                            <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full ${role.permissions.length ? 'bg-green-500' : 'bg-red-500'}"></span> ${role.permissions.length} perms</span>
+                            <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full ${role.permissions.length ? "bg-green-500" : "bg-red-500"}"></span> ${role.permissions.length} perms</span>
                         </div>
                     </div>
                 </div>
@@ -561,9 +826,7 @@
                 </div>`;
         } else {
             list.innerHTML = roles
-                .map((role, i) =>
-                    renderRoleRow(role, i === roles.length - 1),
-                )
+                .map((role, i) => renderRoleRow(role, i === roles.length - 1))
                 .join("");
         }
 
@@ -678,7 +941,8 @@
         }
         // Clamp horizontally within viewport
         if (left < 8) left = 8;
-        if (left + menuW > window.innerWidth - 8) left = window.innerWidth - menuW - 8;
+        if (left + menuW > window.innerWidth - 8)
+            left = window.innerWidth - menuW - 8;
 
         menu.style.top = top + "px";
         menu.style.left = left + "px";
@@ -705,8 +969,11 @@
 
         _pendingDeleteRoleId = roleId;
         _pendingDeleteRole = roleName;
-        document.getElementById("delete-role-name").textContent = `"${roleName}"`;
-        document.getElementById("delete-confirm-modal").classList.remove("hidden");
+        document.getElementById("delete-role-name").textContent =
+            `"${roleName}"`;
+        document
+            .getElementById("delete-confirm-modal")
+            .classList.remove("hidden");
         document.body.classList.add("overflow-hidden");
     }
 
@@ -742,7 +1009,9 @@
                 showToast(`Role "${_pendingDeleteRole}" deleted.`);
                 deleteOk = true;
             } else {
-                try { errMsg = JSON.parse(text).error; } catch {}
+                try {
+                    errMsg = JSON.parse(text).error;
+                } catch {}
                 if (!errMsg) errMsg = `Server returned ${res.status}`;
             }
         } catch (err) {
@@ -760,7 +1029,12 @@
 
     // Close delete modal on Escape
     document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && !document.getElementById("delete-confirm-modal").classList.contains("hidden")) {
+        if (
+            e.key === "Escape" &&
+            !document
+                .getElementById("delete-confirm-modal")
+                .classList.contains("hidden")
+        ) {
             closeDeleteConfirm();
         }
     });
@@ -768,12 +1042,18 @@
     // Close portal menu on outside click or Escape
     document.addEventListener("click", () => {
         const menu = document.getElementById("role-action-menu");
-        if (menu) { menu.classList.add("hidden"); menu._activeRole = null; }
+        if (menu) {
+            menu.classList.add("hidden");
+            menu._activeRole = null;
+        }
     });
     document.addEventListener("keydown", (e) => {
         if (e.key === "Escape") {
             const menu = document.getElementById("role-action-menu");
-            if (menu) { menu.classList.add("hidden"); menu._activeRole = null; }
+            if (menu) {
+                menu.classList.add("hidden");
+                menu._activeRole = null;
+            }
         }
     });
 
@@ -809,8 +1089,10 @@
                 });
 
             document.getElementById("sum-total").textContent = data.total_roles;
-            document.getElementById("sum-perms").textContent = data.total_permissions;
-            document.getElementById("sum-res").textContent = data.unique_resources;
+            document.getElementById("sum-perms").textContent =
+                data.total_permissions;
+            document.getElementById("sum-res").textContent =
+                data.unique_resources;
             document.getElementById("sum-admin").textContent = data.admin_count;
         } catch {
             // Silently ignore summary fetch errors
@@ -882,11 +1164,14 @@
 
     // ── Update role details panel (Account Details) ─────────────
     function showRoleDetail(roleId) {
-        const role = _allRoles.find(r => r.role_id === roleId);
+        const role = _allRoles.find((r) => r.role_id === roleId);
         if (!role) return;
 
-        const panel = document.getElementById('role-detail-panel');
-        const createdDate = new Date(role.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const panel = document.getElementById("role-detail-panel");
+        const createdDate = new Date(role.created_at).toLocaleDateString(
+            "en-US",
+            { month: "short", day: "numeric", year: "numeric" },
+        );
 
         panel.innerHTML = `
             <h2 class="text-[16px] font-bold text-text-primary mb-2">Account Details</h2>
@@ -894,7 +1179,7 @@
                 <div class="flex items-center justify-between">
                     <span class="text-[12px] text-text-secondary">Account ID</span>
                     <span class="text-[12px] text-text-primary text-right font-mono flex items-center gap-1" title="${escHtml(role.role_id)}">
-                        ${escHtml(role.role_id.substring(0,8))}... 
+                        ${escHtml(role.role_id.substring(0, 8))}...
                         <svg class="text-icon-muted cursor-pointer hover:text-text-primary" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                     </span>
                 </div>
@@ -903,7 +1188,7 @@
                     <span class="text-[12px] text-text-primary text-right flex items-center gap-1">${createdDate}</span>
                 </div>
                 <div class="pt-3 border-t border-border-subtle mt-1 flex flex-col gap-2">
-                    <a href="/assign?role=${encodeURIComponent(role.name)}" class="w-full h-8 flex items-center justify-center bg-btn-primary hover:bg-btn-primary-hover text-white text-[13px] font-medium rounded-md transition-colors shadow-sm">Assign Users</a>
+                    <a href="/assign?role=${encodeURIComponent(role.name)}" class="w-full h-8 flex items-center justify-center bg-[var(--color-btn-primary)] hover:bg-[var(--color-btn-primary-hover)] active:bg-[var(--color-btn-primary-press)] text-white text-[13px] font-medium rounded-md transition-colors shadow-sm">Assign Users</a>
                 </div>
             </div>
         `;
@@ -911,7 +1196,7 @@
 
     // ── Store all roles in memory on fetch ─────────────────────
     const _origRenderPage = renderPage;
-    renderPage = function(roles, total, page, pages) {
+    renderPage = function (roles, total, page, pages) {
         // If we are given total==total, it's the full array (mocked inside loadRoles). We just store it.
         // Actually the original loadRoles fetch directly passes data.roles.
         _allRoles = roles;
