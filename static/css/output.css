@@ -374,9 +374,6 @@
   .mr-1 {
     margin-right: calc(var(--spacing) * 1);
   }
-  .mr-8 {
-    margin-right: calc(var(--spacing) * 8);
-  }
   .mb-0\.5 {
     margin-bottom: calc(var(--spacing) * 0.5);
   }
@@ -860,14 +857,14 @@
   .border-banner-border {
     border-color: var(--color-banner-border);
   }
+  .border-banner-text {
+    border-color: var(--color-banner-text);
+  }
   .border-border-strong {
     border-color: var(--color-border-strong);
   }
   .border-border-subtle {
     border-color: var(--color-border-subtle);
-  }
-  .border-btn-primary {
-    border-color: var(--color-btn-primary);
   }
   .border-green-500 {
     border-color: var(--color-green-500);
@@ -1324,9 +1321,6 @@
   .text-border-subtle {
     color: var(--color-border-subtle);
   }
-  .text-btn-primary {
-    color: var(--color-btn-primary);
-  }
   .text-green-500 {
     color: var(--color-green-500);
   }
@@ -1556,6 +1550,13 @@
       }
     }
   }
+  .hover\:bg-banner-text {
+    &:hover {
+      @media (hover: hover) {
+        background-color: var(--color-banner-text);
+      }
+    }
+  }
   .hover\:bg-black\/10 {
     &:hover {
       @media (hover: hover) {
@@ -1563,13 +1564,6 @@
         @supports (color: color-mix(in lab, red, red)) {
           background-color: color-mix(in oklab, var(--color-black) 10%, transparent);
         }
-      }
-    }
-  }
-  .hover\:bg-btn-primary {
-    &:hover {
-      @media (hover: hover) {
-        background-color: var(--color-btn-primary);
       }
     }
   }
@@ -1732,6 +1726,27 @@
   .md\:p-20 {
     @media (width >= 48rem) {
       padding: calc(var(--spacing) * 20);
+    }
+  }
+  .dark\:hover\:bg-white\/10 {
+    @media (prefers-color-scheme: dark) {
+      &:hover {
+        @media (hover: hover) {
+          background-color: color-mix(in srgb, #fff 10%, transparent);
+          @supports (color: color-mix(in lab, red, red)) {
+            background-color: color-mix(in oklab, var(--color-white) 10%, transparent);
+          }
+        }
+      }
+    }
+  }
+  .dark\:hover\:text-banner-bg {
+    @media (prefers-color-scheme: dark) {
+      &:hover {
+        @media (hover: hover) {
+          color: var(--color-banner-bg);
+        }
+      }
     }
   }
 }
