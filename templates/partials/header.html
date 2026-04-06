@@ -1,109 +1,173 @@
 <header
-  class="h-12 min-h-12 bg-surface-01 border-b border-border-subtle flex items-center justify-end px-4 gap-2 sticky top-0 z-40"
+    class="h-12 min-h-12 bg-surface-01 border-b border-border-subtle flex items-center justify-end px-4 gap-2 sticky top-0 z-40"
 >
-  <div class="flex items-center gap-2">
-    <!-- Ask AI -->
-    <button
-      class="flex items-center gap-1 px-3 h-8 rounded-sm text-base text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors border-none bg-transparent font-[inherit]"
-      type="button"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="text-icon-muted"
-      >
-        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-        <path d="M20 3v4" />
-        <path d="M22 5h-4" />
-      </svg>
-      <span class="text-[13px]">Ask AI</span>
-    </button>
+    <div class="flex items-center gap-2">
+        <!-- Ask AI -->
+        <button
+            class="flex items-center gap-1 px-3 h-8 rounded-sm text-base text-text-primary hover:bg-surface-hover transition-colors border-none bg-transparent font-[inherit]"
+            type="button"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="text-icon-muted"
+            >
+                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+                <path d="M20 3v4" />
+                <path d="M22 5h-4" />
+            </svg>
+            <span class="text-[13px]">Ask AI</span>
+        </button>
 
-    <!-- Support -->
-    <button
-      class="flex items-center gap-1 px-3 h-8 rounded-sm text-base text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors border-none bg-transparent font-[inherit]"
-      type="button"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="text-icon-muted"
-      >
-        <circle cx="12" cy="12" r="10" />
-        <circle cx="12" cy="12" r="4" />
-        <line x1="4.93" x2="9.17" y1="4.93" y2="9.17" />
-        <line x1="14.83" x2="19.07" y1="14.83" y2="19.07" />
-        <line x1="14.83" x2="19.07" y1="9.17" y2="4.93" />
-        <line x1="4.93" x2="9.17" y1="19.07" y2="14.83" />
-      </svg>
-      <span class="text-[13px]">Support</span>
-    </button>
+        <!-- Support -->
+        <button
+            class="flex items-center gap-1 px-3 h-8 rounded-sm text-base text-text-primary hover:bg-surface-hover transition-colors border-none bg-transparent font-[inherit]"
+            type="button"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="text-icon-muted"
+            >
+                <circle cx="12" cy="12" r="10" />
+                <circle cx="12" cy="12" r="4" />
+                <line x1="4.93" x2="9.17" y1="4.93" y2="9.17" />
+                <line x1="14.83" x2="19.07" y1="14.83" y2="19.07" />
+                <line x1="14.83" x2="19.07" y1="9.17" y2="4.93" />
+                <line x1="4.93" x2="9.17" y1="19.07" y2="14.83" />
+            </svg>
+            <span class="text-[13px]">Support</span>
+        </button>
 
-    <!-- Theme Toggle -->
-    <button
-      id="theme-toggle"
-      type="button"
-      aria-label="Toggle theme"
-      class="w-8 h-8 flex items-center justify-center rounded-sm text-icon-muted hover:bg-surface-hover hover:text-text-primary transition-colors border-none bg-transparent"
-    >
-      <!-- Sun icon (shown in dark mode) -->
-      <svg
-        id="icon-sun"
-        xmlns="http://www.w3.org/2000/svg"
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="hidden"
-      >
-        <circle cx="12" cy="12" r="4" />
-        <path
-          d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
-        />
-      </svg>
-      <!-- Moon icon (shown in light mode) -->
-      <svg
-        id="icon-moon"
-        xmlns="http://www.w3.org/2000/svg"
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-      >
-        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
-      </svg>
-    </button>
+        <!-- Theme Toggle -->
+        <button
+            id="theme-toggle"
+            type="button"
+            aria-label="Toggle theme"
+            class="w-8 h-8 flex items-center justify-center rounded-sm text-icon-muted hover:bg-surface-hover hover:text-text-primary transition-colors border-none bg-transparent"
+        >
+            <svg
+                id="icon-sun"
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="hidden"
+            >
+                <circle cx="12" cy="12" r="4" />
+                <path
+                    d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+                />
+            </svg>
+            <svg
+                id="icon-moon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+            </svg>
+        </button>
 
-    <!-- Avatar -->
-    <div
-      class="w-7 h-7 rounded-full bg-surface-active border border-border-subtle flex items-center justify-center text-[11px] font-semibold text-text-secondary cursor-pointer select-none"
-      role="button"
-      tabindex="0"
-      aria-label="Account menu"
-    >
-      {{ user_email|truncate(1) }}
+        <!-- Avatar + Dropdown -->
+        <div class="relative" id="account-menu-wrapper">
+            <!-- Avatar -->
+            <div
+                id="account-avatar"
+                class="w-7 h-7 rounded-full bg-surface-active border border-border-subtle flex items-center justify-center text-[11px] font-semibold text-text-secondary cursor-pointer select-none"
+                role="button"
+                tabindex="0"
+                aria-label="Account menu"
+                aria-expanded="false"
+                aria-haspopup="true"
+            >
+                {{ user_email|truncate(1) }}
+            </div>
+
+            <!-- Dropdown (hidden by default, populated by HTMX) -->
+            <div
+                id="account-dropdown"
+                class="hidden absolute right-0 top-9 z-50"
+            ></div>
+        </div>
     </div>
-  </div>
 </header>
+
+<script>
+    (function () {
+        const wrapper = document.getElementById("account-menu-wrapper");
+        const avatar = document.getElementById("account-avatar");
+        const dropdown = document.getElementById("account-dropdown");
+
+        function openMenu() {
+            // Only fetch if the dropdown is currently empty
+            if (!dropdown.innerHTML.trim()) {
+                htmx.ajax("GET", "/account-menu", {
+                    target: "#account-dropdown",
+                    swap: "innerHTML",
+                });
+            }
+            dropdown.classList.remove("hidden");
+            avatar.setAttribute("aria-expanded", "true");
+        }
+
+        function closeMenu() {
+            dropdown.classList.add("hidden");
+            avatar.setAttribute("aria-expanded", "false");
+        }
+
+        function isOpen() {
+            return !dropdown.classList.contains("hidden");
+        }
+
+        // Toggle on avatar click
+        avatar.addEventListener("click", (e) => {
+            e.stopPropagation();
+            isOpen() ? closeMenu() : openMenu();
+        });
+
+        // Keyboard: Enter / Space to toggle, Escape to close
+        avatar.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                isOpen() ? closeMenu() : openMenu();
+            }
+            if (e.key === "Escape") closeMenu();
+        });
+
+        // Close on outside click (anywhere not inside the wrapper)
+        document.addEventListener("click", (e) => {
+            if (!wrapper.contains(e.target)) closeMenu();
+        });
+
+        // Close on Escape from anywhere on the page
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeMenu();
+        });
+    })();
+</script>
