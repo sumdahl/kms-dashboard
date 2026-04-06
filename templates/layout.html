@@ -12,12 +12,22 @@
                 function syncIcons() {
                     const sun = document.getElementById("icon-sun");
                     const moon = document.getElementById("icon-moon");
+                    const textEl = document.getElementById("theme-text");
                     const isDark = html.classList.contains("dark");
+
+                    // Keep your existing icon logic (sun = target light, moon = target dark)
                     if (sun) sun.classList.toggle("hidden", !isDark);
                     if (moon) moon.classList.toggle("hidden", isDark);
+
+                    // NEW: Dynamic text
+                    if (textEl) {
+                        textEl.textContent = isDark
+                            ? "Light mode"
+                            : "Dark mode";
+                    }
                 }
 
-                // Event delegation — works even after HTMX injects the button
+                // Event delegation (works even after HTMX injects the button)
                 document.addEventListener("click", function (e) {
                     if (!e.target.closest("#theme-toggle")) return;
 
@@ -29,7 +39,7 @@
                     html.classList.remove("no-transition");
                 });
 
-                // Also sync icons whenever the dropdown opens (HTMX swaps innerHTML)
+                // Sync whenever the dropdown is injected via HTMX
                 document.addEventListener("htmx:afterSwap", function (e) {
                     if (e.detail.target.id === "account-dropdown") syncIcons();
                 });
