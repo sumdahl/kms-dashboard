@@ -10,6 +10,8 @@
             src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"
             defer
         ></script>
+        <script src="/static/js/lucide.umd.js"></script>
+        <script src="/static/js/lucide-icons.js"></script>
     </head>
     <body class="bg-bg-page flex items-center justify-center min-h-screen px-4">
         <div class="w-full max-w-md">
@@ -31,22 +33,10 @@
                         <div
                             class="w-11 h-11 bg-surface-02 border border-border-subtle rounded-md flex items-center justify-center mb-5"
                         >
-                            <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="20"
-                                height="20"
-                                viewBox="0 0 24 24"
-                                fill="none"
-                                stroke="currentColor"
-                                stroke-width="2"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                class="text-icon-secondary"
-                            >
-                                <path
-                                    d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
-                                />
-                            </svg>
+                            <i
+                                data-lucide="shield"
+                                class="w-5 h-5 text-icon-secondary shrink-0"
+                            ></i>
                         </div>
                         <h1
                             class="text-xl font-semibold text-text-primary tracking-tight"
@@ -57,7 +47,7 @@
                             Log in to manage your keys and roles
                         </p>
 
-                        <!-- Global error (moved here, directly below the subtitle) -->
+                        <!-- Global error -->
                         <p
                             id="login-error"
                             class="hidden text-[11px] text-red-500 text-center bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2 mt-4 w-full max-w-[280px]"
@@ -90,22 +80,14 @@
                                 id="email-error"
                                 class="hidden mt-1.5 text-[11px] text-red-500 flex items-center gap-1"
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="11"
-                                    height="11"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <circle cx="12" cy="12" r="10" />
-                                    <line x1="12" y1="8" x2="12" y2="12" />
-                                    <line x1="12" y1="16" x2="12.01" y2="16" />
-                                </svg>
+                                <i
+                                    data-lucide="circle-alert"
+                                    class="w-[11px] h-[11px] shrink-0"
+                                ></i>
                                 <span id="email-error-text"></span>
                             </p>
                         </div>
+
                         <!-- Password -->
                         <div>
                             <div
@@ -136,42 +118,21 @@
                                     id="toggle-password"
                                     class="absolute right-3 top-1/2 -translate-y-1/2 text-icon-secondary hover:text-text-primary transition-colors focus:outline-none"
                                 >
-                                    <svg
+                                    <i
                                         id="eye-icon"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        width="16"
-                                        height="16"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                    >
-                                        <path
-                                            d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
-                                        ></path>
-                                        <circle cx="12" cy="12" r="3"></circle>
-                                    </svg>
+                                        data-lucide="eye"
+                                        class="w-4 h-4 shrink-0"
+                                    ></i>
                                 </button>
                             </div>
                             <p
                                 id="password-error"
                                 class="hidden mt-1.5 text-[11px] text-red-500 flex items-center gap-1"
                             >
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    width="11"
-                                    height="11"
-                                    viewBox="0 0 24 24"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    stroke-width="2"
-                                >
-                                    <circle cx="12" cy="12" r="10" />
-                                    <line x1="12" y1="8" x2="12" y2="12" />
-                                    <line x1="12" y1="16" x2="12.01" y2="16" />
-                                </svg>
+                                <i
+                                    data-lucide="circle-alert"
+                                    class="w-[11px] h-[11px] shrink-0"
+                                ></i>
                                 <span id="password-error-text"></span>
                             </p>
                         </div>
@@ -199,28 +160,10 @@
                 <div
                     class="px-8 py-4 bg-surface-02 border-t border-border-subtle flex items-center justify-center gap-1.5"
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="11"
-                        height="11"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        class="text-text-helper"
-                    >
-                        <rect
-                            x="3"
-                            y="11"
-                            width="18"
-                            height="11"
-                            rx="2"
-                            ry="2"
-                        ></rect>
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                    </svg>
+                    <i
+                        data-lucide="lock"
+                        class="w-[11px] h-[11px] text-text-helper shrink-0"
+                    ></i>
                     <span class="text-[11px] text-text-helper tracking-wide"
                         >End-to-end encrypted</span
                     >
@@ -333,6 +276,7 @@
             });
 
             // ── Password toggle ──
+            // Updated: swap data-lucide attribute and re-render instead of innerHTML
             const eyeIcon = document.getElementById("eye-icon");
             let pwVisible = false;
             document
@@ -340,9 +284,11 @@
                 .addEventListener("click", () => {
                     pwVisible = !pwVisible;
                     pwInput.type = pwVisible ? "text" : "password";
-                    eyeIcon.innerHTML = pwVisible
-                        ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`
-                        : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+                    eyeIcon.setAttribute(
+                        "data-lucide",
+                        pwVisible ? "eye-off" : "eye",
+                    );
+                    if (window.lucide) window.lucide.createIcons();
                 });
 
             // ── Block submit if invalid ──
@@ -385,8 +331,6 @@
                     window.location.href = "/";
                     return;
                 }
-
-                if (xhr.status >= 200 && xhr.status < 300) return;
 
                 // Error — parse and show message
                 try {
