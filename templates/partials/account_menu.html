@@ -9,6 +9,49 @@
             {{ user_email }}
         </p>
     </div>
+    <!-- Theme Toggle -->
+    <button
+        id="theme-toggle"
+        type="button"
+        role="menuitem"
+        aria-label="Toggle theme"
+        class="w-full flex items-center gap-2 px-3 py-2 text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors border-none bg-transparent font-[inherit] cursor-pointer"
+    >
+        <svg
+            id="icon-sun"
+            xmlns="http://www.w3.org/2000/svg"
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="hidden text-icon-muted"
+        >
+            <circle cx="12" cy="12" r="4" />
+            <path
+                d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+            />
+        </svg>
+        <svg
+            id="icon-moon"
+            xmlns="http://www.w3.org/2000/svg"
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-icon-muted"
+        >
+            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+        </svg>
+        Toggle theme
+    </button>
 
     <!-- Logout -->
     <button
