@@ -2,32 +2,33 @@ mod app_state;
 mod auth;
 mod config;
 mod db;
+mod email_templates;
 mod error;
 mod handlers;
+mod mailer;
 mod middleware;
 mod models;
 mod routes;
 
-use tower_http::services::ServeDir;
+use resend_rs::Resend;
 use tower_http::catch_panic::CatchPanicLayer;
+use tower_http::services::ServeDir;
 use tower_livereload::LiveReloadLayer;
 use tracing::{error, info};
 
 use crate::app_state::AppState;
 use crate::config::Config;
 use crate::db::{init_db, run_migrations, seed_admin};
-use crate::routes::create_router;
+use crate::routes::{create_router, error_page_response};
 
-fn internal_error_response(_panic_info: Box<dyn std::any::Any + Send>) -> axum::http::Response<axum::body::Body> {
-    use axum::http::{StatusCode, header};
-
-    let body = serde_json::json!({ "error": "Internal server error" });
-
-    axum::http::Response::builder()
-        .status(StatusCode::INTERNAL_SERVER_ERROR)
-        .header(header::CONTENT_TYPE, "application/json")
-        .body(axum::body::Body::from(body.to_string()))
-        .unwrap()
+fn internal_error_response(
+    _panic_info: Box<dyn std::any::Any + Send>,
+) -> axum::http::Response<axum::body::Body> {
+    error_page_response(
+        500,
+        "Internal Server Error",
+        "An unexpected error occurred while processing your request. Please try again later.",
+    )
 }
 
 #[tokio::main]
@@ -46,7 +47,10 @@ async fn main() {
     let cleanup_pool = pool.clone();
 
     // 4. Initialize App State
-    let state = AppState { db: pool };
+    let state = AppState {
+        db: pool,
+        resend: Resend::default(),
+    };
 
     // 5. Build Router
     let app = create_router(state)

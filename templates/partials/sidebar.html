@@ -228,8 +228,9 @@
                 <!-- sub-items unchanged -->
             </details>
 
-            <!-- ── Admin section (injected by JS if is_admin) ── -->
-            <div id="admin-nav-section" class="hidden">
+            {% if is_admin %}
+            <!-- ── Admin section ── -->
+            <div>
                 <div class="mt-2">
                     <div class="section-divider bg-border-subtle my-1"></div>
                     <span
@@ -246,6 +247,7 @@
                     <span class="sidebar-label text-[14px] flex-1">Assign Role</span>
                 </a>
             </div>
+            {% endif %}
         </nav>
     </div>
     <!-- /sidebar-hover-zone -->

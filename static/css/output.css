@@ -10,8 +10,10 @@
     --color-red-500: oklch(63.7% 0.237 25.331);
     --color-red-600: oklch(57.7% 0.245 27.325);
     --color-red-700: oklch(50.5% 0.213 27.518);
+    --color-orange-400: oklch(75% 0.183 55.934);
     --color-amber-500: oklch(76.9% 0.188 70.08);
     --color-amber-600: oklch(66.6% 0.179 58.318);
+    --color-yellow-400: oklch(85.2% 0.199 91.936);
     --color-yellow-500: oklch(79.5% 0.184 86.047);
     --color-green-500: oklch(72.3% 0.219 149.579);
     --color-green-600: oklch(62.7% 0.194 149.214);
@@ -248,6 +250,9 @@
   .pointer-events-none {
     pointer-events: none;
   }
+  .visible {
+    visibility: visible;
+  }
   .absolute {
     position: absolute;
   }
@@ -421,6 +426,9 @@
   }
   .table {
     display: table;
+  }
+  .h-1 {
+    height: calc(var(--spacing) * 1);
   }
   .h-1\.5 {
     height: calc(var(--spacing) * 1.5);
@@ -604,6 +612,9 @@
   }
   .max-w-\[280px\] {
     max-width: 280px;
+  }
+  .max-w-\[300px\] {
+    max-width: 300px;
   }
   .max-w-\[1200px\] {
     max-width: 1200px;
@@ -950,6 +961,9 @@
   .bg-indigo-400 {
     background-color: var(--color-indigo-400);
   }
+  .bg-orange-400 {
+    background-color: var(--color-orange-400);
+  }
   .bg-progress-track {
     background-color: var(--color-progress-track);
   }
@@ -982,6 +996,9 @@
   }
   .bg-transparent {
     background-color: transparent;
+  }
+  .bg-yellow-400 {
+    background-color: var(--color-yellow-400);
   }
   .bg-yellow-500\/5 {
     background-color: color-mix(in srgb, oklch(79.5% 0.184 86.047) 5%, transparent);

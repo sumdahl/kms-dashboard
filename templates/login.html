@@ -117,7 +117,7 @@
                                     >Password</label
                                 >
                                 <a
-                                    href="#"
+                                    href="/forgot-password"
                                     class="text-[11px] text-text-helper hover:text-text-secondary transition-colors"
                                     >Forgot password?</a
                                 >
@@ -375,6 +375,7 @@
                 submitBtn.textContent = "Sign in";
                 const xhr = evt.detail.xhr;
 
+<<<<<<< HEAD
                 // Success — save token then redirect
                 if (xhr.status >= 200 && xhr.status < 300) {
                     try {
@@ -384,6 +385,20 @@
                     window.location.href = '/';
                     return;
                 }
+=======
+                // Success — HTMX handles the HX-Redirect, nothing to do
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    try {
+                        const res = JSON.parse(xhr.responseText);
+                        if (res.token)
+                            localStorage.setItem("kms_token", res.token);
+                    } catch (e) {}
+                    window.location.href = "/";
+                    return;
+                }
+
+                if (xhr.status >= 200 && xhr.status < 300) return;
+>>>>>>> main
 
                 // Error — parse and show message
                 try {

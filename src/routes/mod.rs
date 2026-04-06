@@ -30,6 +30,17 @@ pub fn create_router(state: AppState) -> Router {
         .route("/assign", get(assign_page))
         .route("/ui/sidebar/pin", post(sidebar_pin))
         .route("/ui/banner", delete(banner_dismiss))
+        .route("/forgot-password", get(forgot_password_page))
+        .route("/reset-password", get(reset_password_page))
+        //to simulate 500 server error.
+        .route(
+            "/test-panic",
+            get(|| async {
+                panic!("Test 500 error");
+                #[allow(unreachable_code)]
+                axum::http::StatusCode::INTERNAL_SERVER_ERROR
+            }),
+        )
         .route("/account-menu", get(account_menu))
         .nest("/auth", auth::router())
         .nest(
@@ -61,12 +72,28 @@ async fn signup_page() -> impl IntoResponse {
 }
 
 #[derive(askama::Template)]
+#[template(path = "forgot_password.html")]
+struct ForgotPasswordTemplate {}
+
+async fn forgot_password_page() -> impl IntoResponse {
+    ForgotPasswordTemplate {}
+}
+
+#[derive(askama::Template)]
+#[template(path = "reset_password.html")]
+struct ResetPasswordTemplate {}
+
+async fn reset_password_page() -> impl IntoResponse {
+    ResetPasswordTemplate {}
+}
+#[derive(askama::Template)]
 #[template(path = "dashboard/home.html")]
 struct HomeTemplate {
     sidebar_pinned: bool,
     user_email: String,
     show_banner: bool,
     css_version: &'static str,
+    is_admin: bool,
 }
 
 async fn home(claims: Option<Claims>) -> Response {
@@ -77,6 +104,7 @@ async fn home(claims: Option<Claims>) -> Response {
             user_email: c.email,
             show_banner: true,
             css_version: env!("CSS_VERSION"),
+            is_admin: c.is_admin,
         }
         .into_response(),
     }
@@ -89,6 +117,7 @@ struct RolesTemplate {
     user_email: String,
     show_banner: bool,
     css_version: &'static str,
+    is_admin: bool,
 }
 
 async fn roles_page(claims: Option<Claims>) -> Response {
@@ -99,6 +128,7 @@ async fn roles_page(claims: Option<Claims>) -> Response {
             user_email: c.email,
             show_banner: false,
             css_version: env!("CSS_VERSION"),
+            is_admin: c.is_admin,
         }
         .into_response(),
     }
@@ -111,6 +141,7 @@ struct AssignTemplate {
     user_email: String,
     show_banner: bool,
     css_version: &'static str,
+    is_admin: bool,
 }
 
 async fn assign_page(claims: Option<Claims>) -> Response {
@@ -121,6 +152,7 @@ async fn assign_page(claims: Option<Claims>) -> Response {
             user_email: c.email,
             show_banner: false,
             css_version: env!("CSS_VERSION"),
+            is_admin: c.is_admin,
         }
         .into_response(),
     }
@@ -135,6 +167,7 @@ struct RoleDetailTemplate {
     user_email: String,
     show_banner: bool,
     css_version: &'static str,
+    is_admin: bool,
     role_name: String,
     role_description: String,
     role_id_short: String,
@@ -257,6 +290,7 @@ async fn role_detail_page(
         user_email: c.email,
         show_banner: false,
         css_version: env!("CSS_VERSION"),
+        is_admin: c.is_admin,
         role_name: role.name,
         role_description: role.description,
         role_id_short: role.role_id.to_string()[..8].to_string(),
@@ -277,6 +311,34 @@ struct ErrorTemplate {
     code: u16,
     title: String,
     message: String,
+}
+
+pub fn error_page_response(
+    code: u16,
+    title: &str,
+    message: &str,
+) -> axum::http::Response<axum::body::Body> {
+    use askama::Template;
+    use axum::http::{header, StatusCode};
+
+    let template = ErrorTemplate {
+        code,
+        title: title.to_string(),
+        message: message.to_string(),
+    };
+
+    let body = template.render().unwrap_or_else(|_| {
+        format!(
+            "<html><body><h1>{} {}</h1><p>{}</p></body></html>",
+            code, title, message
+        )
+    });
+
+    axum::http::Response::builder()
+        .status(StatusCode::from_u16(code).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR))
+        .header(header::CONTENT_TYPE, "text/html")
+        .body(axum::body::Body::from(body))
+        .unwrap()
 }
 
 fn error_page(code: u16, title: &str, message: &str) -> impl IntoResponse {
