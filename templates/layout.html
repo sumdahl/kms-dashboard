@@ -7,6 +7,19 @@
         <script type="module" src="/static/js/lucide-icons.js"></script>
         <script>
             (function () {
+                const theme = localStorage.getItem("theme");
+                if (
+                    theme === "dark" ||
+                    (!theme &&
+                        window.matchMedia("(prefers-color-scheme: dark)")
+                            .matches)
+                ) {
+                    document.documentElement.classList.add("dark");
+                }
+            })();
+        </script>
+        <script>
+            (function () {
                 const html = document.documentElement;
 
                 function syncIcons() {
@@ -15,11 +28,9 @@
                     const textEl = document.getElementById("theme-text");
                     const isDark = html.classList.contains("dark");
 
-                    // Keep your existing icon logic (sun = target light, moon = target dark)
                     if (sun) sun.classList.toggle("hidden", !isDark);
                     if (moon) moon.classList.toggle("hidden", isDark);
 
-                    // NEW: Dynamic text
                     if (textEl) {
                         textEl.textContent = isDark
                             ? "Light mode"
@@ -27,7 +38,6 @@
                     }
                 }
 
-                // Event delegation (works even after HTMX injects the button)
                 document.addEventListener("click", function (e) {
                     if (!e.target.closest("#theme-toggle")) return;
 
@@ -39,7 +49,6 @@
                     html.classList.remove("no-transition");
                 });
 
-                // Sync whenever the dropdown is injected via HTMX
                 document.addEventListener("htmx:afterSwap", function (e) {
                     if (e.detail.target.id === "account-dropdown") syncIcons();
                 });
