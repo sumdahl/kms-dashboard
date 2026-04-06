@@ -147,7 +147,9 @@ endblock %} {% block head_scripts %}
             ]);
             const users = await usersRes.json();
             const rolesData = await rolesRes.json();
-            const roles = Array.isArray(rolesData) ? rolesData : (rolesData.roles || []);
+            const roles = Array.isArray(rolesData)
+                ? rolesData
+                : rolesData.roles || [];
 
             userSelect.setOptions(
                 users,
@@ -279,7 +281,7 @@ endblock %} {% block head_scripts %}
             <div
                 class="flex items-center gap-2 h-10 px-4 bg-surface-02 border-b border-border-subtle"
             >
-                <svg
+                <!--<svg
                     class="text-icon-secondary w-4 h-4"
                     xmlns="http://www.w3.org/2000/svg"
                     viewBox="0 0 24 24"
@@ -293,7 +295,11 @@ endblock %} {% block head_scripts %}
                     <circle cx="9" cy="7" r="4" />
                     <line x1="19" y1="8" x2="19" y2="14" />
                     <line x1="22" y1="11" x2="16" y2="11" />
-                </svg>
+                </svg>-->
+                <i
+                    data-lucide="user-plus"
+                    class="text-icon-secondary w-4 h-4"
+                ></i>
                 <span class="text-[13px] font-medium text-text-secondary"
                     >Grant a role to a user</span
                 >

@@ -374,9 +374,6 @@
   .mr-1 {
     margin-right: calc(var(--spacing) * 1);
   }
-  .mr-8 {
-    margin-right: calc(var(--spacing) * 8);
-  }
   .mb-0\.5 {
     margin-bottom: calc(var(--spacing) * 0.5);
   }
@@ -481,6 +478,9 @@
   }
   .h-\[18px\] {
     height: 18px;
+  }
+  .h-\[22px\] {
+    height: 22px;
   }
   .h-\[30px\] {
     height: 30px;
@@ -592,6 +592,9 @@
   }
   .w-\[18px\] {
     width: 18px;
+  }
+  .w-\[22px\] {
+    width: 22px;
   }
   .w-\[34px\] {
     width: 34px;
