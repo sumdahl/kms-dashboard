@@ -1,41 +1,41 @@
 <div
-  id="announcement-banner"
-  class="flex items-center justify-center gap-3 px-4 h-10 min-h-10 bg-banner-bg border-b border-banner-border relative"
-  role="alert"
+    id="announcement-banner"
+    class="flex items-center justify-center gap-3 px-4 h-10 min-h-10 bg-banner-bg border-b border-banner-border relative"
+    role="alert"
 >
-  <p class="flex-1 text-center text-xs text-banner-text">
-    Build scalable, production ready applications without usage limits with
-    Workers Paid.
-  </p>
+    <p class="flex-1 text-center text-xs text-banner-text">
+        Build scalable, production ready applications without usage limits with
+        Workers Paid.
+    </p>
 
-  <a
-    href="#"
-    class="inline-flex items-center px-3 py-0.5 border border-btn-primary rounded-sm text-xs font-medium text-btn-primary bg-transparent hover:bg-btn-primary hover:text-white transition-colors whitespace-nowrap"
-  >
-    Get Started
-  </a>
-
-  <button
-    class="absolute right-3 flex items-center justify-center w-7 h-7 rounded-sm text-banner-text hover:bg-black/10 transition-colors"
-    type="button"
-    aria-label="Dismiss"
-    hx-delete="/ui/banner"
-    hx-target="#announcement-banner"
-    hx-swap="outerHTML"
-  >
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+    <a
+        href="#"
+        class="inline-flex items-center px-3 py-0.5 border border-btn-primary rounded-sm text-xs font-medium text-btn-primary bg-transparent hover:bg-btn-primary hover:text-white transition-colors whitespace-nowrap mr-8"
     >
-      <path d="M18 6 6 18" />
-      <path d="m6 6 12 12" />
-    </svg>
-  </button>
+        Get Started
+    </a>
+
+    <button
+        class="absolute right-3 flex items-center justify-center w-7 h-7 rounded-sm text-banner-text hover:bg-black/10 transition-colors"
+        type="button"
+        aria-label="Dismiss"
+        hx-delete="/ui/banner"
+        hx-target="#announcement-banner"
+        hx-swap="outerHTML"
+    >
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+        </svg>
+    </button>
 </div>
