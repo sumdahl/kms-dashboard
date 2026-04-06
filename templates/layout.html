@@ -4,7 +4,6 @@
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{% block title %}Dashboard{% endblock %}</title>
-        <script type="module" src="/static/js/lucide-icons.js"></script>
         <script>
             (function () {
                 const theme = localStorage.getItem("theme");
@@ -153,6 +152,8 @@
         {% include "partials/search_modal.html" %}
 
         <script src="/static/js/sidebar.js"></script>
+        <script src="/static/js/lucide.umd.js"></script>
+        <script src="/static/js/lucide-icons.js"></script>
 
         <script>
             (function () {
