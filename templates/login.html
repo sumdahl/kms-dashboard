@@ -375,6 +375,17 @@
                 submitBtn.textContent = "Sign in";
                 const xhr = evt.detail.xhr;
 
+<<<<<<< HEAD
+                // Success — save token then redirect
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    try {
+                        const res = JSON.parse(xhr.responseText);
+                        if (res.token) localStorage.setItem('kms_token', res.token);
+                    } catch (e) {}
+                    window.location.href = '/';
+                    return;
+                }
+=======
                 // Success — HTMX handles the HX-Redirect, nothing to do
                 if (xhr.status >= 200 && xhr.status < 300) {
                     try {
@@ -387,6 +398,7 @@
                 }
 
                 if (xhr.status >= 200 && xhr.status < 300) return;
+>>>>>>> main
 
                 // Error — parse and show message
                 try {

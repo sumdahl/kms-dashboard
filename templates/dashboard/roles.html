@@ -14,325 +14,111 @@
 </style>
 {% endblock %} {% block content %}
 
-<!-- ── Page Header ──────────────────────────────────────────────────────── -->
-<div class="flex items-start justify-between gap-4 mb-6">
-    <div class="flex items-start gap-3">
-        <div>
-            <h1 class="text-2xl font-semibold text-text-primary leading-tight">
-                Roles
-            </h1>
-            <p class="mt-1 text-[13px] text-text-secondary">
-                Create and manage access control roles for your organization.
-            </p>
-        </div>
-    </div>
-    <div class="flex items-center gap-2 shrink-0">
-        <a
-            href="/docs"
-            target="_blank"
-            class="inline-flex items-center px-3 h-9 border border-border-strong rounded-sm bg-surface-01 text-[13px] font-medium text-text-primary hover:bg-surface-hover transition-colors"
-        >
-            Documentation
-        </a>
-        <button
-            onclick="openCreateModal()"
-            class="inline-flex items-center gap-1.5 px-3 h-9 rounded-sm bg-btn-primary text-text-on-primary text-[13px] font-medium hover:bg-btn-primary-hover active:bg-btn-primary-press transition-colors"
-        >
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-            >
-                <path d="M5 12h14" />
-                <path d="M12 5v14" />
-            </svg>
-            New Role
-        </button>
-    </div>
-</div>
-
-<!-- ── Two-Column Layout ────────────────────────────────────────────────── -->
-<!-- ── Toolbar (full-width, above two-column so sidebar aligns with list top) ── -->
-<div class="flex items-center gap-2 mb-3">
-    <div class="relative flex-1 max-w-sm">
-        <svg
-            class="absolute left-2.5 top-1/2 -translate-y-1/2 text-icon-muted pointer-events-none"
-            xmlns="http://www.w3.org/2000/svg"
-            width="13"
-            height="13"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-        >
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.35-4.35" />
-        </svg>
-        <input
-            id="role-search"
-            type="text"
-            placeholder="Search roles..."
-            oninput="filterRoles()"
-            class="w-full pl-8 pr-3 h-9 bg-surface-01 border border-border-subtle rounded-sm text-[13px] text-text-primary placeholder:text-text-placeholder focus:outline-none focus:border-border-strong transition-colors"
-        />
-    </div>
-    <button
-        onclick="loadRoles()"
-        title="Refresh"
-        class="inline-flex items-center justify-center w-9 h-9 border border-border-subtle rounded-sm bg-surface-01 text-icon-secondary hover:bg-surface-hover transition-colors"
-    >
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="14"
-            height="14"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-        >
-            <path
-                d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
-            />
-            <path d="M21 3v5h-5" />
-            <path
-                d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
-            />
-            <path d="M8 16H3v5" />
-        </svg>
-    </button>
-</div>
-
-<!-- ── Two-Column Layout ─────────────────────────────────────────────────── -->
-<div class="flex items-start gap-6">
-    <!-- ── LEFT: List ─────────────────────────────────────────────────── -->
-    <div class="flex-1 min-w-0">
-        <!-- Roles card list -->
-        <div
-            id="roles-list"
-            class="bg-surface-01 border border-border-subtle rounded-sm overflow-hidden"
-        >
-            <!-- Initial skeleton (replaced by JS on load) -->
-            <div class="border-b border-border-subtle animate-pulse">
-                <div class="flex items-center gap-3 px-4 py-3">
-                    <div
-                        class="w-8 h-8 rounded-sm bg-surface-02 shrink-0"
-                    ></div>
-                    <div class="flex-1 space-y-1.5">
-                        <div class="h-3.5 bg-surface-02 rounded w-32"></div>
-                        <div class="h-3 bg-surface-02 rounded w-48"></div>
-                    </div>
-                    <div class="h-3 bg-surface-02 rounded w-20"></div>
+<!-- ── LIGHT THEME OVERRIDE WRAPPER ────────────────────────────────────────── -->
+<div style="--color-bg-page:#fafafa;--color-surface-01:#ffffff;--color-surface-02:#f9fafb;--color-surface-active:#e5e7eb;--color-surface-hover:#f3f4f6;--color-text-primary:#171717;--color-text-secondary:#525252;--color-text-helper:#737373;--color-text-placeholder:#a3a3a3;--color-border-subtle:#e5e7eb;--color-border-strong:#d4d4d8;--color-icon-muted:#a3a3a3;--color-icon-secondary:#525252;--color-icon-primary:#171717;--color-btn-primary:#0051c3;--color-btn-primary-hover:#003681;--color-badge-bg:#f3f4f6;--color-badge-text:#525252;"
+     class="bg-bg-page text-text-primary font-sans transition-none">
+    <!-- ── Header ── -->
+    <div class="flex flex-col gap-6 mb-8 max-w-[1200px] w-full mx-auto">
+        <div class="flex items-start justify-between">
+            <div class="flex items-start gap-3">
+                <div class="text-icon-secondary mt-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="16 18 22 12 16 6"/>
+                        <polyline points="8 6 2 12 8 18"/>
+                    </svg>
                 </div>
-                <div class="flex items-center gap-2 px-4 pb-3 pl-[52px]">
-                    <div class="h-5 bg-surface-02 rounded w-24"></div>
-                    <div class="h-5 bg-surface-02 rounded w-20"></div>
-                </div>
-            </div>
-            <div class="border-b border-border-subtle animate-pulse">
-                <div class="flex items-center gap-3 px-4 py-3">
-                    <div
-                        class="w-8 h-8 rounded-sm bg-surface-02 shrink-0"
-                    ></div>
-                    <div class="flex-1 space-y-1.5">
-                        <div class="h-3.5 bg-surface-02 rounded w-40"></div>
-                        <div class="h-3 bg-surface-02 rounded w-56"></div>
-                    </div>
-                    <div class="h-3 bg-surface-02 rounded w-20"></div>
-                </div>
-                <div class="flex items-center gap-2 px-4 pb-3 pl-[52px]">
-                    <div class="h-5 bg-surface-02 rounded w-20"></div>
-                    <div class="h-5 bg-surface-02 rounded w-28"></div>
-                </div>
-            </div>
-            <div class="animate-pulse">
-                <div class="flex items-center gap-3 px-4 py-3">
-                    <div
-                        class="w-8 h-8 rounded-sm bg-surface-02 shrink-0"
-                    ></div>
-                    <div class="flex-1 space-y-1.5">
-                        <div class="h-3.5 bg-surface-02 rounded w-28"></div>
-                        <div class="h-3 bg-surface-02 rounded w-40"></div>
-                    </div>
-                    <div class="h-3 bg-surface-02 rounded w-20"></div>
-                </div>
-                <div class="flex items-center gap-2 px-4 pb-3 pl-[52px]">
-                    <div class="h-5 bg-surface-02 rounded w-28"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Pagination -->
-        <div class="flex items-center justify-between mt-3 min-h-8">
-            <span id="showing-text" class="text-xs text-text-helper"></span>
-            <div
-                id="pagination-controls"
-                class="hidden flex items-center gap-1"
-            >
-                <button
-                    id="pg-first"
-                    onclick="goPage(1)"
-                    class="flex items-center justify-center w-8 h-8 rounded-sm border border-border-subtle text-[13px] text-icon-secondary hover:bg-surface-hover transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                    «
-                </button>
-                <button
-                    id="pg-prev"
-                    onclick="goPage(_page - 1)"
-                    class="flex items-center justify-center w-8 h-8 rounded-sm border border-border-subtle text-[13px] text-icon-secondary hover:bg-surface-hover transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                    ‹
-                </button>
-                <span
-                    id="pg-num"
-                    class="flex items-center justify-center min-w-8 h-8 px-2 rounded-sm border border-btn-primary bg-btn-primary text-text-on-primary text-[13px] font-medium select-none"
-                >
-                    1
-                </span>
-                <button
-                    id="pg-next"
-                    onclick="goPage(_page + 1)"
-                    class="flex items-center justify-center w-8 h-8 rounded-sm border border-border-subtle text-[13px] text-icon-secondary hover:bg-surface-hover transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                    ›
-                </button>
-                <button
-                    id="pg-last"
-                    class="flex items-center justify-center w-8 h-8 rounded-sm border border-border-subtle text-[13px] text-icon-secondary hover:bg-surface-hover transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                >
-                    »
-                </button>
-            </div>
-        </div>
-    </div>
-    <!-- ── RIGHT: Summary Sidebar (FLAT STYLE) ───────────────────────────── -->
-    <div class="w-72 shrink-0 space-y-4">
-
-        <!-- Summary -->
-        <div class="bg-surface-01 border border-border-subtle rounded-sm overflow-hidden">
-
-            <!-- Header -->
-            <div class="flex items-center justify-between px-4 py-3 border-b border-border-subtle">
-                <span class="text-[13px] font-semibold text-text-primary">Summary</span>
-                <span id="summary-date" class="text-xs text-text-helper">—</span>
-            </div>
-
-            <!-- Body -->
-            <div class="px-4 py-3 space-y-4">
-
-                <!-- Total roles -->
                 <div>
-                    <div class="flex items-center justify-between">
-                        <span class="text-[13px] text-text-secondary">Total roles</span>
-                        <span id="sum-total" class="text-[13px] font-medium text-text-primary">—</span>
-                    </div>
+                    <h1 class="text-[22px] font-bold text-text-primary">Roles & Access</h1>
+                    <p class="text-[13px] text-text-secondary mt-0.5">Manage permissions, user assignment, and access control.</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+                <a href="/docs" target="_blank" class="px-3.5 h-[32px] border border-border-strong rounded-md text-[13px] font-medium bg-surface-01 hover:bg-surface-hover text-text-primary flex items-center justify-center transition-colors shadow-sm">Documentation</a>
+                <button onclick="openCreateModal()" class="px-3.5 h-[32px] bg-btn-primary hover:bg-btn-primary-hover text-white rounded-md text-[13px] font-medium flex items-center justify-center transition-colors shadow-sm">Create application</button>
+            </div>
+        </div>
 
-                    <div class="h-1.5 rounded-full bg-surface-02 overflow-hidden mt-2">
-                        <div id="sum-bar"
-                            class="h-full rounded-full bg-btn-primary transition-all duration-500"
-                            style="width: 0%">
+        <div class="flex items-start gap-8">
+            <!-- ── Left Column: Cards List ── -->
+            <div class="flex-1 min-w-0 flex flex-col">
+                <!-- Toolbar -->
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="relative flex-1">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 text-icon-muted" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+                        <input id="role-search" oninput="filterRoles()" type="text" placeholder="Search applications" class="w-full pl-9 pr-3 h-[34px] border border-border-strong rounded-md bg-surface-01 text-[13px] placeholder:text-text-placeholder focus:outline-none focus:border-btn-primary transition-colors">
+                    </div>
+                    <!-- Mock dropdowns -->
+                    <button class="h-[34px] px-3 flex items-center gap-2.5 border border-border-strong rounded-md bg-surface-01 text-[13px] text-text-primary hover:bg-surface-hover transition-colors shadow-sm"><span>Show all</span> <svg class="text-icon-muted" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+                    <button class="h-[34px] px-3 flex items-center gap-2.5 border border-border-strong rounded-md bg-surface-01 text-[13px] text-text-primary hover:bg-surface-hover transition-colors shadow-sm"><span>Last modified</span> <svg class="text-icon-muted" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></button>
+                    <!-- Refresh tool -->
+                    <button onclick="loadRoles()" class="h-[34px] w-[34px] shrink-0 flex items-center justify-center border border-border-strong rounded-md bg-surface-01 text-icon-secondary hover:bg-surface-hover transition-colors shadow-sm">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+                    </button>
+                </div>
+                
+                <!-- Cards Container -->
+                <div id="roles-list" class="flex flex-col gap-3">
+                    <!-- Skeletons... -->
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex items-center justify-between mt-4">
+                    <span id="showing-text" class="text-[12px] text-text-secondary"></span>
+                    <div id="pagination-controls" class="hidden flex items-center shadow-sm">
+                        <button id="pg-first" onclick="goPage(1)" class="w-8 h-[30px] flex items-center justify-center border border-border-strong rounded-l-md bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-50">«</button>
+                        <button id="pg-prev" onclick="goPage(_page-1)" class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-50">‹</button>
+                        <span id="pg-num" class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-text-primary text-[13px] font-medium">1</span>
+                        <button id="pg-next" onclick="goPage(_page+1)" class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-50">›</button>
+                        <button id="pg-last" class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong rounded-r-md bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-50">»</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── Right Column: Summary & Account Details ── -->
+            <div class="w-[300px] shrink-0 flex flex-col gap-6">
+                
+                <!-- Usage / Summary Card -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-[16px] font-bold text-text-primary">Summary</h2>
+                        <span id="summary-date" class="text-[11px] text-text-secondary uppercase"></span>
+                    </div>
+                    <div class="bg-surface-01 border border-border-strong rounded-[8px] shadow-sm overflow-hidden flex flex-col">
+                        <div class="grid grid-cols-2 border-b border-border-subtle">
+                            <div class="p-3 border-r border-border-subtle">
+                                <span class="flex items-center gap-1 text-[11px] text-text-secondary">Requests today <svg class="text-icon-muted" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
+                                <div id="sum-total" class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight">—</div>
+                            </div>
+                            <div class="p-3">
+                                <span class="flex items-center gap-1 text-[11px] text-text-secondary">Permissions <svg class="text-icon-muted" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
+                                <div id="sum-perms" class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight">—</div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2">
+                            <div class="p-3 border-r border-border-subtle">
+                                <span class="flex items-center gap-1 text-[11px] text-text-secondary">Resources <svg class="text-icon-muted" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
+                                <div id="sum-res" class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight">—</div>
+                            </div>
+                            <div class="p-3">
+                                <span class="flex items-center gap-1 text-[11px] text-text-secondary">Admins <svg class="text-icon-muted" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg></span>
+                                <div id="sum-admin" class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight">—</div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Flat stats (NO boxes) -->
-                <div class="flex flex-col divide-y divide-border-subtle">
-
-                    <div class="flex items-center justify-between py-2">
-                        <span class="text-[13px] text-text-secondary">Permissions</span>
-                        <span id="sum-perms" class="text-[13px] font-medium text-text-primary">0</span>
+                <!-- Account Details Panel -->
+                <div id="role-detail-panel">
+                    <h2 class="text-[16px] font-bold text-text-primary mb-2">Account Details</h2>
+                    <div class="bg-surface-01 border border-border-strong rounded-[8px] shadow-sm p-4 flex flex-col gap-3.5">
+                        <div class="flex items-center justify-center py-6">
+                            <span class="text-[12px] text-text-secondary text-center">Click an application to view account mapping details.</span>
+                        </div>
                     </div>
-
-                    <div class="flex items-center justify-between py-2">
-                        <span class="text-[13px] text-text-secondary">Resources</span>
-                        <span id="sum-res" class="text-[13px] font-medium text-text-primary">0</span>
-                    </div>
-
-                    <div class="flex items-center justify-between py-2">
-                        <span class="text-[13px] text-text-secondary">Write access</span>
-                        <span id="sum-write" class="text-[13px] font-medium text-text-primary">0</span>
-                    </div>
-
-                    <div class="flex items-center justify-between py-2">
-                        <span class="text-[13px] text-text-secondary">Admin access</span>
-                        <span id="sum-admin" class="text-[13px] font-medium text-text-primary">0</span>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <!-- Role Details -->
-        <div class="bg-surface-01 border border-border-subtle rounded-sm overflow-hidden">
-
-            <!-- Header -->
-            <div class="flex items-center px-4 py-3 border-b border-border-subtle">
-                <span class="text-[13px] font-semibold text-text-primary">Role Details</span>
-            </div>
-
-            <!-- Body -->
-            <div class="flex flex-col divide-y divide-border-subtle">
-
-                <div class="flex items-center justify-between px-4 py-3">
-                    <span class="text-[13px] text-text-secondary">Total roles</span>
-                    <span id="det-total" class="text-[13px] font-medium text-text-primary">—</span>
-                </div>
-
-                <div class="flex items-start justify-between px-4 py-3 gap-3">
-                    <span class="text-[13px] text-text-secondary">Resources</span>
-                    <span id="det-resources"
-                          class="text-[13px] font-medium text-text-primary text-right break-all">
-                        —
-                    </span>
-                </div>
-
-            </div>
-        </div>
-
-    </div>
-        <!-- Role Details card (mirrors CF "Account Details") -->
-        <div
-            class="bg-surface-01 border border-border-subtle rounded-sm overflow-hidden"
-        >
-            <div class="px-4 py-3 border-b border-border-subtle">
-                <span class="text-base font-semibold text-text-primary"
-                    >Role Details</span
-                >
-            </div>
-            <div>
-                <div
-                    class="flex items-center justify-between px-4 py-3 border-b border-border-subtle"
-                >
-                    <span class="text-[13px] text-text-secondary shrink-0"
-                        >Total roles</span
-                    >
-                    <span
-                        id="det-total"
-                        class="text-[13px] font-medium text-text-primary ml-3"
-                        >—</span
-                    >
-                </div>
-                <div class="flex items-start justify-between px-4 py-3 gap-3">
-                    <span class="text-[13px] text-text-secondary shrink-0"
-                        >Resources</span
-                    >
-                    <span
-                        id="det-resources"
-                        class="text-[13px] font-medium text-text-primary text-right break-all"
-                        >—</span
-                    >
                 </div>
             </div>
         </div>
     </div>
-    <!-- /right sidebar -->
 </div>
 <!-- /two-column -->
 
@@ -673,6 +459,21 @@
             btn.textContent = "Create Role";
         }
     }
+    // ── Utility: Generate deterministic color from name ──────────
+    function roleColor(name) {
+        let hash = 0;
+        for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash);
+        const hue = Math.abs(hash) % 360;
+        return [`hsl(${hue}, 70%, 30%)`, `hsl(${hue}, 80%, 90%)`];
+    }
+
+    // ── Utility: Get leading icon initials ───────────────────────
+    function roleInitial(name) {
+        if (!name) return "?";
+        const parts = name.trim().split(/\s+/);
+        if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
+        return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
 
     // ── Render a single role row (CF-style card row) ──────────────────────
     function renderRoleRow(role, isLast) {
@@ -682,75 +483,53 @@
             day: "numeric",
             year: "numeric",
         });
+        const [fg, bg] = roleColor(role.name);
 
         const permBadges = role.permissions.length
-            ? role.permissions
-                  .map(
-                      (p) =>
-                          `<span class="inline-flex items-center px-1.5 py-0.5 rounded-sm bg-badge-bg text-badge-text text-[11px] font-medium">${escHtml(p.resource)}:${escHtml(p.access)}</span>`,
-                  )
-                  .join(" ")
-            : `<span class="text-[11px] text-text-helper italic">No permissions assigned</span>`;
+            ? role.permissions.map(p => p.resource).join(", ")
+            : "No permissions assigned";
+            
+        let commitIco = `<svg class="text-icon-muted" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>`;
 
         return `
-        <div class="group ${isLast ? "" : "border-b border-border-subtle"}">
-            <!-- Primary row -->
-            <div class="flex items-center gap-3 px-4 py-3 hover:bg-surface-hover transition-colors">
-                <!-- Role icon (CF-style coloured square) -->
-                <div class="flex items-center justify-center w-8 h-8 rounded-sm bg-badge-beta-bg text-badge-beta-text shrink-0">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
-                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                    </svg>
+        <div class="bg-surface-01 border border-border-strong rounded-[8px] overflow-hidden hover:border-[#0051c3] transition-colors cursor-pointer"
+             data-role-id="${role.role_id}"
+             onclick="showRoleDetail('${role.role_id}')">
+            <!-- Top Half -->
+            <div class="p-4 flex items-center justify-between">
+                <div class="flex items-center gap-4 flex-1 min-w-0 pr-4">
+                    <!-- Icon -->
+                    <div style="background:${bg};color:${fg};box-shadow:inset 0 0 0 1px rgba(0,0,0,0.1)" 
+                         class="w-10 h-10 rounded shrink-0 flex items-center justify-center text-[15px] font-bold select-none">
+                        ${roleInitial(role.name)}
+                    </div>
+                    <!-- Text -->
+                    <div class="flex flex-col flex-1 min-w-0">
+                        <span class="text-[14px] font-semibold text-text-primary truncate">${escHtml(role.name)}</span>
+                        <div class="flex items-center gap-1.5 mt-0.5 text-[12px] text-text-secondary truncate">
+                            <span class="truncate">${escHtml(role.description) || "No description"}</span>
+                            <span class="text-text-placeholder">•</span>
+                            <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full ${role.permissions.length ? 'bg-green-500' : 'bg-red-500'}"></span> ${role.permissions.length} perms</span>
+                        </div>
+                    </div>
                 </div>
-                <!-- Name + description -->
-                <div class="flex-1 min-w-0">
-                    <p class="text-[13px] font-semibold text-text-primary leading-tight truncate">
-                        ${escHtml(role.name)}
-                    </p>
-                    <p class="text-[12px] text-text-helper truncate mt-0.5">
-                        ${escHtml(role.description) || "No description"}
-                    </p>
-                </div>
-                <!-- Date + view icon + ⋯ action menu -->
-                <div class="flex items-center gap-2.5 shrink-0">
-                    <span class="text-[12px] text-text-helper">${date}</span>
-                    <a href="/roles/${encodeURIComponent(role.role_id)}"
-                       title="View role details"
-                       class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-text-primary hover:bg-surface-active transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
-                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                            <circle cx="12" cy="12" r="3"/>
-                        </svg>
-                    </a>
-                    <button
-                        data-role-name="${escHtml(role.name)}"
-                        data-role-id="${escHtml(role.role_id)}"
-                        onclick="toggleRoleMenu(this.dataset.roleName, this.dataset.roleId, event)"
-                        title="More actions"
-                        class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-text-primary hover:bg-surface-active transition-colors"
-                    >
-                        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
-                             viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="5"  cy="12" r="1"/>
-                            <circle cx="12" cy="12" r="1"/>
-                            <circle cx="19" cy="12" r="1"/>
-                        </svg>
+                <div class="flex items-center gap-4 shrink-0">
+                    <span class="text-[12px] text-text-secondary">${date} relative</span>
+                    <button class="text-icon-muted hover:text-text-primary transition-colors p-1"
+                            data-role-name="${escHtml(role.name)}" data-role-id="${escHtml(role.role_id)}"
+                            onclick="event.stopPropagation();toggleRoleMenu(this.dataset.roleName,this.dataset.roleId,event)"
+                            title="More actions">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
                     </button>
                 </div>
             </div>
-            <!-- Permissions sub-row (mirrors CF's commit info row) -->
-            <div class="flex items-start gap-2 px-4 pb-3 pl-[52px]">
-                <svg class="text-icon-muted shrink-0 mt-0.5" xmlns="http://www.w3.org/2000/svg"
-                     width="12" height="12" viewBox="0 0 24 24" fill="none"
-                     stroke="currentColor" stroke-width="2">
-                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-                    <line x1="7" y1="7" x2="7.01" y2="7"/>
-                </svg>
-                <div class="flex flex-wrap gap-1">${permBadges}</div>
+            <!-- Bottom Half (Footer) -->
+            <div class="bg-surface-02 border-t border-border-subtle px-4 py-2.5 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-2 min-w-0 flex-1">
+                    ${commitIco}
+                    <span class="text-[12px] text-text-secondary truncate"><span class="font-medium text-text-primary">grants access to:</span> <span class="text-text-helper">${escHtml(permBadges)}</span></span>
+                </div>
+                <span class="text-[12px] text-text-helper flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> KMS Panel Admin</span>
             </div>
         </div>`;
     }
@@ -837,7 +616,7 @@
         const encoded = encodeURIComponent(roleName);
         const safe = escHtml(roleName);
         menu.innerHTML = `
-            <a href="/roles/${escHtml(roleId)}"
+            <a href="/roles/${encoded}"
                class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors">
                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
                      viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -1029,18 +808,10 @@
                     day: "numeric",
                 });
 
-            // Progress bar (capped at 100 roles = 100%)
-            document.getElementById("sum-bar").style.width =
-                Math.min(data.total_roles, 100) + "%";
-
             document.getElementById("sum-total").textContent = data.total_roles;
             document.getElementById("sum-perms").textContent = data.total_permissions;
             document.getElementById("sum-res").textContent = data.unique_resources;
-            document.getElementById("sum-write").textContent = data.write_count;
             document.getElementById("sum-admin").textContent = data.admin_count;
-
-            document.getElementById("det-total").textContent =
-                `${data.total_roles} role${data.total_roles !== 1 ? "s" : ""}`;
         } catch {
             // Silently ignore summary fetch errors
         }
@@ -1105,6 +876,47 @@
             .replace(/>/g, "&gt;")
             .replace(/"/g, "&quot;");
     }
+
+    // ── In-memory roles store (populated on loadRoles) ──────────
+    let _allRoles = [];
+
+    // ── Update role details panel (Account Details) ─────────────
+    function showRoleDetail(roleId) {
+        const role = _allRoles.find(r => r.role_id === roleId);
+        if (!role) return;
+
+        const panel = document.getElementById('role-detail-panel');
+        const createdDate = new Date(role.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+        panel.innerHTML = `
+            <h2 class="text-[16px] font-bold text-text-primary mb-2">Account Details</h2>
+            <div class="bg-surface-01 border border-border-strong rounded-[8px] shadow-sm p-4 flex flex-col gap-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-[12px] text-text-secondary">Account ID</span>
+                    <span class="text-[12px] text-text-primary text-right font-mono flex items-center gap-1" title="${escHtml(role.role_id)}">
+                        ${escHtml(role.role_id.substring(0,8))}... 
+                        <svg class="text-icon-muted cursor-pointer hover:text-text-primary" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-[12px] text-text-secondary">Created</span>
+                    <span class="text-[12px] text-text-primary text-right flex items-center gap-1">${createdDate}</span>
+                </div>
+                <div class="pt-3 border-t border-border-subtle mt-1 flex flex-col gap-2">
+                    <a href="/assign?role=${encodeURIComponent(role.name)}" class="w-full h-8 flex items-center justify-center bg-btn-primary hover:bg-btn-primary-hover text-white text-[13px] font-medium rounded-md transition-colors shadow-sm">Assign Users</a>
+                </div>
+            </div>
+        `;
+    }
+
+    // ── Store all roles in memory on fetch ─────────────────────
+    const _origRenderPage = renderPage;
+    renderPage = function(roles, total, page, pages) {
+        // If we are given total==total, it's the full array (mocked inside loadRoles). We just store it.
+        // Actually the original loadRoles fetch directly passes data.roles.
+        _allRoles = roles;
+        _origRenderPage(roles, total, page, pages);
+    };
 
     document.addEventListener("DOMContentLoaded", loadRoles);
 </script>

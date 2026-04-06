@@ -26,7 +26,7 @@ pub fn create_router(state: AppState) -> Router {
         .route("/login", get(login_page))
         .route("/signup", get(signup_page))
         .route("/roles", get(roles_page))
-        .route("/roles/{name}", get(role_detail_page))
+        .route("/roles/:name", get(role_detail_page))
         .route("/assign", get(assign_page))
         .route("/ui/sidebar/pin", post(sidebar_pin))
         .route("/ui/banner", delete(banner_dismiss))
@@ -100,7 +100,7 @@ async fn home(claims: Option<Claims>) -> Response {
     match claims {
         None => Redirect::to("/login").into_response(),
         Some(c) => HomeTemplate {
-            sidebar_pinned: false,
+            sidebar_pinned: true,
             user_email: c.email,
             show_banner: true,
             css_version: env!("CSS_VERSION"),
@@ -124,7 +124,7 @@ async fn roles_page(claims: Option<Claims>) -> Response {
     match claims {
         None => Redirect::to("/login").into_response(),
         Some(c) => RolesTemplate {
-            sidebar_pinned: false,
+            sidebar_pinned: true,
             user_email: c.email,
             show_banner: false,
             css_version: env!("CSS_VERSION"),
@@ -148,7 +148,7 @@ async fn assign_page(claims: Option<Claims>) -> Response {
     match claims {
         None => Redirect::to("/login").into_response(),
         Some(c) => AssignTemplate {
-            sidebar_pinned: false,
+            sidebar_pinned: true,
             user_email: c.email,
             show_banner: false,
             css_version: env!("CSS_VERSION"),
@@ -286,7 +286,7 @@ async fn role_detail_page(
     let assignments_len = assignments.len();
 
     RoleDetailTemplate {
-        sidebar_pinned: false,
+        sidebar_pinned: true,
         user_email: c.email,
         show_banner: false,
         css_version: env!("CSS_VERSION"),
