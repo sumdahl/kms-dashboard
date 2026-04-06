@@ -15,23 +15,31 @@
     </head>
     <body class="bg-bg-page flex items-center justify-center min-h-screen px-4">
         <div class="w-full max-w-md">
-            <div class="flex items-center justify-center gap-2 mb-6">
+            <!-- Brand -->
+            <div
+                class="flex items-center justify-center gap-2 mb-6"
+                aria-hidden="true"
+            >
                 <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
                 <span
                     class="text-[11px] text-text-helper tracking-widest uppercase font-medium"
                     >KMS Dashboard</span
                 >
             </div>
+
             <div
                 class="bg-surface-01 border border-border-subtle rounded-card shadow-sm overflow-hidden"
             >
                 <div
                     class="h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent"
                 ></div>
+
                 <div class="p-8">
+                    <!-- Header -->
                     <div class="flex flex-col items-center mb-8">
                         <div
                             class="w-11 h-11 bg-surface-02 border border-border-subtle rounded-md flex items-center justify-center mb-5"
+                            aria-hidden="true"
                         >
                             <i
                                 data-lucide="shield"
@@ -48,37 +56,66 @@
                         </p>
 
                         <!-- Global error -->
-                        <p
+                        <div
                             id="login-error"
-                            class="hidden text-[11px] text-red-500 text-center bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2 mt-4 w-full max-w-[280px]"
-                        ></p>
+                            role="alert"
+                            aria-live="assertive"
+                            aria-atomic="true"
+                            class="hidden w-full max-w-[280px] mt-4"
+                        >
+                            <p
+                                class="text-[11px] text-red-500 text-center bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2"
+                            ></p>
+                        </div>
                     </div>
 
+                    <!-- Form -->
                     <form
                         id="login-form"
                         hx-post="/auth/login"
                         hx-ext="json-enc"
                         hx-swap="none"
+                        novalidate
+                        aria-label="Sign in form"
                         class="space-y-4"
                     >
                         <!-- Email -->
-                        <div>
+                        <div class="space-y-1.5">
                             <label
                                 for="email"
-                                class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase"
-                                >Email address</label
+                                class="block text-[11px] font-medium text-text-secondary tracking-wider uppercase"
                             >
-                            <input
-                                type="email"
-                                name="email"
-                                id="email"
-                                autocomplete="email"
-                                placeholder="you@example.com"
-                                class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors"
-                            />
+                                Email address
+                                <span
+                                    class="text-red-500 ml-0.5"
+                                    aria-hidden="true"
+                                    >*</span
+                                >
+                            </label>
+                            <div class="relative">
+                                <input
+                                    type="email"
+                                    name="email"
+                                    id="email"
+                                    autocomplete="email"
+                                    placeholder="you@example.com"
+                                    aria-required="true"
+                                    aria-describedby="email-error"
+                                    aria-invalid="false"
+                                    class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors duration-150"
+                                />
+                                <!-- Validation status icon -->
+                                <span
+                                    id="email-status-icon"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 hidden"
+                                    aria-hidden="true"
+                                ></span>
+                            </div>
                             <p
                                 id="email-error"
-                                class="hidden mt-1.5 text-[11px] text-red-500 flex items-center gap-1"
+                                role="alert"
+                                aria-live="polite"
+                                class="hidden text-[11px] text-red-500 flex items-center gap-1 mt-1"
                             >
                                 <i
                                     data-lucide="circle-alert"
@@ -89,18 +126,23 @@
                         </div>
 
                         <!-- Password -->
-                        <div>
-                            <div
-                                class="flex items-center justify-between mb-1.5"
-                            >
+                        <div class="space-y-1.5">
+                            <div class="flex items-center justify-between">
                                 <label
                                     for="password"
                                     class="block text-[11px] font-medium text-text-secondary tracking-wider uppercase"
-                                    >Password</label
                                 >
+                                    Password
+                                    <span
+                                        class="text-red-500 ml-0.5"
+                                        aria-hidden="true"
+                                        >*</span
+                                    >
+                                </label>
+
                                 <a
                                     href="/forgot-password"
-                                    class="text-[11px] text-text-helper hover:text-text-secondary transition-colors"
+                                    class="text-[11px] text-text-helper hover:text-text-secondary transition-colors focus:outline-none focus:underline"
                                     >Forgot password?</a
                                 >
                             </div>
@@ -111,12 +153,17 @@
                                     id="password"
                                     autocomplete="current-password"
                                     placeholder="••••••••"
-                                    class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors pr-10"
+                                    aria-required="true"
+                                    aria-describedby="password-error"
+                                    aria-invalid="false"
+                                    class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors duration-150 pr-10"
                                 />
                                 <button
                                     type="button"
                                     id="toggle-password"
-                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-icon-secondary hover:text-text-primary transition-colors focus:outline-none"
+                                    aria-label="Show password"
+                                    aria-pressed="false"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-icon-secondary hover:text-text-primary transition-colors focus:outline-none focus:text-text-primary"
                                 >
                                     <i
                                         id="eye-icon"
@@ -127,7 +174,9 @@
                             </div>
                             <p
                                 id="password-error"
-                                class="hidden mt-1.5 text-[11px] text-red-500 flex items-center gap-1"
+                                role="alert"
+                                aria-live="polite"
+                                class="hidden text-[11px] text-red-500 flex items-center gap-1 mt-1"
                             >
                                 <i
                                     data-lucide="circle-alert"
@@ -137,10 +186,13 @@
                             </p>
                         </div>
 
+                        <!-- Submit -->
                         <button
                             type="submit"
                             id="submit-btn"
-                            class="w-full h-9 bg-btn-primary text-white text-[13px] font-medium rounded-sm hover:bg-btn-primary-hover transition-colors mt-1"
+                            disabled
+                            aria-disabled="true"
+                            class="w-full h-9 bg-btn-primary text-white text-[13px] font-medium rounded-sm transition-all duration-150 mt-1 opacity-40 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-btn-primary"
                         >
                             Sign in
                         </button>
@@ -151,12 +203,14 @@
                             Don't have an account?
                             <a
                                 href="/signup"
-                                class="text-link-primary hover:underline font-medium"
+                                class="text-link-primary hover:underline font-medium focus:outline-none focus:underline"
                                 >Sign up</a
                             >
                         </p>
                     </div>
                 </div>
+
+                <!-- Footer -->
                 <div
                     class="px-8 py-4 bg-surface-02 border-t border-border-subtle flex items-center justify-center gap-1.5"
                 >
@@ -172,190 +226,354 @@
         </div>
 
         <script>
-            const emailInput = document.getElementById("email");
-            const pwInput = document.getElementById("password");
-            const emailErr = document.getElementById("email-error");
-            const emailErrTxt = document.getElementById("email-error-text");
-            const pwErr = document.getElementById("password-error");
-            const pwErrTxt = document.getElementById("password-error-text");
-            const globalErr = document.getElementById("login-error");
-            const submitBtn = document.getElementById("submit-btn");
+            (function () {
+                // ── Element refs ──────────────────────────────────────────────
+                const form = document.getElementById("login-form");
+                const emailInput = document.getElementById("email");
+                const pwInput = document.getElementById("password");
+                const emailErr = document.getElementById("email-error");
+                const emailErrTxt = document.getElementById("email-error-text");
+                const pwErr = document.getElementById("password-error");
+                const pwErrTxt = document.getElementById("password-error-text");
+                const globalErrEl = document.getElementById("login-error");
+                const globalErrP = globalErrEl.querySelector("p");
+                const submitBtn = document.getElementById("submit-btn");
+                const eyeIcon = document.getElementById("eye-icon");
+                const toggleBtn = document.getElementById("toggle-password");
+                const emailIcon = document.getElementById("email-status-icon");
 
-            // ── Border state helpers ──
-            const BASE = ["border-border-subtle"];
-            const RED = ["border-red-500"];
-            const GREEN = ["border-green-500"];
-            function setBorder(input, state) {
-                input.classList.remove(...BASE, ...RED, ...GREEN);
-                if (state === "error") input.classList.add(...RED);
-                else if (state === "ok") input.classList.add(...GREEN);
-                else input.classList.add(...BASE);
-            }
-            function showErr(errEl, txtEl, msg) {
-                txtEl.textContent = msg;
-                errEl.classList.remove("hidden");
-            }
-            function clearErr(errEl, txtEl) {
-                txtEl.textContent = "";
-                errEl.classList.add("hidden");
-            }
+                // ── State ─────────────────────────────────────────────────────
+                let isSubmitting = false;
+                let emailDirty = false;
+                let pwDirty = false;
 
-            // ── Rules ──
-            function checkEmail(val) {
-                if (!val) return "Email is required.";
-                if (!val.includes("@")) return "Email must contain @.";
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val))
-                    return "Enter a valid email address.";
-                return "";
-            }
-            function checkPassword(val) {
-                if (!val) return "Password is required.";
-                if (val.length < 6)
-                    return `Password must be at least 6 characters (${val.length}/6).`;
-                return "";
-            }
+                // ── Validation rules ──────────────────────────────────────────
+                const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-            // ── Real-time validation on every keystroke ──
-            emailInput.addEventListener("input", () => {
-                const val = emailInput.value;
-                if (!val) {
-                    setBorder(emailInput, "default");
-                    clearErr(emailErr, emailErrTxt);
-                    return;
+                function validateEmail(val) {
+                    if (!val) return "Email is required.";
+                    if (!val.includes("@")) return "Email must contain @.";
+                    if (!EMAIL_RE.test(val))
+                        return "Enter a valid email address.";
+                    return "";
                 }
-                const err = checkEmail(val);
-                if (err) {
-                    setBorder(emailInput, "error");
-                    showErr(emailErr, emailErrTxt, err);
-                } else {
-                    setBorder(emailInput, "ok");
-                    clearErr(emailErr, emailErrTxt);
-                }
-            });
 
-            pwInput.addEventListener("input", () => {
-                const val = pwInput.value;
-                if (!val) {
-                    setBorder(pwInput, "default");
-                    clearErr(pwErr, pwErrTxt);
-                    return;
+                function validatePassword(val) {
+                    if (!val) return "Password is required.";
+                    if (val.length < 6)
+                        return `At least 6 characters (${val.length}/6).`;
+                    return "";
                 }
-                const err = checkPassword(val);
-                if (err) {
-                    setBorder(pwInput, "error");
-                    showErr(pwErr, pwErrTxt, err);
-                } else {
-                    setBorder(pwInput, "ok");
-                    clearErr(pwErr, pwErrTxt);
-                }
-            });
 
-            // Also fire on blur (tab through without typing)
-            emailInput.addEventListener("blur", () => {
-                if (!emailInput.value) return;
-                const err = checkEmail(emailInput.value);
-                if (err) {
-                    setBorder(emailInput, "error");
-                    showErr(emailErr, emailErrTxt, err);
-                } else {
-                    setBorder(emailInput, "ok");
-                    clearErr(emailErr, emailErrTxt);
-                }
-            });
+                // ── Border helpers ────────────────────────────────────────────
+                const BORDER = {
+                    default: ["border-border-subtle"],
+                    error: ["border-red-500"],
+                    ok: ["border-green-500"],
+                };
 
-            pwInput.addEventListener("blur", () => {
-                if (!pwInput.value) return;
-                const err = checkPassword(pwInput.value);
-                if (err) {
-                    setBorder(pwInput, "error");
-                    showErr(pwErr, pwErrTxt, err);
-                } else {
-                    setBorder(pwInput, "ok");
-                    clearErr(pwErr, pwErrTxt);
+                function setBorder(el, state) {
+                    Object.values(BORDER).forEach((cls) =>
+                        el.classList.remove(...cls),
+                    );
+                    el.classList.add(...BORDER[state]);
                 }
-            });
 
-            // ── Password toggle ──
-            // Updated: swap data-lucide attribute and re-render instead of innerHTML
-            const eyeIcon = document.getElementById("eye-icon");
-            let pwVisible = false;
-            document
-                .getElementById("toggle-password")
-                .addEventListener("click", () => {
+                // ── Field error display ───────────────────────────────────────
+                function showFieldError(errEl, txtEl, input, msg) {
+                    txtEl.textContent = msg;
+                    errEl.classList.remove("hidden");
+                    input.setAttribute("aria-invalid", "true");
+                    setBorder(input, "error");
+                }
+
+                function clearFieldError(errEl, txtEl, input) {
+                    txtEl.textContent = "";
+                    errEl.classList.add("hidden");
+                    input.setAttribute("aria-invalid", "false");
+                }
+
+                // ── Email status icon (✓ when valid) ──────────────────────────
+                function setEmailIcon(state) {
+                    if (state === "ok") {
+                        emailIcon.innerHTML = `<i data-lucide="circle-check" class="w-3.5 h-3.5 text-green-500 shrink-0"></i>`;
+                        emailIcon.classList.remove("hidden");
+                        if (window.lucide) window.lucide.createIcons();
+                    } else {
+                        emailIcon.classList.add("hidden");
+                        emailIcon.innerHTML = "";
+                    }
+                }
+
+                // ── Global error banner ───────────────────────────────────────
+                function showGlobalError(msg) {
+                    globalErrP.textContent = msg;
+                    globalErrEl.classList.remove("hidden");
+                    globalErrEl.scrollIntoView({
+                        behavior: "smooth",
+                        block: "nearest",
+                    });
+                }
+
+                function clearGlobalError() {
+                    globalErrEl.classList.add("hidden");
+                    globalErrP.textContent = "";
+                }
+
+                // ── Submit button state ───────────────────────────────────────
+                function updateSubmitState() {
+                    const emailOk = validateEmail(emailInput.value) === "";
+                    const pwOk = validatePassword(pwInput.value) === "";
+                    const canSubmit = emailOk && pwOk && !isSubmitting;
+
+                    submitBtn.disabled = !canSubmit;
+                    submitBtn.setAttribute("aria-disabled", String(!canSubmit));
+
+                    if (canSubmit) {
+                        submitBtn.classList.remove(
+                            "opacity-40",
+                            "cursor-not-allowed",
+                        );
+                        submitBtn.classList.add(
+                            "hover:bg-btn-primary-hover",
+                            "cursor-pointer",
+                        );
+                    } else {
+                        submitBtn.classList.add(
+                            "opacity-40",
+                            "cursor-not-allowed",
+                        );
+                        submitBtn.classList.remove(
+                            "hover:bg-btn-primary-hover",
+                            "cursor-pointer",
+                        );
+                    }
+                }
+
+                // ── Loading state ─────────────────────────────────────────────
+                function setLoading(loading) {
+                    isSubmitting = loading;
+                    submitBtn.disabled = loading;
+                    submitBtn.setAttribute("aria-disabled", String(loading));
+
+                    if (loading) {
+                        submitBtn.innerHTML = `
+                        <span class="flex items-center justify-center gap-2">
+                            <svg class="animate-spin w-3.5 h-3.5 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                            Signing in…
+                        </span>`;
+                        submitBtn.classList.add(
+                            "opacity-70",
+                            "cursor-not-allowed",
+                        );
+                        submitBtn.classList.remove(
+                            "hover:bg-btn-primary-hover",
+                        );
+                    } else {
+                        submitBtn.textContent = "Sign in";
+                        submitBtn.classList.remove(
+                            "opacity-70",
+                            "cursor-not-allowed",
+                        );
+                        updateSubmitState();
+                    }
+                }
+
+                // ── Email validation handler ───────────────────────────────────
+                function handleEmailValidation() {
+                    const val = emailInput.value;
+                    const err = validateEmail(val);
+
+                    if (!val) {
+                        setBorder(emailInput, "default");
+                        clearFieldError(emailErr, emailErrTxt, emailInput);
+                        setEmailIcon(null);
+                    } else if (err) {
+                        showFieldError(emailErr, emailErrTxt, emailInput, err);
+                        setEmailIcon(null);
+                    } else {
+                        clearFieldError(emailErr, emailErrTxt, emailInput);
+                        setBorder(emailInput, "ok");
+                        setEmailIcon("ok");
+                    }
+                    updateSubmitState();
+                }
+
+                // ── Password validation handler ────────────────────────────────
+                function handlePasswordValidation() {
+                    const val = pwInput.value;
+                    const err = validatePassword(val);
+
+                    if (!val) {
+                        setBorder(pwInput, "default");
+                        clearFieldError(pwErr, pwErrTxt, pwInput);
+                    } else if (err) {
+                        showFieldError(pwErr, pwErrTxt, pwInput, err);
+                    } else {
+                        clearFieldError(pwErr, pwErrTxt, pwInput);
+                        setBorder(pwInput, "ok");
+                    }
+                    updateSubmitState();
+                }
+
+                // ── Event listeners ───────────────────────────────────────────
+                emailInput.addEventListener("input", () => {
+                    emailDirty = true;
+                    handleEmailValidation();
+                });
+
+                emailInput.addEventListener("blur", () => {
+                    if (emailDirty) handleEmailValidation();
+                });
+
+                pwInput.addEventListener("input", () => {
+                    pwDirty = true;
+                    handlePasswordValidation();
+                });
+
+                pwInput.addEventListener("blur", () => {
+                    if (pwDirty) handlePasswordValidation();
+                });
+
+                // Clear global error on any input change
+                emailInput.addEventListener("input", clearGlobalError);
+                pwInput.addEventListener("input", clearGlobalError);
+
+                // ── Password visibility toggle ────────────────────────────────
+                let pwVisible = false;
+                toggleBtn.addEventListener("click", () => {
                     pwVisible = !pwVisible;
                     pwInput.type = pwVisible ? "text" : "password";
                     eyeIcon.setAttribute(
                         "data-lucide",
                         pwVisible ? "eye-off" : "eye",
                     );
+                    toggleBtn.setAttribute(
+                        "aria-label",
+                        pwVisible ? "Hide password" : "Show password",
+                    );
+                    toggleBtn.setAttribute("aria-pressed", String(pwVisible));
                     if (window.lucide) window.lucide.createIcons();
+                    // Keep focus on input for accessibility
+                    pwInput.focus();
                 });
 
-            // ── Block submit if invalid ──
-            document
-                .getElementById("login-form")
-                .addEventListener("htmx:beforeRequest", (evt) => {
-                    globalErr.classList.add("hidden");
-                    const eErr = checkEmail(emailInput.value);
-                    const pErr = checkPassword(pwInput.value);
-                    if (eErr) {
-                        setBorder(emailInput, "error");
-                        showErr(emailErr, emailErrTxt, eErr);
-                    }
-                    if (pErr) {
-                        setBorder(pwInput, "error");
-                        showErr(pwErr, pwErrTxt, pErr);
-                    }
-                    if (eErr || pErr) {
+                // ── HTMX: block if invalid, set loading ───────────────────────
+                form.addEventListener("htmx:beforeRequest", (evt) => {
+                    clearGlobalError();
+
+                    // Final validation gate
+                    const eErr = validateEmail(emailInput.value);
+                    const pErr = validatePassword(pwInput.value);
+
+                    if (eErr)
+                        showFieldError(emailErr, emailErrTxt, emailInput, eErr);
+                    if (pErr) showFieldError(pwErr, pwErrTxt, pwInput, pErr);
+
+                    if (eErr || pErr || isSubmitting) {
                         evt.preventDefault();
                         return;
                     }
-                    submitBtn.disabled = true;
-                    submitBtn.textContent = "Signing in…";
+
+                    setLoading(true);
                 });
 
-            // ── Handle response ──
-            document.body.addEventListener("htmx:afterRequest", (evt) => {
-                if (evt.detail.elt.id !== "login-form") return;
-                submitBtn.disabled = false;
-                submitBtn.textContent = "Sign in";
-                const xhr = evt.detail.xhr;
+                // ── HTMX: handle response ─────────────────────────────────────
+                document.body.addEventListener("htmx:afterRequest", (evt) => {
+                    if (evt.detail.elt.id !== "login-form") return;
 
-                // Success — save token then redirect
-                if (xhr.status >= 200 && xhr.status < 300) {
+                    setLoading(false);
+                    const xhr = evt.detail.xhr;
+
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        try {
+                            const res = JSON.parse(xhr.responseText);
+                            if (res.token)
+                                localStorage.setItem("kms_token", res.token);
+                        } catch {}
+                        // Show brief success state before redirect
+                        submitBtn.innerHTML = `
+                        <span class="flex items-center justify-center gap-2">
+                            <i data-lucide="circle-check" class="w-3.5 h-3.5 shrink-0"></i>
+                            Redirecting…
+                        </span>`;
+                        submitBtn.classList.add("bg-green-600");
+                        if (window.lucide) window.lucide.createIcons();
+                        setTimeout(() => {
+                            window.location.href = "/";
+                        }, 300);
+                        return;
+                    }
+
+                    // Error response
+                    let msg = "Login failed. Please try again.";
                     try {
                         const res = JSON.parse(xhr.responseText);
-                        if (res.token)
-                            localStorage.setItem("kms_token", res.token);
-                    } catch (e) {}
-                    window.location.href = "/";
-                    return;
-                }
+                        msg =
+                            res.error ||
+                            res.message ||
+                            res.detail ||
+                            (xhr.status === 401
+                                ? "Incorrect email or password."
+                                : xhr.status === 422
+                                  ? "Invalid email or password format."
+                                  : xhr.status === 429
+                                    ? "Too many attempts. Try again later."
+                                    : msg);
+                    } catch {
+                        if (xhr.status === 0)
+                            msg = "Connection error. Check your network.";
+                    }
 
-                // Error — parse and show message
-                try {
-                    const res = JSON.parse(xhr.responseText);
-                    const msg =
-                        res.error ||
-                        res.message ||
-                        res.detail ||
-                        (xhr.status === 401
-                            ? "Incorrect email or password."
-                            : xhr.status === 422
-                              ? "Invalid email or password format."
-                              : xhr.status === 429
-                                ? "Too many attempts. Try again later."
-                                : "Login failed. Please try again.");
-                    globalErr.textContent = msg;
-                    globalErr.classList.remove("hidden");
-                } catch {
-                    globalErr.textContent =
-                        xhr.status === 0
-                            ? "Connection error. Check your network."
-                            : "Login failed. Please try again.";
-                    globalErr.classList.remove("hidden");
-                }
-            });
+                    showGlobalError(msg);
+
+                    // Shake the form card for visual feedback on auth error
+                    const card = form.closest(".bg-surface-01");
+                    if (card) {
+                        card.classList.add("animate-shake");
+                        setTimeout(
+                            () => card.classList.remove("animate-shake"),
+                            500,
+                        );
+                    }
+                });
+
+                // ── Init ──────────────────────────────────────────────────────
+                updateSubmitState();
+            })();
         </script>
+
+        <style>
+            @keyframes shake {
+                0%,
+                100% {
+                    transform: translateX(0);
+                }
+                15% {
+                    transform: translateX(-5px);
+                }
+                30% {
+                    transform: translateX(5px);
+                }
+                45% {
+                    transform: translateX(-4px);
+                }
+                60% {
+                    transform: translateX(4px);
+                }
+                75% {
+                    transform: translateX(-2px);
+                }
+                90% {
+                    transform: translateX(2px);
+                }
+            }
+            .animate-shake {
+                animation: shake 0.45s ease-in-out;
+            }
+        </style>
     </body>
 </html>
