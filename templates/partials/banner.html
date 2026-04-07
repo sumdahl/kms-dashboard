@@ -1,26 +1,33 @@
 <div
     id="announcement-banner"
-    class="flex items-center gap-3 px-8 h-10 min-h-10 bg-banner-bg border-b border-banner-border relative"
+    class="relative flex flex-col items-center gap-2 px-4 py-3 bg-banner-bg border-b border-banner-border sm:flex-row sm:justify-between sm:items-center sm:px-12 sm:py-0 sm:h-10"
     role="alert"
 >
-    <p class="text-sm text-banner-text">
+    <!-- Banner Text -->
+    <p
+        class="text-sm text-banner-text text-center max-w-full sm:text-left sm:max-w-[70%]"
+    >
         Dynamically optimize, clip, and resize video from any origin with Media
         Transformations.
     </p>
+
+    <!-- Action Button -->
     <a
         href="#"
-        class="inline-flex items-center px-3 py-1 border border-banner-text rounded-sm text-xs font-medium text-banner-text bg-transparent hover:bg-banner-text hover:text-white dark:hover:text-banner-bg transition-colors whitespace-nowrap"
+        class="inline-flex items-center justify-center px-3 py-1 mt-2 text-xs font-medium border border-banner-text rounded-sm text-banner-text bg-transparent hover:bg-banner-text hover:text-white dark:hover:text-banner-bg transition-colors whitespace-nowrap sm:mt-0"
     >
         Enable Now
     </a>
+
+    <!-- Close Button -->
     <button
-        class="absolute right-4 flex items-center justify-center w-7 h-7 rounded-sm text-banner-text hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
         type="button"
         aria-label="Dismiss"
+        class="absolute right-2 top-3 flex items-center justify-center w-8 h-8 rounded-sm text-banner-text hover:bg-black/10 dark:hover:bg-white/10 transition-colors sm:static sm:ml-4 sm:translate-y-0"
         hx-delete="/ui/banner"
         hx-target="#announcement-banner"
         hx-swap="outerHTML"
     >
-        <i data-lucide="x" class="w-3.5 h-3.5 shrink-0"></i>
+        <i data-lucide="x" class="w-4 h-4"></i>
     </button>
 </div>
