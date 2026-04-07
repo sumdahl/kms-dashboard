@@ -59,6 +59,11 @@
     --color-btn-primary-hover: #0057d9;
     --color-btn-primary-press: #0043b0;
 
+    /* ── Colors: Buttons ────────────────────────────────────────────────── */
+    --color-documentation-btn-bg: #ffffff;
+    --color-documentation-btn-hover: #fafafa;
+    --color-documentation-btn-border: #e0e0e0;
+
     /* ── Colors: Status ─────────────────────────────────────────────────── */
     --color-status-green: #24a148;
     --color-status-red: #da1e28;
