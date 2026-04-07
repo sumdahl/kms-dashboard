@@ -171,7 +171,7 @@ pub struct HomeParams {
 
 async fn home(
     claims: Option<Claims>,
-    axum::extract::Query(params): axum::extract::Query<HomeParams>,
+    axum::extract::Query(_params): axum::extract::Query<HomeParams>,
 ) -> Response {
     match claims {
         None => Redirect::to("/login").into_response(),
@@ -201,7 +201,7 @@ struct RolesTemplate {
 
 async fn roles_page(
     claims: Option<Claims>,
-    axum::extract::Query(params): axum::extract::Query<HomeParams>,
+    axum::extract::Query(_params): axum::extract::Query<HomeParams>,
 ) -> Response {
     match claims {
         None => Redirect::to("/login").into_response(),

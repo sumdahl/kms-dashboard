@@ -16,65 +16,9 @@
                     class="text-[11px] text-text-helper tracking-widest uppercase font-medium"
                     >KMS Dashboard</span
                 >
-                    <i
-                        data-lucide="shield"
-                        class="w-5 h-5 text-icon-secondary shrink-0"
-                    ></i>
-                </div>
-                <h1
-                    class="text-xl font-semibold text-text-primary tracking-tight"
-                >
-                    Welcome back
-                </h1>
-                <p class="text-[13px] text-text-helper mt-1.5">
-                    Log in to manage your keys and roles
-                </p>
-
-                <!-- Global error -->
-                <div
-                    id="login-error"
-                    role="alert"
-                    aria-live="assertive"
-                    aria-atomic="true"
-                    class="hidden w-full max-w-[280px] mt-4"
-                >
-                    <p
-                        class="text-[11px] text-red-500 text-center bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2"
-                    ></p>
-                </div>
-                <!-- Account disabled banner -->
-                {% if account_disabled %}
-                <div class="w-full mt-4" role="alert" aria-live="assertive">
-                    <div
-                        class="flex items-start gap-2.5 bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2.5"
-                    >
-                        <i
-                            data-lucide="shield-off"
-                            class="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5"
-                        ></i>
-                        <div>
-                            <p class="text-[11px] font-medium text-red-500">
-                                Account disabled
-                            </p>
-                            <p class="text-[11px] text-red-400 mt-0.5">
-                                Your account has been disabled by an
-                                administrator. Please contact support.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
             </div>
-
-            <!-- Form -->
-            <form
-                id="login-form"
-                hx-post="/auth/login"
-                hx-ext="json-enc"
-                hx-swap="none"
-                novalidate
-                aria-label="Sign in form"
-                class="space-y-4"
+            <div
+                class="bg-surface-01 border border-border-subtle rounded-card shadow-sm overflow-hidden"
             >
                 <div
                     class="h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent"
@@ -240,359 +184,245 @@
                                    disabled:bg-btn-primary/60 disabled:text-white/70 
                                    disabled:cursor-not-allowed disabled:shadow-none"
                         >
-                            <i
-                                id="eye-icon"
-                                data-lucide="eye"
-                                class="w-4 h-4 shrink-0"
-                            ></i>
+                            Sign in
                         </button>
+                    </form>
+
+                    <div class="mt-6 text-center">
+                        <p class="text-[13px] text-text-helper">
+                            Don't have an account?
+                            <a
+                                href="/signup"
+                                class="text-link-primary hover:underline font-medium"
+                                >Sign up</a
+                            >
+                        </p>
                     </div>
-                    <p
-                        id="password-error"
-                        role="alert"
-                        aria-live="polite"
-                        class="hidden text-[11px] text-red-500 flex items-center gap-1 mt-1"
-                    >
-                        <i
-                            data-lucide="circle-alert"
-                            class="w-[11px] h-[11px] shrink-0"
-                        ></i>
-                        <span id="password-error-text"></span>
-                    </p>
                 </div>
-
-                <!-- Submit -->
-                <button
-                    type="submit"
-                    id="submit-btn"
-                    disabled
-                    aria-disabled="true"
-                    class="w-full h-9 bg-btn-primary text-white text-[13px] font-medium rounded-sm transition-all duration-150 mt-1 opacity-40 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-btn-primary"
+                <div
+                    class="px-8 py-4 bg-surface-02 border-t border-border-subtle flex items-center justify-center gap-1.5"
                 >
-                    Sign in
-                </button>
-            </form>
-
-            <div class="mt-6 text-center">
-                <p class="text-[13px] text-text-helper">
-                    Don't have an account?
-
-                    <a
-                        href="/signup"
-                        class="text-link-primary hover:underline font-medium focus:outline-none focus:underline"
-                        >Sign up</a
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-text-helper"
                     >
-                </p>
+                        <rect
+                            x="3"
+                            y="11"
+                            width="18"
+                            height="11"
+                            rx="2"
+                            ry="2"
+                        ></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <span class="text-[11px] text-text-helper tracking-wide"
+                        >End-to-end encrypted</span
+                    >
+                </div>
             </div>
         </div>
 
-        <!-- Footer -->
-        <div
-            class="px-8 py-4 bg-surface-02 border-t border-border-subtle flex items-center justify-center gap-1.5"
-        >
-            <i
-                data-lucide="lock"
-                class="w-[11px] h-[11px] text-text-helper shrink-0"
-            ></i>
-            <span class="text-[11px] text-text-helper tracking-wide"
-                >End-to-end encrypted</span
-            >
-        </div>
-    </div>
-</div>
-{% endblock %} {% block body_scripts %}
-<script>
-    (function () {
-        const form = document.getElementById("login-form");
-        const emailInput = document.getElementById("email");
-        const pwInput = document.getElementById("password");
-        const emailErr = document.getElementById("email-error");
-        const emailErrTxt = document.getElementById("email-error-text");
-        const pwErr = document.getElementById("password-error");
-        const pwErrTxt = document.getElementById("password-error-text");
-        const globalErrEl = document.getElementById("login-error");
-        const globalErrP = globalErrEl.querySelector("p");
-        const submitBtn = document.getElementById("submit-btn");
-        const eyeIcon = document.getElementById("eye-icon");
-        const toggleBtn = document.getElementById("toggle-password");
-        const emailIcon = document.getElementById("email-status-icon");
+        <script>
+            const emailInput = document.getElementById("email");
+            const pwInput = document.getElementById("password");
+            const emailErr = document.getElementById("email-error");
+            const emailErrTxt = document.getElementById("email-error-text");
+            const pwErr = document.getElementById("password-error");
+            const pwErrTxt = document.getElementById("password-error-text");
+            const globalErr = document.getElementById("login-error");
+            const submitBtn = document.getElementById("submit-btn");
 
-        let isSubmitting = false;
-        let emailDirty = false;
-        let pwDirty = false;
+            // ── Border state helpers ──
+            const BASE = ["border-border-subtle"];
+            const RED = ["border-red-500"];
+            const GREEN = ["border-green-500"];
 
-        const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        function validateEmail(val) {
-            if (!val) return "Email is required.";
-            if (!val.includes("@")) return "Email must contain @.";
-            if (!EMAIL_RE.test(val)) return "Enter a valid email address.";
-            return "";
-        }
-
-        function validatePassword(val) {
-            if (!val) return "Password is required.";
-            if (val.length < 6)
-                return `At least 6 characters (${val.length}/6).`;
-            return "";
-        }
-
-        const BORDER = {
-            default: ["border-border-subtle"],
-            error: ["border-red-500"],
-            ok: ["border-green-500"],
-        };
-
-        function setBorder(el, state) {
-            Object.values(BORDER).forEach((cls) => el.classList.remove(...cls));
-            el.classList.add(...BORDER[state]);
-        }
-
-        function showFieldError(errEl, txtEl, input, msg) {
-            txtEl.textContent = msg;
-            errEl.classList.remove("hidden");
-            input.setAttribute("aria-invalid", "true");
-            setBorder(input, "error");
-        }
-
-        function clearFieldError(errEl, txtEl, input) {
-            txtEl.textContent = "";
-            errEl.classList.add("hidden");
-            input.setAttribute("aria-invalid", "false");
-        }
-
-        function setEmailIcon(state) {
-            if (state === "ok") {
-                emailIcon.innerHTML = `<i data-lucide="circle-check" class="w-3.5 h-3.5 text-green-500 shrink-0"></i>`;
-                emailIcon.classList.remove("hidden");
-                if (window.lucide) window.lucide.createIcons();
-            } else {
-                emailIcon.classList.add("hidden");
-                emailIcon.innerHTML = "";
+            function setBorder(input, state) {
+                input.classList.remove(...BASE, ...RED, ...GREEN);
+                if (state === "error") input.classList.add(...RED);
+                else if (state === "ok") input.classList.add(...GREEN);
+                else input.classList.add(...BASE);
             }
-        }
 
-        function showGlobalError(msg) {
-            globalErrP.textContent = msg;
-            globalErrEl.classList.remove("hidden");
-            globalErrEl.scrollIntoView({
-                behavior: "smooth",
-                block: "nearest",
+            function showErr(errEl, txtEl, msg) {
+                txtEl.textContent = msg;
+                errEl.classList.remove("hidden");
+            }
+
+            function clearErr(errEl, txtEl) {
+                txtEl.textContent = "";
+                errEl.classList.add("hidden");
+            }
+
+            // ── Validation Rules ──
+            function checkEmail(val) {
+                if (!val) return "Email is required.";
+                if (!val.includes("@")) return "Email must contain @.";
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val))
+                    return "Enter a valid email address.";
+                return "";
+            }
+
+            function checkPassword(val) {
+                if (!val) return "Password is required.";
+                if (val.length < 6)
+                    return `Password must be at least 6 characters (${val.length}/6).`;
+                return "";
+            }
+
+            // ── Update Submit Button State ──
+            function updateSubmitButton() {
+                const emailVal = emailInput.value.trim();
+                const pwVal = pwInput.value.trim();
+
+                const emailError = checkEmail(emailVal);
+                const pwError = checkPassword(pwVal);
+
+                const isFormValid = emailVal !== "" && pwVal !== "" && !emailError && !pwError;
+
+                submitBtn.disabled = !isFormValid;
+            }
+
+            // ── Real-time validation ──
+            emailInput.addEventListener("input", () => {
+                const val = emailInput.value.trim();
+                if (!val) {
+                    setBorder(emailInput, "default");
+                    clearErr(emailErr, emailErrTxt);
+                } else {
+                    const err = checkEmail(val);
+                    if (err) {
+                        setBorder(emailInput, "error");
+                        showErr(emailErr, emailErrTxt, err);
+                    } else {
+                        setBorder(emailInput, "ok");
+                        clearErr(emailErr, emailErrTxt);
+                    }
+                }
+                updateSubmitButton();
             });
-        }
 
-        function clearGlobalError() {
-            globalErrEl.classList.add("hidden");
-            globalErrP.textContent = "";
-        }
+            pwInput.addEventListener("input", () => {
+                const val = pwInput.value.trim();
+                if (!val) {
+                    setBorder(pwInput, "default");
+                    clearErr(pwErr, pwErrTxt);
+                } else {
+                    const err = checkPassword(val);
+                    if (err) {
+                        setBorder(pwInput, "error");
+                        showErr(pwErr, pwErrTxt, err);
+                    } else {
+                        setBorder(pwInput, "ok");
+                        clearErr(pwErr, pwErrTxt);
+                    }
+                }
+                updateSubmitButton();
+            });
 
-        function updateSubmitState() {
-            const emailOk = validateEmail(emailInput.value) === "";
-            const pwOk = validatePassword(pwInput.value) === "";
-            const canSubmit = emailOk && pwOk && !isSubmitting;
+            // Blur validation
+            emailInput.addEventListener("blur", () => {
+                if (!emailInput.value.trim()) return;
+                const err = checkEmail(emailInput.value.trim());
+                if (err) {
+                    setBorder(emailInput, "error");
+                    showErr(emailErr, emailErrTxt, err);
+                } else {
+                    setBorder(emailInput, "ok");
+                    clearErr(emailErr, emailErrTxt);
+                }
+                updateSubmitButton();
+            });
 
-            submitBtn.disabled = !canSubmit;
-            submitBtn.setAttribute("aria-disabled", String(!canSubmit));
+            pwInput.addEventListener("blur", () => {
+                if (!pwInput.value.trim()) return;
+                const err = checkPassword(pwInput.value.trim());
+                if (err) {
+                    setBorder(pwInput, "error");
+                    showErr(pwErr, pwErrTxt, err);
+                } else {
+                    setBorder(pwInput, "ok");
+                    clearErr(pwErr, pwErrTxt);
+                }
+                updateSubmitButton();
+            });
 
-            if (canSubmit) {
-                submitBtn.classList.remove("opacity-40", "cursor-not-allowed");
-                submitBtn.classList.add(
-                    "hover:bg-btn-primary-hover",
-                    "cursor-pointer",
-                );
-            } else {
-                submitBtn.classList.add("opacity-40", "cursor-not-allowed");
-                submitBtn.classList.remove(
-                    "hover:bg-btn-primary-hover",
-                    "cursor-pointer",
-                );
-            }
-        }
+            // ── Password toggle ──
+            const eyeIcon = document.getElementById("eye-icon");
+            let pwVisible = false;
 
-        function setLoading(loading) {
-            isSubmitting = loading;
-            submitBtn.disabled = loading;
-            submitBtn.setAttribute("aria-disabled", String(loading));
+            document.getElementById("toggle-password").addEventListener("click", () => {
+                pwVisible = !pwVisible;
+                pwInput.type = pwVisible ? "text" : "password";
+                eyeIcon.innerHTML = pwVisible
+                    ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`
+                    : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+            });
 
-            if (loading) {
-                submitBtn.innerHTML = `
-                    <span class="flex items-center justify-center gap-2">
-                        <svg class="animate-spin w-3.5 h-3.5 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                        </svg>
-                        Signing in…
-                    </span>`;
-                submitBtn.classList.add("opacity-70", "cursor-not-allowed");
-                submitBtn.classList.remove("hover:bg-btn-primary-hover");
-            } else {
+            // ── Prevent submission if invalid (backup) ──
+            document.getElementById("login-form").addEventListener("htmx:beforeRequest", (evt) => {
+                globalErr.classList.add("hidden");
+
+                const eErr = checkEmail(emailInput.value.trim());
+                const pErr = checkPassword(pwInput.value.trim());
+
+                if (eErr || pErr) {
+                    evt.preventDefault();
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = "Signing in…";
+            });
+
+            // ── Handle response ──
+            document.body.addEventListener("htmx:afterRequest", (evt) => {
+                if (evt.detail.elt.id !== "login-form") return;
+
+                submitBtn.disabled = false;
                 submitBtn.textContent = "Sign in";
-                submitBtn.classList.remove("opacity-70", "cursor-not-allowed");
-                updateSubmitState();
-            }
-        }
 
-        function handleEmailValidation() {
-            const val = emailInput.value;
-            const err = validateEmail(val);
+                const xhr = evt.detail.xhr;
 
-            if (!val) {
-                setBorder(emailInput, "default");
-                clearFieldError(emailErr, emailErrTxt, emailInput);
-                setEmailIcon(null);
-            } else if (err) {
-                showFieldError(emailErr, emailErrTxt, emailInput, err);
-                setEmailIcon(null);
-            } else {
-                clearFieldError(emailErr, emailErrTxt, emailInput);
-                setBorder(emailInput, "ok");
-                setEmailIcon("ok");
-            }
-            updateSubmitState();
-        }
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    try {
+                        const res = JSON.parse(xhr.responseText);
+                        if (res.token) localStorage.setItem("kms_token", res.token);
+                    } catch (e) {}
+                    window.location.href = "/";
+                    return;
+                }
 
-        function handlePasswordValidation() {
-            const val = pwInput.value;
-            const err = validatePassword(val);
-
-            if (!val) {
-                setBorder(pwInput, "default");
-                clearFieldError(pwErr, pwErrTxt, pwInput);
-            } else if (err) {
-                showFieldError(pwErr, pwErrTxt, pwInput, err);
-            } else {
-                clearFieldError(pwErr, pwErrTxt, pwInput);
-                setBorder(pwInput, "ok");
-            }
-            updateSubmitState();
-        }
-
-        emailInput.addEventListener("input", () => {
-            emailDirty = true;
-            handleEmailValidation();
-        });
-        emailInput.addEventListener("blur", () => {
-            if (emailDirty) handleEmailValidation();
-        });
-        pwInput.addEventListener("input", () => {
-            pwDirty = true;
-            handlePasswordValidation();
-        });
-        pwInput.addEventListener("blur", () => {
-            if (pwDirty) handlePasswordValidation();
-        });
-        emailInput.addEventListener("input", clearGlobalError);
-        pwInput.addEventListener("input", clearGlobalError);
-
-        let pwVisible = false;
-        toggleBtn.addEventListener("click", () => {
-            pwVisible = !pwVisible;
-            pwInput.type = pwVisible ? "text" : "password";
-            eyeIcon.setAttribute("data-lucide", pwVisible ? "eye-off" : "eye");
-            toggleBtn.setAttribute(
-                "aria-label",
-                pwVisible ? "Hide password" : "Show password",
-            );
-            toggleBtn.setAttribute("aria-pressed", String(pwVisible));
-            if (window.lucide) window.lucide.createIcons();
-            pwInput.focus();
-        });
-
-        form.addEventListener("htmx:beforeRequest", (evt) => {
-            clearGlobalError();
-            const eErr = validateEmail(emailInput.value);
-            const pErr = validatePassword(pwInput.value);
-            if (eErr) showFieldError(emailErr, emailErrTxt, emailInput, eErr);
-            if (pErr) showFieldError(pwErr, pwErrTxt, pwInput, pErr);
-            if (eErr || pErr || isSubmitting) {
-                evt.preventDefault();
-                return;
-            }
-            setLoading(true);
-        });
-
-        document.body.addEventListener("htmx:afterRequest", (evt) => {
-            if (evt.detail.elt.id !== "login-form") return;
-            setLoading(false);
-            const xhr = evt.detail.xhr;
-
-            if (xhr.status >= 200 && xhr.status < 300) {
+                // Show error
                 try {
                     const res = JSON.parse(xhr.responseText);
-                    if (res.token) localStorage.setItem("kms_token", res.token);
-                } catch {}
-                submitBtn.innerHTML = `
-                    <span class="flex items-center justify-center gap-2">
-                        <i data-lucide="circle-check" class="w-3.5 h-3.5 shrink-0"></i>
-                        Redirecting…
-                    </span>`;
-                submitBtn.classList.add("bg-green-600");
-                if (window.lucide) window.lucide.createIcons();
-                setTimeout(() => {
-                    window.location.href = "/";
-                }, 300);
-                return;
-            }
+                    const msg = res.error || res.message || res.detail || 
+                               (xhr.status === 401 ? "Incorrect email or password." : 
+                                xhr.status === 422 ? "Invalid email or password format." :
+                                xhr.status === 429 ? "Too many attempts. Try again later." :
+                                "Login failed. Please try again.");
+                    globalErr.textContent = msg;
+                    globalErr.classList.remove("hidden");
+                } catch {
+                    globalErr.textContent = 
+                        xhr.status === 0 
+                            ? "Connection error. Check your network." 
+                            : "Login failed. Please try again.";
+                    globalErr.classList.remove("hidden");
+                }
+            });
 
-            let msg = "Login failed. Please try again.";
-            try {
-                const res = JSON.parse(xhr.responseText);
-                msg =
-                    res.error ||
-                    res.message ||
-                    res.detail ||
-                    (xhr.status === 401
-                        ? "Incorrect email or password."
-                        : xhr.status === 422
-                          ? "Invalid email or password format."
-                          : xhr.status === 429
-                            ? "Too many attempts. Try again later."
-                            : msg);
-            } catch {
-                if (xhr.status === 0)
-                    msg = "Connection error. Check your network.";
-            }
-
-            showGlobalError(msg);
-
-            const card = form.closest(".bg-surface-01");
-            if (card) {
-                card.classList.add("animate-shake");
-                setTimeout(() => card.classList.remove("animate-shake"), 500);
-            }
-        });
-
-        updateSubmitState();
-    })();
-</script>
-
-<style>
-    @keyframes shake {
-        0%,
-        100% {
-            transform: translateX(0);
-        }
-        15% {
-            transform: translateX(-5px);
-        }
-        30% {
-            transform: translateX(5px);
-        }
-        45% {
-            transform: translateX(-4px);
-        }
-        60% {
-            transform: translateX(4px);
-        }
-        75% {
-            transform: translateX(-2px);
-        }
-        90% {
-            transform: translateX(2px);
-        }
-    }
-    .animate-shake {
-        animation: shake 0.45s ease-in-out;
-    }
-</style>
-{% endblock %}
+            // Initial button state
+            updateSubmitButton();
+        </script>
+    </body>
+</html>

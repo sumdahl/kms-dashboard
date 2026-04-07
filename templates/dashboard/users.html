@@ -22,19 +22,19 @@
                 <a
                     href="/docs"
                     target="_blank"
-                    class="inline-flex items-center justify-center h-8 px-4 rounded-md text-[13px] font-medium bg-(--color-documentation-btn-bg) hover:bg-(--color-documentation-btn-hover) border border-(--color-documentation-btn-border) transition-colors shadow-sm"
+                    class="inline-flex items-center justify-center h-8 px-4 rounded-md text-[13px] font-medium bg-[#d0e2ff] hover:bg-[#b8d4ff] text-[#0043ce] border border-transparent transition-colors shadow-sm"
                 >
                     Documentation
                 </a>
             </div>
         </div>
 
-        <div class="flex items-start gap-8">
+        <div class="flex flex-col lg:flex-row items-start gap-8">
             <!-- ── Left: User List ── -->
-            <div class="flex-1 min-w-0 flex flex-col">
+            <div class="flex-1 min-w-0 flex flex-col w-full">
                 <!-- Toolbar -->
-                <div class="flex items-center gap-2 mb-4">
-                    <div class="relative flex-1">
+                <div class="flex flex-wrap items-center gap-2 mb-4">
+                    <div class="relative flex-1 min-w-[200px]">
                         <i
                             data-lucide="search"
                             class="absolute left-3 top-1/2 -translate-y-1/2 text-icon-muted w-3.5 h-3.5 shrink-0"
@@ -84,7 +84,7 @@
             </div>
 
             <!-- ── Right: Stats + Detail Panel ── -->
-            <div class="w-[300px] shrink-0 flex flex-col gap-6">
+            <div class="w-full lg:w-[300px] lg:shrink-0 flex flex-col gap-6">
                 <!-- Stats Card -->
                 <div>
                     <div class="flex items-center justify-between mb-2">
@@ -352,7 +352,7 @@
         <div class="bg-surface-01 border border-border-strong rounded-[8px] overflow-hidden hover:border-[#0051c3] transition-colors cursor-pointer ${disabledCls}"
              data-user-id="${escHtml(user.user_id)}"
              onclick="showUserDetail('${escHtml(user.user_id)}')">
-            <div class="p-4 flex items-center justify-between gap-4">
+            <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div class="flex items-center gap-3 flex-1 min-w-0">
                     <!-- Avatar -->
                     <div style="background:${bg};color:${fg};box-shadow:inset 0 0 0 1px rgba(0,0,0,0.08)"
@@ -369,7 +369,7 @@
                     </div>
                 </div>
                 <!-- Status + Action -->
-                <div class="flex items-center gap-3 shrink-0">
+                <div class="flex items-center sm:justify-end gap-3 shrink-0">
                     ${statusBadge(user.is_active)}
                     <button
                         data-user-id="${escHtml(user.user_id)}"
@@ -699,3 +699,4 @@
     })();
 </script>
 {% endblock %}
+

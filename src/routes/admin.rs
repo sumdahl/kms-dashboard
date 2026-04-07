@@ -1,7 +1,7 @@
 use crate::app_state::AppState;
 use crate::handlers::admin::{
     assign_role, create_role, delete_role, disable_user, enable_user, get_role_detail, list_roles,
-    list_users, roles_summary,
+    list_users, permission_row, roles_summary,
 };
 use axum::{
     routing::{delete, get, post},
