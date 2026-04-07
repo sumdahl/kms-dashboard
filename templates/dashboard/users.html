@@ -622,7 +622,7 @@
 
             try {
                 const res = await fetch(
-                    `/admin/users/${_pendingUserId}/disable`,
+                    `/admin/users/disable/${_pendingUserId}`,
                     {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -659,7 +659,7 @@
 
         async function enableUser(userId, email) {
             try {
-                const res = await fetch(`/admin/users/${userId}/enable`, {
+                const res = await fetch(`/admin/users/enable/${userId}`, {
                     method: "POST",
                 });
                 const data = await res.json();
