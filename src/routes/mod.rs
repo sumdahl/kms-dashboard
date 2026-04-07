@@ -11,12 +11,13 @@ use crate::models::types::{AccessLevel, Resource};
 use crate::models::{Claims, Role, RolePermission};
 use axum::middleware;
 use axum::{
-    extract::{Form, Path, State},
+    extract::{Form, Path, Query, State},
     http::StatusCode,
     response::{Html, IntoResponse, Redirect, Response},
     routing::{delete, get, post},
     Router,
 };
+use std::collections::HashMap;
 
 use serde::Deserialize;
 
@@ -26,6 +27,7 @@ pub fn create_router(state: AppState) -> Router {
         .route("/login", get(login_page))
         .route("/signup", get(signup_page))
         .route("/roles", get(roles_page))
+        .route("/users", get(users_page))
         .route("/roles/new", get(create_role_wizard_page))
         .route("/roles/:name", get(role_detail_page))
         .route("/assign", get(assign_page))
@@ -57,13 +59,43 @@ pub fn create_router(state: AppState) -> Router {
 }
 
 #[derive(askama::Template)]
-#[template(path = "login.html")]
-struct LoginTemplate {}
-
-async fn login_page() -> impl IntoResponse {
-    LoginTemplate {}
+#[template(path = "dashboard/users.html")]
+struct UsersTemplate {
+    pub sidebar_pinned: bool,
+    pub user_email: String,
+    pub show_banner: bool,
+    pub css_version: &'static str,
+    pub is_admin: bool,
 }
 
+async fn users_page(claims: Option<Claims>) -> Response {
+    match claims {
+        None => Redirect::to("/login").into_response(),
+        Some(c) => UsersTemplate {
+            sidebar_pinned: true,
+            user_email: c.email,
+            show_banner: false,
+            css_version: env!("CSS_VERSION"),
+            is_admin: c.is_admin,
+        }
+        .into_response(),
+    }
+}
+
+#[derive(askama::Template)]
+#[template(path = "login.html")]
+struct LoginTemplate {
+    pub account_disabled: bool,
+}
+
+async fn login_page(Query(params): Query<HashMap<String, String>>) -> impl IntoResponse {
+    LoginTemplate {
+        account_disabled: params
+            .get("reason")
+            .map(|r| r == "account_disabled")
+            .unwrap_or(false),
+    }
+}
 #[derive(askama::Template)]
 #[template(path = "signup.html")]
 struct SignupTemplate {}

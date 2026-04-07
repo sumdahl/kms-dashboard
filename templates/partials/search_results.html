@@ -1,9 +1,18 @@
 <div class="flex flex-col bg-surface-01 pb-2">
     {% if results.is_empty() %}
     <div class="px-4 py-14 text-center sm:px-14">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mx-auto h-6 w-6 text-icon-muted opacity-20"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-        <p class="mt-4 text-sm text-text-secondary">No results found for "<span class="font-medium text-text-primary">{{ query }}</span>"</p>
-        <p class="mt-1 text-xs text-text-helper">Try searching for something else, like "Roles" or "Admin".</p>
+        <i
+            data-lucide="search"
+            class="mx-auto h-6 w-6 text-icon-muted opacity-20"
+        ></i>
+        <p class="mt-4 text-sm text-text-secondary">
+            No results found for "<span class="font-medium text-text-primary"
+                >{{ query }}</span
+            >"
+        </p>
+        <p class="mt-1 text-xs text-text-helper">
+            Try searching for something else, like "Roles" or "Admin".
+        </p>
     </div>
     {% else %}
     <div class="px-4 py-2 mt-2">
@@ -11,17 +20,24 @@
     </div>
     <div class="flex flex-col gap-1 px-4">
         {% for res in results %}
-        <a href="{{ res.url }}" class="group flex items-center gap-3 px-3 py-2 rounded-md text-[13px] text-text-secondary hover:bg-surface-02 transition-colors">
-            <div class="flex h-4 w-4 shrink-0 items-center justify-center text-icon-muted">
-                <!-- Fallback to a generic icon if the specific one isn't handled by JS icons -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        <a
+            href="{{ res.url }}"
+            class="group flex items-center gap-3 px-3 py-2 rounded-md text-[13px] text-text-secondary hover:bg-surface-02 transition-colors"
+        >
+            <div
+                class="flex h-4 w-4 shrink-0 items-center justify-center text-icon-muted"
+            >
+                <i data-lucide="info" class="w-3.5 h-3.5 shrink-0"></i>
             </div>
             <div class="flex-1 min-w-0">
                 <span class="font-bold text-text-primary">{{ res.title }}</span>
                 <span class="text-text-helper mx-1">—</span>
                 <span class="truncate">{{ res.description }}</span>
             </div>
-            <i data-lucide="arrow-right" class="w-4 h-4 text-icon-muted opacity-0 group-hover:opacity-100 transition-opacity"></i>
+            <i
+                data-lucide="arrow-right"
+                class="w-4 h-4 text-icon-muted opacity-0 group-hover:opacity-100 transition-opacity"
+            ></i>
         </a>
         {% endfor %}
     </div>

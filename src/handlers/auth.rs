@@ -56,7 +56,22 @@ pub async fn login(
         return Err(AppError::BadCredentials);
     }
 
-    let token = create_jwt(&user.user_id.to_string(), &user.email, user.is_admin)?;
+    if !user.is_active {
+        return Ok((
+            StatusCode::FORBIDDEN,
+            Json(serde_json::json!({
+                "error": "Your account has been disabled. Please contact an administrator."
+            })),
+        )
+            .into_response());
+    }
+
+    let token = create_jwt(
+        &user.user_id.to_string(),
+        &user.email,
+        user.is_admin,
+        user.session_version,
+    )?;
 
     let cookie = Cookie::build(("token", token.clone()))
         .http_only(true)

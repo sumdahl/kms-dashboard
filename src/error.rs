@@ -1,5 +1,5 @@
 use axum::{
-    http::StatusCode,
+    http::{HeaderMap, HeaderValue, StatusCode},
     response::{IntoResponse, Response},
     Json,
 };
@@ -16,7 +16,7 @@ pub enum AppError {
     Unauthorized,
     #[error("Token expired")]
     TokenExpired,
-    #[error("Token has been revoked")] // ← new
+    #[error("Token has been revoked")]
     TokenRevoked,
     #[error("No active assignment for this resource")]
     NoPermission,
@@ -32,6 +32,8 @@ pub enum AppError {
     Internal(String),
     #[error("Bad request: {0}")]
     BadRequest(String),
+    #[error("Account disabled")]
+    AccountDisabled,
 }
 
 impl From<sqlx::Error> for AppError {
@@ -48,12 +50,16 @@ impl From<serde_json::Error> for AppError {
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
+        if let AppError::AccountDisabled = self {
+            return disabled_response();
+        }
+
         let status = match &self {
             AppError::EmailTaken => StatusCode::CONFLICT,
             AppError::BadCredentials => StatusCode::UNAUTHORIZED,
             AppError::Unauthorized => StatusCode::UNAUTHORIZED,
             AppError::TokenExpired => StatusCode::UNAUTHORIZED,
-            AppError::TokenRevoked => StatusCode::UNAUTHORIZED, // ← new
+            AppError::TokenRevoked => StatusCode::UNAUTHORIZED,
             AppError::NoPermission => StatusCode::FORBIDDEN,
             AppError::InsufficientAccess => StatusCode::FORBIDDEN,
             AppError::RoleNotFound => StatusCode::NOT_FOUND,
@@ -61,10 +67,23 @@ impl IntoResponse for AppError {
             AppError::Conflict(_) => StatusCode::CONFLICT,
             AppError::Internal(_) => StatusCode::INTERNAL_SERVER_ERROR,
             AppError::BadRequest(_) => StatusCode::BAD_REQUEST,
+            AppError::AccountDisabled => StatusCode::FORBIDDEN,
         };
 
         (status, Json(json!({ "error": self.to_string() }))).into_response()
     }
 }
 
+fn disabled_response() -> Response {
+    let mut headers = HeaderMap::new();
+    headers.insert(
+        axum::http::header::LOCATION,
+        HeaderValue::from_static("/login?reason=account_disabled"),
+    );
+    headers.insert(
+        "HX-Redirect",
+        HeaderValue::from_static("/login?reason=account_disabled"),
+    );
+    (StatusCode::FOUND, headers).into_response()
+}
 pub type AppResult<T> = Result<T, AppError>;

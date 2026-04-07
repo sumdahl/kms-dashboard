@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>{% block title %}KMS Dashboard{% endblock %}</title>
+
+        <!-- Theme must run before CSS to avoid flash -->
+        <script>
+            (function () {
+                const theme = localStorage.getItem("theme");
+                if (
+                    theme === "dark" ||
+                    (!theme &&
+                        window.matchMedia("(prefers-color-scheme: dark)")
+                            .matches)
+                ) {
+                    document.documentElement.classList.add("dark");
+                }
+            })();
+        </script>
+
+        <link rel="stylesheet" href="/static/css/output.css" />
+        <script src="/static/js/htmx.min.js" defer></script>
+        <script
+            src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"
+            defer
+        ></script>
+        <script src="/static/js/lucide.umd.js"></script>
+        <script src="/static/js/lucide-icons.js"></script>
+        {% block head_scripts %}{% endblock %}
+    </head>
+    <body class="bg-bg-page flex items-center justify-center min-h-screen px-4">
+        {% block content %}{% endblock %} {% block body_scripts %}{% endblock %}
+    </body>
+</html>
