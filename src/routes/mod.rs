@@ -27,6 +27,7 @@ pub fn create_router(state: AppState) -> Router {
         .route("/login", get(login_page))
         .route("/signup", get(signup_page))
         .route("/roles", get(roles_page))
+        .route("/users", get(users_page))
         .route("/roles/:name", get(role_detail_page))
         .route("/assign", get(assign_page))
         .route("/ui/sidebar/pin", post(sidebar_pin))
@@ -54,6 +55,30 @@ pub fn create_router(state: AppState) -> Router {
         .nest("/api", api::router())
         .fallback(not_found_handler)
         .with_state(state)
+}
+
+#[derive(askama::Template)]
+#[template(path = "dashboard/users.html")]
+struct UsersTemplate {
+    pub sidebar_pinned: bool,
+    pub user_email: String,
+    pub show_banner: bool,
+    pub css_version: &'static str,
+    pub is_admin: bool,
+}
+
+async fn users_page(claims: Option<Claims>) -> Response {
+    match claims {
+        None => Redirect::to("/login").into_response(),
+        Some(c) => UsersTemplate {
+            sidebar_pinned: true,
+            user_email: c.email,
+            show_banner: false,
+            css_version: env!("CSS_VERSION"),
+            is_admin: c.is_admin,
+        }
+        .into_response(),
+    }
 }
 
 #[derive(askama::Template)]

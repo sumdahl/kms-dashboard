@@ -17,6 +17,8 @@ pub struct UserSummary {
     pub email: String,
     pub full_name: String,
     pub is_admin: bool,
+    pub is_active: bool,
+    pub disabled_reason: Option<String>,
 }
 
 pub async fn list_users(
@@ -24,7 +26,8 @@ pub async fn list_users(
     State(pool): State<Db>,
 ) -> AppResult<Json<Vec<UserSummary>>> {
     let users = sqlx::query_as::<_, UserSummary>(
-        "SELECT user_id, email, full_name, is_admin FROM users ORDER BY created_at DESC",
+        "SELECT user_id, email, full_name, is_admin, is_active, disabled_reason
+         FROM users ORDER BY created_at DESC",
     )
     .fetch_all(&pool)
     .await?;

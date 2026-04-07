@@ -1,0 +1,701 @@
+{% extends "layout.html" %} {% block title %}Users — KMS Dashboard{% endblock %}
+{% block content %}
+<div>
+    <!-- ── Header ── -->
+    <div class="flex flex-col gap-6 mb-8 max-w-[1200px] w-full mx-auto">
+        <div class="flex items-start justify-between">
+            <div class="flex items-start gap-3">
+                <div class="text-icon-secondary mt-1">
+                    <i data-lucide="users" class="w-[22px] h-[22px]"></i>
+                </div>
+                <div>
+                    <h1 class="text-[22px] font-bold text-text-primary">
+                        User Management
+                    </h1>
+                    <p class="text-[13px] text-text-secondary mt-0.5">
+                        Control user access, disable accounts, and review
+                        account status.
+                    </p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+                <a
+                    href="/docs"
+                    target="_blank"
+                    class="inline-flex items-center justify-center h-8 px-4 rounded-md text-[13px] font-medium bg-(--color-documentation-btn-bg) hover:bg-(--color-documentation-btn-hover) border border-(--color-documentation-btn-border) transition-colors shadow-sm"
+                >
+                    Documentation
+                </a>
+            </div>
+        </div>
+
+        <div class="flex items-start gap-8">
+            <!-- ── Left: User List ── -->
+            <div class="flex-1 min-w-0 flex flex-col">
+                <!-- Toolbar -->
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="relative flex-1">
+                        <i
+                            data-lucide="search"
+                            class="absolute left-3 top-1/2 -translate-y-1/2 text-icon-muted w-3.5 h-3.5 shrink-0"
+                        ></i>
+                        <input
+                            id="user-search"
+                            oninput="filterUsers()"
+                            type="text"
+                            placeholder="Search by name or email"
+                            class="w-full pl-9 pr-3 h-[34px] border border-border-strong rounded-md bg-surface-01 text-[13px] placeholder:text-text-placeholder focus:outline-none focus:border-btn-primary transition-colors"
+                        />
+                    </div>
+                    <!-- Filter: Status -->
+                    <button
+                        id="filter-btn"
+                        onclick="cycleFilter()"
+                        class="h-[34px] px-3 flex items-center gap-2.5 border border-border-strong rounded-md bg-surface-01 text-[13px] text-text-primary hover:bg-surface-hover transition-colors shadow-sm"
+                    >
+                        <span id="filter-label">Show all</span>
+                        <i
+                            data-lucide="chevron-down"
+                            class="text-icon-muted w-3 h-3 shrink-0"
+                        ></i>
+                    </button>
+                    <!-- Refresh -->
+                    <button
+                        onclick="loadUsers()"
+                        class="h-[34px] w-[34px] shrink-0 flex items-center justify-center border border-border-strong rounded-md bg-surface-01 text-icon-secondary hover:bg-surface-hover transition-colors shadow-sm"
+                    >
+                        <i
+                            data-lucide="refresh-cw"
+                            class="w-3.5 h-3.5 shrink-0"
+                        ></i>
+                    </button>
+                </div>
+
+                <!-- User List -->
+                <div id="users-list" class="flex flex-col gap-3"></div>
+
+                <!-- Showing count -->
+                <div class="mt-3">
+                    <span
+                        id="showing-text"
+                        class="text-[12px] text-text-secondary"
+                    ></span>
+                </div>
+            </div>
+
+            <!-- ── Right: Stats + Detail Panel ── -->
+            <div class="w-[300px] shrink-0 flex flex-col gap-6">
+                <!-- Stats Card -->
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="text-[16px] font-bold text-text-primary">
+                            Summary
+                        </h2>
+                        <span
+                            id="summary-date"
+                            class="text-[11px] text-text-secondary uppercase"
+                        ></span>
+                    </div>
+                    <div
+                        class="bg-surface-01 border border-border-strong rounded-[8px] shadow-sm overflow-hidden"
+                    >
+                        <div
+                            class="grid grid-cols-2 border-b border-border-subtle"
+                        >
+                            <div class="p-3 border-r border-border-subtle">
+                                <span
+                                    class="flex items-center gap-1 text-[11px] text-text-secondary"
+                                >
+                                    Total Users
+                                    <i
+                                        data-lucide="info"
+                                        class="text-icon-muted w-2.5 h-2.5 shrink-0"
+                                    ></i>
+                                </span>
+                                <div
+                                    id="sum-total"
+                                    class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight"
+                                >
+                                    —
+                                </div>
+                            </div>
+                            <div class="p-3">
+                                <span
+                                    class="flex items-center gap-1 text-[11px] text-text-secondary"
+                                >
+                                    Active
+                                    <i
+                                        data-lucide="info"
+                                        class="text-icon-muted w-2.5 h-2.5 shrink-0"
+                                    ></i>
+                                </span>
+                                <div
+                                    id="sum-active"
+                                    class="text-[20px] font-bold text-status-green mt-1 leading-none tracking-tight"
+                                >
+                                    —
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2">
+                            <div class="p-3 border-r border-border-subtle">
+                                <span
+                                    class="flex items-center gap-1 text-[11px] text-text-secondary"
+                                >
+                                    Disabled
+                                    <i
+                                        data-lucide="info"
+                                        class="text-icon-muted w-2.5 h-2.5 shrink-0"
+                                    ></i>
+                                </span>
+                                <div
+                                    id="sum-disabled"
+                                    class="text-[20px] font-bold text-status-red mt-1 leading-none tracking-tight"
+                                >
+                                    —
+                                </div>
+                            </div>
+                            <div class="p-3">
+                                <span
+                                    class="flex items-center gap-1 text-[11px] text-text-secondary"
+                                >
+                                    Admins
+                                    <i
+                                        data-lucide="info"
+                                        class="text-icon-muted w-2.5 h-2.5 shrink-0"
+                                    ></i>
+                                </span>
+                                <div
+                                    id="sum-admins"
+                                    class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight"
+                                >
+                                    —
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detail Panel -->
+                <div id="user-detail-panel">
+                    <h2 class="text-[16px] font-bold text-text-primary mb-2">
+                        Account Details
+                    </h2>
+                    <div
+                        class="bg-surface-01 border border-border-strong rounded-[8px] shadow-sm p-4"
+                    >
+                        <div class="flex items-center justify-center py-6">
+                            <span
+                                class="text-[12px] text-text-secondary text-center"
+                            >
+                                Click a user to view account details and
+                                actions.
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ── Disable Confirmation Modal ── -->
+<div
+    id="disable-modal"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]"
+>
+    <div
+        class="w-full max-w-sm mx-4 bg-surface-01 border border-border-subtle rounded-card shadow-xl overflow-hidden"
+    >
+        <div class="flex items-center gap-3 px-5 py-4">
+            <div
+                class="flex items-center justify-center w-10 h-10 rounded-full bg-red-500/10 text-red-500 shrink-0"
+            >
+                <i data-lucide="shield-off" class="w-5 h-5 shrink-0"></i>
+            </div>
+            <div>
+                <p class="text-[14px] font-semibold text-text-primary">
+                    Disable Account
+                </p>
+                <p class="text-[12px] text-text-secondary mt-0.5">
+                    Disabling
+                    <span
+                        id="disable-user-email"
+                        class="font-medium text-text-primary"
+                    ></span>
+                    will immediately terminate all active sessions.
+                </p>
+            </div>
+        </div>
+        <!-- Reason input -->
+        <div class="px-5 pb-4">
+            <label
+                class="block text-[11px] font-medium text-text-secondary uppercase tracking-wider mb-1.5"
+            >
+                Reason
+                <span
+                    class="text-text-helper normal-case tracking-normal font-normal"
+                    >(optional)</span
+                >
+            </label>
+            <input
+                id="disable-reason"
+                type="text"
+                placeholder="e.g. Suspicious activity, policy violation…"
+                class="w-full px-3 h-9 border border-border-subtle rounded-sm bg-surface-02 text-[13px] text-text-primary placeholder:text-text-placeholder focus:border-border-strong focus:bg-surface-01 focus:outline-none transition-colors"
+            />
+        </div>
+        <div
+            class="flex items-center justify-end gap-2 px-5 py-3.5 bg-surface-02 border-t border-border-subtle"
+        >
+            <button
+                onclick="closeDisableModal()"
+                class="px-4 h-8 border border-border-subtle rounded-sm text-[13px] text-text-secondary bg-surface-01 hover:bg-surface-hover transition-colors"
+            >
+                Cancel
+            </button>
+            <button
+                id="disable-confirm-btn"
+                onclick="confirmDisable()"
+                class="px-4 h-8 bg-red-600 text-white rounded-sm text-[13px] font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                Disable Account
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ── Toast ── -->
+<div
+    id="toast"
+    class="hidden fixed bottom-6 right-6 z-[100] flex items-center gap-2.5 px-4 py-3 rounded-card border shadow-lg bg-surface-01 border-border-subtle text-[13px] text-text-primary min-w-[220px]"
+>
+    <span id="toast-icon" class="shrink-0"></span>
+    <span id="toast-msg"></span>
+</div>
+
+{% endblock %} {% block body_scripts %}
+<script>
+    (function () {
+        let _allUsers = [];
+        let _search = "";
+        let _filter = "all"; // 'all' | 'active' | 'disabled'
+        let _filterCycle = ["all", "active", "disabled"];
+        let _filterIdx = 0;
+        let _debounce = null;
+        let _pendingUserId = null;
+        let _pendingUserEmail = null;
+
+        // ── Helpers ─────────────────────────────────────────────────────────
+
+        function escHtml(str) {
+            if (!str) return "";
+            return String(str)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;");
+        }
+
+        function showToast(msg, ok = true) {
+            const toast = document.getElementById("toast");
+            document.getElementById("toast-msg").textContent = msg;
+            document.getElementById("toast-icon").innerHTML = ok
+                ? `<i data-lucide="circle-check" class="text-green-500 w-[15px] h-[15px] shrink-0"></i>`
+                : `<i data-lucide="circle-alert" class="text-red-500 w-[15px] h-[15px] shrink-0"></i>`;
+            toast.classList.remove("hidden");
+            if (window.lucide) window.lucide.createIcons();
+            setTimeout(() => toast.classList.add("hidden"), 3500);
+        }
+
+        // ── Status Badge ────────────────────────────────────────────────────
+
+        function statusBadge(isActive) {
+            return isActive
+                ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-green-500/10 text-green-600 border border-green-500/20">
+                   <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Active
+               </span>`
+                : `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-red-500/10 text-red-500 border border-red-500/20">
+                   <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Disabled
+               </span>`;
+        }
+
+        function adminBadge() {
+            return `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-badge-bg text-badge-text border border-border-subtle">
+                    <i data-lucide="shield" class="w-2.5 h-2.5 shrink-0"></i>Admin
+                </span>`;
+        }
+
+        // ── Render User Row ──────────────────────────────────────────────────
+
+        function initials(name) {
+            if (!name) return "?";
+            const parts = name.trim().split(/\s+/);
+            return parts.length === 1
+                ? parts[0].substring(0, 2).toUpperCase()
+                : (parts[0][0] + parts[1][0]).toUpperCase();
+        }
+
+        function avatarColor(email) {
+            let hash = 0;
+            for (let i = 0; i < email.length; i++)
+                hash = email.charCodeAt(i) + ((hash << 5) - hash);
+            const hue = Math.abs(hash) % 360;
+            return [`hsl(${hue},65%,28%)`, `hsl(${hue},75%,90%)`];
+        }
+
+        function renderUserRow(user) {
+            const [fg, bg] = avatarColor(user.email);
+            const disabledCls = user.is_active ? "" : "opacity-60";
+
+            return `
+        <div class="bg-surface-01 border border-border-strong rounded-[8px] overflow-hidden hover:border-[#0051c3] transition-colors cursor-pointer ${disabledCls}"
+             data-user-id="${escHtml(user.user_id)}"
+             onclick="showUserDetail('${escHtml(user.user_id)}')">
+            <div class="p-4 flex items-center justify-between gap-4">
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                    <!-- Avatar -->
+                    <div style="background:${bg};color:${fg};box-shadow:inset 0 0 0 1px rgba(0,0,0,0.08)"
+                         class="w-10 h-10 rounded shrink-0 flex items-center justify-center text-[14px] font-bold select-none">
+                        ${initials(user.full_name)}
+                    </div>
+                    <!-- Info -->
+                    <div class="flex flex-col min-w-0 flex-1">
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <span class="text-[14px] font-semibold text-text-primary truncate">${escHtml(user.full_name)}</span>
+                            ${user.is_admin ? adminBadge() : ""}
+                        </div>
+                        <span class="text-[12px] text-text-secondary truncate mt-0.5">${escHtml(user.email)}</span>
+                    </div>
+                </div>
+                <!-- Status + Action -->
+                <div class="flex items-center gap-3 shrink-0">
+                    ${statusBadge(user.is_active)}
+                    <button
+                        data-user-id="${escHtml(user.user_id)}"
+                        data-user-email="${escHtml(user.email)}"
+                        data-is-active="${user.is_active}"
+                        onclick="event.stopPropagation(); handleToggle(this)"
+                        class="h-7 px-3 rounded-sm text-[12px] font-medium border transition-colors ${
+                            user.is_active
+                                ? "border-red-300 text-red-600 hover:bg-red-500/8 bg-transparent"
+                                : "border-green-300 text-green-600 hover:bg-green-500/8 bg-transparent"
+                        }">
+                        ${user.is_active ? "Disable" : "Enable"}
+                    </button>
+                </div>
+            </div>
+            ${
+                !user.is_active && user.disabled_reason
+                    ? `
+            <div class="bg-red-500/3 border-t border-red-500/15 px-4 py-2 flex items-center gap-2">
+                <i data-lucide="info" class="text-red-400 w-3 h-3 shrink-0"></i>
+                <span class="text-[11px] text-red-400 truncate">Reason: ${escHtml(user.disabled_reason)}</span>
+            </div>`
+                    : ""
+            }
+        </div>`;
+        }
+
+        // ── Render List ──────────────────────────────────────────────────────
+
+        function renderList() {
+            const list = document.getElementById("users-list");
+            const search = _search.toLowerCase();
+
+            let filtered = _allUsers.filter((u) => {
+                const matchSearch =
+                    !search ||
+                    u.email.toLowerCase().includes(search) ||
+                    u.full_name.toLowerCase().includes(search);
+                const matchFilter =
+                    _filter === "all" ||
+                    (_filter === "active" && u.is_active) ||
+                    (_filter === "disabled" && !u.is_active);
+                return matchSearch && matchFilter;
+            });
+
+            if (filtered.length === 0) {
+                list.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-16 gap-3 text-center">
+                    <div class="flex items-center justify-center w-12 h-12 rounded-full bg-surface-02 text-icon-muted">
+                        <i data-lucide="users" class="w-[22px] h-[22px] shrink-0"></i>
+                    </div>
+                    <p class="text-[13px] font-medium text-text-primary">No users found</p>
+                    <p class="text-xs text-text-helper max-w-xs">Try adjusting your search or filter.</p>
+                </div>`;
+            } else {
+                list.innerHTML = filtered.map(renderUserRow).join("");
+            }
+
+            document.getElementById("showing-text").textContent =
+                filtered.length === _allUsers.length
+                    ? `${_allUsers.length} user${_allUsers.length !== 1 ? "s" : ""}`
+                    : `Showing ${filtered.length} of ${_allUsers.length}`;
+
+            updateSummary();
+            if (window.lucide) window.lucide.createIcons();
+        }
+
+        // ── Summary ──────────────────────────────────────────────────────────
+
+        function updateSummary() {
+            const total = _allUsers.length;
+            const active = _allUsers.filter((u) => u.is_active).length;
+            const disabled = _allUsers.filter((u) => !u.is_active).length;
+            const admins = _allUsers.filter((u) => u.is_admin).length;
+
+            document.getElementById("sum-total").textContent = total;
+            document.getElementById("sum-active").textContent = active;
+            document.getElementById("sum-disabled").textContent = disabled;
+            document.getElementById("sum-admins").textContent = admins;
+            document.getElementById("summary-date").textContent =
+                new Date().toLocaleDateString("en-US", {
+                    month: "long",
+                    day: "numeric",
+                });
+        }
+
+        // ── Load Users ───────────────────────────────────────────────────────
+
+        async function loadUsers() {
+            const list = document.getElementById("users-list");
+
+            // Skeleton
+            const skeleton = () => `
+            <div class="bg-surface-01 border border-border-strong rounded-[8px] p-4 flex items-center gap-3 animate-pulse">
+                <div class="w-10 h-10 rounded bg-surface-02 shrink-0"></div>
+                <div class="flex-1 space-y-2">
+                    <div class="h-3.5 bg-surface-02 rounded w-32"></div>
+                    <div class="h-3 bg-surface-02 rounded w-48"></div>
+                </div>
+                <div class="h-6 w-16 bg-surface-02 rounded-full"></div>
+            </div>`;
+            list.innerHTML = skeleton() + skeleton() + skeleton();
+
+            try {
+                const res = await fetch("/admin/users");
+                if (!res.ok) throw new Error(`${res.status}`);
+                _allUsers = await res.json();
+                renderList();
+            } catch {
+                list.innerHTML = `
+                <div class="flex items-center justify-center gap-2 px-4 py-10 text-[13px] text-red-500">
+                    <i data-lucide="circle-alert" class="w-[15px] h-[15px] shrink-0"></i>
+                    Failed to load users. Please try again.
+                </div>`;
+                if (window.lucide) window.lucide.createIcons();
+            }
+        }
+
+        // ── Filter / Search ──────────────────────────────────────────────────
+
+        window.filterUsers = function () {
+            clearTimeout(_debounce);
+            _debounce = setTimeout(() => {
+                _search = document.getElementById("user-search").value.trim();
+                renderList();
+            }, 200);
+        };
+
+        const filterLabels = {
+            all: "Show all",
+            active: "Active only",
+            disabled: "Disabled only",
+        };
+
+        window.cycleFilter = function () {
+            _filterIdx = (_filterIdx + 1) % _filterCycle.length;
+            _filter = _filterCycle[_filterIdx];
+            document.getElementById("filter-label").textContent =
+                filterLabels[_filter];
+            renderList();
+        };
+
+        // ── Detail Panel ─────────────────────────────────────────────────────
+
+        window.showUserDetail = function (userId) {
+            const user = _allUsers.find((u) => u.user_id === userId);
+            if (!user) return;
+            const panel = document.getElementById("user-detail-panel");
+
+            panel.innerHTML = `
+            <h2 class="text-[16px] font-bold text-text-primary mb-2">Account Details</h2>
+            <div class="bg-surface-01 border border-border-strong rounded-[8px] shadow-sm p-4 flex flex-col gap-3.5">
+                <div class="flex items-center justify-between">
+                    <span class="text-[12px] text-text-secondary">User ID</span>
+                    <span class="text-[12px] font-mono text-text-primary flex items-center gap-1" title="${escHtml(user.user_id)}">
+                        ${escHtml(user.user_id.substring(0, 8))}…
+                        <i data-lucide="copy" onclick="navigator.clipboard.writeText('${escHtml(user.user_id)}').then(()=>showToast('Copied!'))"
+                           class="text-icon-muted cursor-pointer hover:text-text-primary w-3 h-3 shrink-0"></i>
+                    </span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-[12px] text-text-secondary">Email</span>
+                    <span class="text-[12px] text-text-primary truncate max-w-[160px] text-right">${escHtml(user.email)}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-[12px] text-text-secondary">Role</span>
+                    <span class="text-[12px] text-text-primary">${user.is_admin ? "Administrator" : "Member"}</span>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="text-[12px] text-text-secondary">Status</span>
+                    ${statusBadge(user.is_active)}
+                </div>
+                ${
+                    user.disabled_reason
+                        ? `
+                <div class="flex flex-col gap-1 pt-2 border-t border-border-subtle">
+                    <span class="text-[11px] text-text-secondary">Disabled reason</span>
+                    <span class="text-[12px] text-text-primary">${escHtml(user.disabled_reason)}</span>
+                </div>`
+                        : ""
+                }
+                <!-- Action -->
+                <div class="pt-2 border-t border-border-subtle">
+                    ${
+                        user.is_active
+                            ? `<button onclick="openDisableModal('${escHtml(user.user_id)}','${escHtml(user.email)}')"
+                               class="w-full h-8 flex items-center justify-center gap-2 border border-red-300 text-red-600 text-[13px] font-medium rounded-sm hover:bg-red-500/8 transition-colors">
+                               <i data-lucide="shield-off" class="w-3.5 h-3.5 shrink-0"></i>
+                               Disable Account
+                           </button>`
+                            : `<button onclick="handleEnableFromPanel('${escHtml(user.user_id)}','${escHtml(user.email)}')"
+                               class="w-full h-8 flex items-center justify-center gap-2 border border-green-300 text-green-600 text-[13px] font-medium rounded-sm hover:bg-green-500/8 transition-colors">
+                               <i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i>
+                               Re-enable Account
+                           </button>`
+                    }
+                </div>
+            </div>`;
+            if (window.lucide) window.lucide.createIcons();
+        };
+
+        // ── Toggle (inline row button) ───────────────────────────────────────
+
+        window.handleToggle = function (btn) {
+            const userId = btn.dataset.userId;
+            const email = btn.dataset.userEmail;
+            const isActive = btn.dataset.isActive === "true";
+
+            if (isActive) {
+                openDisableModal(userId, email);
+            } else {
+                enableUser(userId, email);
+            }
+        };
+
+        // ── Disable Modal ────────────────────────────────────────────────────
+
+        window.openDisableModal = function (userId, email) {
+            _pendingUserId = userId;
+            _pendingUserEmail = email;
+            document.getElementById("disable-user-email").textContent = email;
+            document.getElementById("disable-reason").value = "";
+            document.getElementById("disable-modal").classList.remove("hidden");
+            document.body.classList.add("overflow-hidden");
+            setTimeout(
+                () => document.getElementById("disable-reason").focus(),
+                50,
+            );
+        };
+
+        window.closeDisableModal = function () {
+            _pendingUserId = null;
+            _pendingUserEmail = null;
+            document.getElementById("disable-modal").classList.add("hidden");
+            document.body.classList.remove("overflow-hidden");
+            const btn = document.getElementById("disable-confirm-btn");
+            btn.disabled = false;
+            btn.textContent = "Disable Account";
+        };
+
+        window.confirmDisable = async function () {
+            if (!_pendingUserId) return;
+            const btn = document.getElementById("disable-confirm-btn");
+            const reason = document
+                .getElementById("disable-reason")
+                .value.trim();
+
+            btn.disabled = true;
+            btn.textContent = "Disabling…";
+
+            try {
+                const res = await fetch(
+                    `/admin/users/${_pendingUserId}/disable`,
+                    {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ reason: reason || null }),
+                    },
+                );
+                const data = await res.json();
+                if (res.ok) {
+                    // Update local state — no full reload needed
+                    const user = _allUsers.find(
+                        (u) => u.user_id === _pendingUserId,
+                    );
+                    if (user) {
+                        user.is_active = false;
+                        user.disabled_reason = reason || null;
+                    }
+                    showToast(`${_pendingUserEmail} has been disabled.`);
+                    closeDisableModal();
+                    renderList();
+                    showUserDetail(_pendingUserId);
+                } else {
+                    showToast(data.error || "Failed to disable user.", false);
+                    btn.disabled = false;
+                    btn.textContent = "Disable Account";
+                }
+            } catch {
+                showToast("Network error. Please try again.", false);
+                btn.disabled = false;
+                btn.textContent = "Disable Account";
+            }
+        };
+
+        // ── Enable ───────────────────────────────────────────────────────────
+
+        async function enableUser(userId, email) {
+            try {
+                const res = await fetch(`/admin/users/${userId}/enable`, {
+                    method: "POST",
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    const user = _allUsers.find((u) => u.user_id === userId);
+                    if (user) {
+                        user.is_active = true;
+                        user.disabled_reason = null;
+                    }
+                    showToast(`${email} has been re-enabled.`);
+                    renderList();
+                    showUserDetail(userId);
+                } else {
+                    showToast(data.error || "Failed to enable user.", false);
+                }
+            } catch {
+                showToast("Network error. Please try again.", false);
+            }
+        }
+
+        window.handleEnableFromPanel = function (userId, email) {
+            enableUser(userId, email);
+        };
+
+        // ── Keyboard ─────────────────────────────────────────────────────────
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") closeDisableModal();
+        });
+
+        // ── Boot ─────────────────────────────────────────────────────────────
+
+        document.addEventListener("DOMContentLoaded", loadUsers);
+
+        // expose for refresh button
+        window.loadUsers = loadUsers;
+    })();
+</script>
+{% endblock %}
