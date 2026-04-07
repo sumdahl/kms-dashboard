@@ -4,8 +4,8 @@ content %}
 <!-- Page header -->
 <div class="mb-6">
   <p class="text-xs text-text-helper mb-1">Account home</p>
-  <div class="flex items-center justify-between gap-4">
-    <h1 class="text-2xl font-semibold text-text-primary leading-tight">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <h1 class="text-xl md:text-2xl font-semibold text-text-primary leading-tight">
       {{ user_email }}'s Account
     </h1>
     <div class="flex items-center gap-2 shrink-0">
@@ -30,7 +30,7 @@ content %}
         </svg>
       </button>
       <button
-        class="flex items-center gap-2 px-3 h-8 rounded-sm bg-btn-primary text-white text-[13px] font-medium hover:bg-btn-primary-hover transition-colors"
+        class="flex-1 md:flex-none flex items-center justify-center gap-2 px-3 h-8 rounded-sm bg-btn-primary text-white text-[13px] font-medium hover:bg-btn-primary-hover transition-colors"
         type="button"
       >
         <svg
@@ -51,9 +51,9 @@ content %}
       </button>
     </div>
   </div>
-  <div class="flex justify-end mt-2">
+  <div class="flex md:justify-end mt-4 md:mt-2">
     <button
-      class="flex items-center gap-2 px-3 h-[30px] border border-border-subtle rounded-sm bg-surface-01 text-xs text-text-secondary hover:bg-surface-hover hover:border-border-strong transition-colors"
+      class="w-full md:w-auto flex items-center justify-center gap-2 px-3 h-[30px] border border-border-subtle rounded-sm bg-surface-01 text-xs text-text-secondary hover:bg-surface-hover hover:border-border-strong transition-colors"
       type="button"
     >
       <svg
@@ -78,7 +78,7 @@ content %}
 </div>
 
 <!-- Row 1: Stat cards -->
-<div class="grid grid-cols-3 gap-4 mb-4">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
   <!-- Security -->
   <div
     class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden flex flex-col"
@@ -263,7 +263,7 @@ content %}
 </div>
 
 <!-- Row 2: Domains / Workers / Zero Trust -->
-<div class="grid grid-cols-3 gap-4 mb-4">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
   <!-- Domains -->
   <div
     class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden flex flex-col"
@@ -562,7 +562,7 @@ content %}
 </div>
 
 <!-- Row 3: Next steps (left-column width) -->
-<div class="w-[calc(33.333%-11px)]">
+<div class="w-full md:w-1/2 lg:w-[calc(33.333%-11px)]">
   <div
     class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden"
   >

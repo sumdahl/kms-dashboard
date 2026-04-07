@@ -1,0 +1,402 @@
+{% extends "layout.html" %} {% block title %}Create New Role{% endblock %} {% block
+content %}
+
+<div class="max-w-4xl mx-auto py-8">
+    <!-- Wizard Header -->
+    <div class="mb-12 text-center">
+        <h1 class="text-3xl font-extrabold text-text-primary mb-3 leading-tight">Create New Role</h1>
+        <p class="text-[16px] text-text-secondary max-w-xl mx-auto leading-relaxed">
+            Define a system role with specific permissions to manage account resources.
+        </p>
+        
+        <!-- Progress Stepper -->
+        <div class="mt-10 max-w-2xl mx-auto relative px-4">
+            <div class="flex items-center justify-between relative z-10">
+                <!-- Step 1 Indicator -->
+                <div class="flex flex-col items-center gap-2">
+                    <div id="step-1-dot" class="w-10 h-10 rounded-full bg-btn-primary text-white flex items-center justify-center font-bold shadow-sm transition-all duration-500">1</div>
+                    <span class="text-[11px] font-bold text-text-primary uppercase tracking-wider">Identity</span>
+                </div>
+                <!-- Step 2 Indicator -->
+                <div class="flex flex-col items-center gap-2">
+                    <div id="step-2-dot" class="w-10 h-10 rounded-full bg-surface-02 border border-border-subtle text-text-helper flex items-center justify-center font-bold transition-all duration-500">2</div>
+                    <span class="text-[11px] font-bold text-text-helper uppercase tracking-wider">Permissions</span>
+                </div>
+                <!-- Step 3 Indicator -->
+                <div class="flex flex-col items-center gap-2">
+                    <div id="step-3-dot" class="w-10 h-10 rounded-full bg-surface-02 border border-border-subtle text-text-helper flex items-center justify-center font-bold transition-all duration-500">3</div>
+                    <span class="text-[11px] font-bold text-text-helper uppercase tracking-wider">Review</span>
+                </div>
+            </div>
+            <!-- Background Line -->
+            <div class="absolute top-5 left-0 right-0 h-px bg-border-subtle -z-0 mx-12">
+                <div id="progress-line" class="h-full bg-btn-primary transition-all duration-700 ease-in-out" style="width: 0%"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Wizard Cards -->
+    <div class="flex flex-col gap-6" id="wizard-container">
+
+        <!-- Step 1: Role Identity -->
+        <div class="onboarding-card bg-surface-01 border border-border-strong rounded-card overflow-hidden shadow-sm active-step" id="card-identity">
+            <div class="p-8">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-12 h-12 rounded-lg bg-surface-02 flex items-center justify-center text-icon-secondary border border-border-subtle">
+                        <i data-lucide="tag" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-text-primary">Role Identity</h3>
+                        <p class="text-sm text-text-secondary">Give your role a name and a clear description.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div>
+                        <label class="block text-[11px] font-bold text-text-secondary uppercase tracking-widest mb-2">Role Name</label>
+                        <input type="text" id="role-name" placeholder="e.g. Security Auditor" class="w-full px-4 py-3 bg-surface-02 border border-border-subtle rounded-md text-[14px] text-text-primary outline-none focus:border-btn-primary transition-all shadow-sm">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-text-secondary uppercase tracking-widest mb-2">Description</label>
+                        <textarea id="role-desc" rows="3" placeholder="What is this role for?" class="w-full px-4 py-3 bg-surface-02 border border-border-subtle rounded-md text-[14px] text-text-primary outline-none focus:border-btn-primary transition-all shadow-sm resize-none"></textarea>
+                    </div>
+                    <div class="flex justify-end pt-4">
+                        <button id="goto-step-2" class="bg-btn-primary hover:bg-btn-primary-hover text-white px-10 py-2.5 rounded-md font-bold text-[14px] transition-all shadow-sm active:scale-[0.98]">
+                            Next: Configure Permissions
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Permissions -->
+        <div class="onboarding-card bg-surface-01 border border-border-subtle rounded-card overflow-hidden shadow-sm hidden" id="card-permissions">
+            <div class="p-8">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-12 h-12 rounded-lg bg-surface-02 flex items-center justify-center text-icon-secondary border border-border-subtle">
+                        <i data-lucide="key" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-text-primary">Permissions</h3>
+                        <p class="text-sm text-text-secondary">Define which resources this role can access.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between border-b border-border-subtle pb-3">
+                        <span class="text-[11px] font-bold text-text-secondary uppercase tracking-widest">Active Permissions</span>
+                        <button type="button" 
+                                hx-post="/admin/roles/permission-row" 
+                                hx-target="#permissions-list" 
+                                hx-swap="beforeend"
+                                hx-on::before-request="if(!checkDuplicates()) event.preventDefault()"
+                                class="text-[11px] font-bold text-btn-primary hover:underline flex items-center gap-1 transition-all">
+                            <i data-lucide="plus" class="w-3.5 h-3.5"></i> Add permission
+                        </button>
+                    </div>
+
+                    <div id="permissions-list" class="space-y-3 min-h-[100px]">
+                        <!-- Dynamic rows via HTMX -->
+                    </div>
+
+                    <p id="permission-error" class="hidden text-[12px] text-red-500 bg-red-500/5 border border-red-500/20 rounded-md px-4 py-3 font-medium"></p>
+
+                    <div class="flex justify-between items-center pt-4">
+                        <button id="back-to-step-1" class="text-text-helper hover:text-text-primary font-bold text-[13px] transition-colors flex items-center gap-1">
+                            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to Identity
+                        </button>
+                        <button id="goto-step-3" class="bg-btn-primary hover:bg-btn-primary-hover text-white px-10 py-2.5 rounded-md font-bold text-[14px] transition-all shadow-sm active:scale-[0.98]">
+                            Next: Review
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Review & Finalize -->
+        <div class="onboarding-card bg-surface-01 border border-border-subtle rounded-card overflow-hidden shadow-sm hidden" id="card-review">
+            <div class="p-8">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-12 h-12 rounded-lg bg-surface-02 flex items-center justify-center text-icon-secondary border border-border-subtle">
+                        <i data-lucide="clipboard-check" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-text-primary">Review Role</h3>
+                        <p class="text-sm text-text-secondary">Confirm your new role configuration.</p>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-surface-02 rounded-lg p-6 border border-border-subtle space-y-4">
+                        <div>
+                            <span class="text-[10px] text-text-helper font-extrabold uppercase tracking-widest block mb-1">Role Name</span>
+                            <p id="summary-name" class="text-[16px] font-bold text-text-primary font-mono"></p>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-text-helper font-extrabold uppercase tracking-widest block mb-1">Description</span>
+                            <p id="summary-desc" class="text-[14px] text-text-secondary italic"></p>
+                        </div>
+                        <div>
+                            <span class="text-[10px] text-text-helper font-extrabold uppercase tracking-widest block mb-2">Granted Permissions</span>
+                            <div id="summary-perms" class="flex flex-wrap gap-2">
+                                <!-- Summary tags -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <p id="wizard-error" class="hidden text-[12px] text-red-500 bg-red-500/5 border border-red-500/20 rounded-md px-4 py-3 font-medium"></p>
+
+                    <div class="flex justify-between items-center pt-2">
+                        <button id="back-to-step-2" class="text-text-helper hover:text-text-primary font-bold text-[13px] transition-colors flex items-center gap-1">
+                            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i> Back to Permissions
+                        </button>
+                        <button id="wizard-submit-btn" class="bg-btn-primary hover:bg-btn-primary-hover text-white px-12 py-3 rounded-md font-bold text-[14px] transition-all shadow-md active:scale-[0.95]">
+                            Create Role Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Success Modal -->
+        <div id="wizard-success" class="hidden text-center py-16 bg-surface-01 border border-border-subtle rounded-card shadow-lg scale-in">
+            <div class="w-20 h-20 rounded-full bg-status-green/10 text-status-green flex items-center justify-center mx-auto mb-6 border border-status-green/20">
+                <i data-lucide="party-popper" class="w-10 h-10"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-text-primary">Success! Role Created</h2>
+            <p class="text-text-secondary mt-3 max-w-sm mx-auto leading-relaxed">
+                The new system role has been successfully established and is ready for user assignments.
+            </p>
+            <div class="mt-10 flex flex-col gap-3 max-w-xs mx-auto">
+                <a href="/roles?skip_onboarding=true" class="bg-btn-primary hover:bg-btn-primary-hover text-white px-8 py-3 rounded-md font-bold transition-all shadow-sm active:scale-95">
+                    View All Roles
+                </a>
+                <button onclick="window.location.reload()" class="text-xs text-text-helper hover:text-text-primary font-medium">Create another role</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .onboarding-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    .active-step { border-color: var(--color-btn-primary) !important; border-width: 1px !important; }
+    .scale-in { animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+</style>
+
+<script>
+    // ── Real-time Duplicate Validation ──
+    function getActivePermissions() {
+        const rows = document.querySelectorAll('.permission-row');
+        return Array.from(rows).map(row => {
+            return {
+                resource: row.querySelector('.permission-resource').value,
+                access: row.querySelector('.permission-access').value,
+                row: row
+            };
+        });
+    }
+
+    function checkDuplicates() {
+        const perms = getActivePermissions();
+        const errorEl = document.getElementById('permission-error');
+        errorEl.classList.add('hidden');
+
+        // 1. Check if we reached the limit
+        if (perms.length >= 10) {
+            errorEl.textContent = "Maximum 10 permissions allowed per role.";
+            errorEl.classList.remove('hidden');
+            return false;
+        }
+
+        // 2. Prevent adding a new row if the 'default' row (orders:read) already exists
+        // This prevents spamming the 'Add' button.
+        const hasDefault = perms.some(p => p.resource === 'orders' && p.access === 'read');
+        if (hasDefault) {
+            errorEl.innerHTML = `<i data-lucide="alert-circle" class="w-3.5 h-3.5 inline mr-1"></i> You already have a default "orders:read" permission. Modify it first.`;
+            errorEl.classList.remove('hidden');
+            if (window.lucide) window.lucide.createIcons();
+            return false;
+        }
+
+        return true;
+    }
+
+    // Live validation whenever a dropdown changes
+    document.addEventListener('change', (e) => {
+        if (e.target.classList.contains('permission-resource') || e.target.classList.contains('permission-access')) {
+            validateCurrentList();
+        }
+    });
+
+    function validateCurrentList() {
+        const perms = getActivePermissions();
+        const errorEl = document.getElementById('permission-error');
+        const seen = new Set();
+        let hasDuplicates = false;
+
+        perms.forEach(p => {
+            const key = `${p.resource}:${p.access}`;
+            if (seen.has(key)) {
+                p.row.classList.add('border-red-500/50', 'bg-red-500/5');
+                hasDuplicates = true;
+            } else {
+                p.row.classList.remove('border-red-500/50', 'bg-red-500/5');
+                seen.add(key);
+            }
+        });
+
+        if (hasDuplicates) {
+            errorEl.innerHTML = `<i data-lucide="alert-circle" class="w-3.5 h-3.5 inline mr-1"></i> Duplicate permissions detected! Please remove or change redundant entries.`;
+            errorEl.classList.remove('hidden');
+            if (window.lucide) window.lucide.createIcons();
+        } else {
+            errorEl.classList.add('hidden');
+        }
+        return !hasDuplicates;
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+        const roleNameInput = document.getElementById('role-name');
+        const roleDescInput = document.getElementById('role-desc');
+        const permissionsList = document.getElementById('permissions-list');
+        const submitBtn = document.getElementById('wizard-submit-btn');
+        const wizardError = document.getElementById('wizard-error');
+        
+        const cardIdentity = document.getElementById('card-identity');
+        const cardPermissions = document.getElementById('card-permissions');
+        const cardReview = document.getElementById('card-review');
+        const wizardSuccess = document.getElementById('wizard-success');
+        
+        const dot2 = document.getElementById('step-2-dot');
+        const dot3 = document.getElementById('step-3-dot');
+        const progLine = document.getElementById('progress-line');
+
+        // State
+        let currentRoleName = "";
+        let currentRoleDesc = "";
+
+        // ── Navigation ──
+        document.getElementById('goto-step-2').addEventListener('click', () => {
+            if (!roleNameInput.value.trim()) {
+                roleNameInput.classList.add('border-red-500');
+                return;
+            }
+            currentRoleName = roleNameInput.value.trim();
+            currentRoleDesc = roleDescInput.value.trim();
+            
+            cardIdentity.classList.add('hidden');
+            cardPermissions.classList.remove('hidden');
+            cardPermissions.classList.add('active-step');
+            
+            dot2.classList.replace('bg-surface-02', 'bg-btn-primary');
+            dot2.classList.replace('text-text-helper', 'text-white');
+            progLine.style.width = '50%';
+            
+            // Seed one row if empty
+            if (permissionsList.children.length === 0) {
+                htmx.trigger(document.querySelector('[hx-post="/admin/roles/permission-row"]'), 'click');
+            }
+            if (window.lucide) window.lucide.createIcons();
+        });
+
+        document.getElementById('back-to-step-1').addEventListener('click', () => {
+            cardPermissions.classList.add('hidden');
+            cardIdentity.classList.remove('hidden');
+            dot2.classList.replace('bg-btn-primary', 'bg-surface-02');
+            dot2.classList.replace('text-white', 'text-text-helper');
+            progLine.style.width = '0%';
+        });
+
+        document.getElementById('goto-step-3').addEventListener('click', () => {
+            const perms = getActivePermissions();
+            const errorEl = document.getElementById('permission-error');
+            errorEl.classList.add('hidden');
+
+            if (perms.length === 0) {
+                errorEl.textContent = "Please add at least one permission.";
+                errorEl.classList.remove('hidden');
+                return;
+            }
+
+            // Perform strict validation
+            if (!validateCurrentList()) {
+                return; // Duplicate detected, function already showed error
+            }
+
+            // Populate Summary
+            document.getElementById('summary-name').textContent = currentRoleName;
+            document.getElementById('summary-desc').textContent = currentRoleDesc || "No description provided.";
+            
+            const summaryPerms = document.getElementById('summary-perms');
+            summaryPerms.innerHTML = "";
+            perms.forEach(p => {
+                const tag = document.createElement('span');
+                tag.className = "px-2.5 py-1 bg-surface-02 border border-border-subtle rounded text-[12px] font-medium text-text-secondary flex items-center gap-1.5";
+                tag.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-btn-primary"></span> ${p.resource} • <span class="text-text-primary font-bold uppercase text-[10px]">${p.access}</span>`;
+                summaryPerms.appendChild(tag);
+            });
+
+            cardPermissions.classList.add('hidden');
+            cardReview.classList.remove('hidden');
+            cardReview.classList.add('active-step');
+            
+            dot3.classList.replace('bg-surface-02', 'bg-btn-primary');
+            dot3.classList.replace('text-text-helper', 'text-white');
+            progLine.style.width = '100%';
+            if (window.lucide) window.lucide.createIcons();
+        });
+
+        document.getElementById('back-to-step-2').addEventListener('click', () => {
+            cardReview.classList.add('hidden');
+            cardPermissions.classList.remove('hidden');
+            dot3.classList.replace('bg-btn-primary', 'bg-surface-02');
+            dot3.classList.replace('text-white', 'text-text-helper');
+            progLine.style.width = '50%';
+        });
+
+        // ── Final Submit ──
+        submitBtn.addEventListener('click', async () => {
+            const rows = document.querySelectorAll('.permission-row');
+            const permissions = Array.from(rows).map(row => ({
+                resource: row.querySelector('.permission-resource').value,
+                access: row.querySelector('.permission-access').value
+            }));
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Establishing Role...";
+            wizardError.classList.add('hidden');
+
+            try {
+                const res = await fetch('/admin/roles', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        name: currentRoleName,
+                        description: currentRoleDesc,
+                        permissions: permissions
+                    })
+                });
+
+                if (res.ok) {
+                    cardReview.classList.add('hidden');
+                    wizardSuccess.classList.remove('hidden');
+                    if (window.lucide) window.lucide.createIcons();
+                } else {
+                    const data = await res.json();
+                    wizardError.textContent = data.error || "Failed to create role. It might already exist.";
+                    wizardError.classList.remove('hidden');
+                }
+            } catch (e) {
+                wizardError.textContent = "A network error occurred. Please try again.";
+                wizardError.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Create Role Now";
+            }
+        });
+    });
+</script>
+
+{% endblock %}

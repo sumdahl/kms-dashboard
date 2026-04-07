@@ -108,8 +108,7 @@
         activeIndex = -1;
         document.body.style.overflow = 'hidden';
         
-        // Refresh Lucide icons if any were added dynamically
-        if (window.lucide) window.lucide.createIcons();
+
     }
 
     function closeSearch() {
@@ -168,7 +167,6 @@
     document.addEventListener('htmx:afterOnLoad', (e) => {
         if (e.detail.target.id === 'search-results') {
             activeIndex = -1;
-            if (window.lucide) window.lucide.createIcons();
         }
     });
 </script>

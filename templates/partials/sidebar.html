@@ -35,7 +35,7 @@
         <!-- Nav -->
         <nav class="p-1 flex flex-col gap-0.5 flex-1" aria-label="Main navigation">
             <!-- Account home (active) -->
-            <a href="/"
+            <a href="/?skip_onboarding=true"
                 class="flex items-center gap-3 h-10 px-3 rounded-md text-text-primary font-semibold overflow-hidden"
                 aria-current="page">
                 <!-- Lucide icon: home -->
@@ -252,28 +252,3 @@
     </div>
     <!-- /sidebar-hover-zone -->
 </aside>
-
-<script>
-    (function () {
-        try {
-            const token = localStorage.getItem("kms_token");
-            if (!token) return;
-            const payload = JSON.parse(atob(token.split(".")[1]));
-
-            // ── Populate user email in sidebar account header ──
-            const emailEl = document.querySelector(
-                "#sidebar .sidebar-label span.flex-1",
-            );
-            if (emailEl && payload.email) emailEl.textContent = payload.email;
-
-            // ── Show Admin section if is_admin ──
-            if (payload.is_admin) {
-                const section = document.getElementById("admin-nav-section");
-                if (section) {
-                    section.classList.remove("hidden");
-                    if (window.lucide) window.lucide.createIcons();
-                }
-            }
-        } catch (e) { }
-    })();
-</script>

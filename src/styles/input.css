@@ -208,11 +208,76 @@
     /* ── Sidebar Width Transition ────────────────────────────────────── */
     .sidebar {
         width: var(--spacing-sidebar);
-        transition: width 220ms cubic-bezier(0.2, 0, 0, 1);
+        transition: width 220ms cubic-bezier(0.2, 0, 0, 1), transform 220ms cubic-bezier(0.2, 0, 0, 1);
     }
 
     .sidebar.is-expanded {
         width: var(--spacing-drawer);
+    }
+
+    /* Mobile Overlay */
+    .sidebar-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 40;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 220ms ease;
+    }
+    .sidebar-overlay.mobile-open {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    @media (max-width: 768px) {
+        .app-shell {
+            grid-template-columns: 1fr;
+            grid-template-areas:
+                "main"
+                "footer";
+        }
+        .app-shell.sidebar-expanded {
+            grid-template-columns: 1fr;
+        }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 50;
+            transform: translateX(-100%);
+            width: var(--spacing-drawer) !important;
+        }
+        .sidebar.mobile-open {
+            transform: translateX(0);
+        }
+        .footer-toggle-zone {
+            display: none !important;
+        }
+        /* Force label visibility on mobile since sidebar is always drawer width */
+        .sidebar-label {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+        }
+        .section-label {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+            height: 32px !important;
+        }
+        .sidebar-logo-wrapper {
+            width: 80px !important;
+        }
+        .section-divider {
+            opacity: 0 !important;
+            height: 0 !important;
+            margin: 0 !important;
+        }
+        .sidebar-search-btn {
+            background-color: var(--color-surface-02) !important;
+            border-color: var(--color-border-strong) !important;
+            box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05) !important;
+        }
     }
 
     /* ── Footer Toggle Zone Width ────────────────────────────────────── */

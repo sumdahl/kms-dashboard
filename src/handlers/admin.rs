@@ -19,6 +19,20 @@ pub struct UserSummary {
     pub is_admin: bool,
 }
 
+#[derive(askama::Template)]
+#[template(path = "partials/permission_row.html")]
+pub struct PermissionRowTemplate {
+    pub resources: Vec<&'static str>,
+    pub access_levels: Vec<&'static str>,
+}
+
+pub async fn permission_row() -> PermissionRowTemplate {
+    PermissionRowTemplate {
+        resources: vec!["orders", "customers", "reports", "inventory", "admin_panel"],
+        access_levels: vec!["read", "write", "admin"],
+    }
+}
+
 pub async fn list_users(
     _admin: AdminClaims,
     State(pool): State<Db>,

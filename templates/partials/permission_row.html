@@ -1,0 +1,20 @@
+<div class="permission-row flex items-center gap-3 animate-in fade-in slide-in-from-top-1 duration-200">
+    <div class="flex-1">
+        <select name="resource" class="permission-resource w-full px-3 py-2 bg-surface-02 border border-border-subtle rounded-md text-[13px] text-text-primary outline-none focus:border-btn-primary transition-all appearance-none cursor-pointer">
+            {% for res in resources %}
+            <option value="{{ res }}">{{ res }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="flex-1">
+        <select name="access" class="permission-access w-full px-3 py-2 bg-surface-02 border border-border-subtle rounded-md text-[13px] text-text-primary outline-none focus:border-btn-primary transition-all appearance-none cursor-pointer">
+            {% for acc in access_levels %}
+            <option value="{{ acc }}">{{ acc }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="button" onclick="this.closest('.permission-row').remove(); if(window.validateCurrentList) window.validateCurrentList();" class="w-9 h-9 flex items-center justify-center rounded-md text-text-helper hover:text-red-500 hover:bg-red-500/5 transition-all">
+        <i data-lucide="trash-2" class="w-4 h-4"></i>
+    </button>
+</div>
+<script>if (window.lucide) window.lucide.createIcons();</script>

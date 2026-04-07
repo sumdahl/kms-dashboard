@@ -1,0 +1,11 @@
+{
+  "skills": {
+    "disabled": [
+      "google-chat",
+      "google-docs",
+      "google-slides",
+      "gmail",
+      "google-calendar"
+    ]
+  }
+}

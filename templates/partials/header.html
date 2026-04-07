@@ -1,7 +1,20 @@
 <header
-    class="h-12 min-h-12 bg-surface-01 border-b border-border-subtle flex items-center justify-end px-4 gap-2 sticky top-0 z-40"
+    class="h-12 min-h-12 bg-surface-01 border-b border-border-subtle flex items-center justify-between px-4 gap-2 sticky top-0 z-40"
 >
-    <div class="flex items-center gap-2">
+    <!-- Mobile Sidebar Toggle -->
+    <div class="flex items-center md:hidden">
+        <button
+            id="mobile-sidebar-toggle"
+            class="flex items-center justify-center w-8 h-8 rounded-sm text-icon-muted hover:text-icon-secondary hover:bg-surface-active transition-colors border-none bg-transparent"
+            title="Menu"
+            aria-label="Menu"
+        >
+            <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+    </div>
+
+    <!-- Header Actions (Right aligned) -->
+    <div class="flex items-center gap-2 ml-auto">
         <!-- Ask AI -->
         <button
             class="flex items-center gap-1 px-3 h-8 rounded-sm text-base text-text-primary hover:bg-surface-hover transition-colors border-none bg-transparent font-[inherit]"

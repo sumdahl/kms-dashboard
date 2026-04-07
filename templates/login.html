@@ -6,10 +6,7 @@
         <title>Login - KMS Dashboard</title>
         <link rel="stylesheet" href="/static/css/output.css" />
         <script src="/static/js/htmx.min.js" defer></script>
-        <script
-            src="https://unpkg.com/htmx.org/dist/ext/json-enc.js"
-            defer
-        ></script>
+        <script src="/static/js/json-enc.js" defer></script>
     </head>
     <body class="bg-bg-page flex items-center justify-center min-h-screen px-4">
         <div class="w-full max-w-md">
@@ -57,7 +54,7 @@
                             Log in to manage your keys and roles
                         </p>
 
-                        <!-- Global error (moved here, directly below the subtitle) -->
+                        <!-- Global error -->
                         <p
                             id="login-error"
                             class="hidden text-[11px] text-red-500 text-center bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2 mt-4 w-full max-w-[280px]"
@@ -106,6 +103,7 @@
                                 <span id="email-error-text"></span>
                             </p>
                         </div>
+
                         <!-- Password -->
                         <div>
                             <div
@@ -176,10 +174,15 @@
                             </p>
                         </div>
 
+                        <!-- Submit Button -->
                         <button
                             type="submit"
                             id="submit-btn"
-                            class="w-full h-9 bg-btn-primary text-white text-[13px] font-medium rounded-sm hover:bg-btn-primary-hover transition-colors mt-1"
+                            disabled
+                            class="w-full h-9 bg-btn-primary text-white text-[13px] font-medium rounded-sm 
+                                   hover:bg-btn-primary-hover transition-colors mt-1
+                                   disabled:bg-btn-primary/60 disabled:text-white/70 
+                                   disabled:cursor-not-allowed disabled:shadow-none"
                         >
                             Sign in
                         </button>
@@ -242,22 +245,25 @@
             const BASE = ["border-border-subtle"];
             const RED = ["border-red-500"];
             const GREEN = ["border-green-500"];
+
             function setBorder(input, state) {
                 input.classList.remove(...BASE, ...RED, ...GREEN);
                 if (state === "error") input.classList.add(...RED);
                 else if (state === "ok") input.classList.add(...GREEN);
                 else input.classList.add(...BASE);
             }
+
             function showErr(errEl, txtEl, msg) {
                 txtEl.textContent = msg;
                 errEl.classList.remove("hidden");
             }
+
             function clearErr(errEl, txtEl) {
                 txtEl.textContent = "";
                 errEl.classList.add("hidden");
             }
 
-            // ── Rules ──
+            // ── Validation Rules ──
             function checkEmail(val) {
                 if (!val) return "Email is required.";
                 if (!val.includes("@")) return "Email must contain @.";
@@ -265,6 +271,7 @@
                     return "Enter a valid email address.";
                 return "";
             }
+
             function checkPassword(val) {
                 if (!val) return "Password is required.";
                 if (val.length < 6)
@@ -272,45 +279,60 @@
                 return "";
             }
 
-            // ── Real-time validation on every keystroke ──
+            // ── Update Submit Button State ──
+            function updateSubmitButton() {
+                const emailVal = emailInput.value.trim();
+                const pwVal = pwInput.value.trim();
+
+                const emailError = checkEmail(emailVal);
+                const pwError = checkPassword(pwVal);
+
+                const isFormValid = emailVal !== "" && pwVal !== "" && !emailError && !pwError;
+
+                submitBtn.disabled = !isFormValid;
+            }
+
+            // ── Real-time validation ──
             emailInput.addEventListener("input", () => {
-                const val = emailInput.value;
+                const val = emailInput.value.trim();
                 if (!val) {
                     setBorder(emailInput, "default");
                     clearErr(emailErr, emailErrTxt);
-                    return;
-                }
-                const err = checkEmail(val);
-                if (err) {
-                    setBorder(emailInput, "error");
-                    showErr(emailErr, emailErrTxt, err);
                 } else {
-                    setBorder(emailInput, "ok");
-                    clearErr(emailErr, emailErrTxt);
+                    const err = checkEmail(val);
+                    if (err) {
+                        setBorder(emailInput, "error");
+                        showErr(emailErr, emailErrTxt, err);
+                    } else {
+                        setBorder(emailInput, "ok");
+                        clearErr(emailErr, emailErrTxt);
+                    }
                 }
+                updateSubmitButton();
             });
 
             pwInput.addEventListener("input", () => {
-                const val = pwInput.value;
+                const val = pwInput.value.trim();
                 if (!val) {
                     setBorder(pwInput, "default");
                     clearErr(pwErr, pwErrTxt);
-                    return;
-                }
-                const err = checkPassword(val);
-                if (err) {
-                    setBorder(pwInput, "error");
-                    showErr(pwErr, pwErrTxt, err);
                 } else {
-                    setBorder(pwInput, "ok");
-                    clearErr(pwErr, pwErrTxt);
+                    const err = checkPassword(val);
+                    if (err) {
+                        setBorder(pwInput, "error");
+                        showErr(pwErr, pwErrTxt, err);
+                    } else {
+                        setBorder(pwInput, "ok");
+                        clearErr(pwErr, pwErrTxt);
+                    }
                 }
+                updateSubmitButton();
             });
 
-            // Also fire on blur (tab through without typing)
+            // Blur validation
             emailInput.addEventListener("blur", () => {
-                if (!emailInput.value) return;
-                const err = checkEmail(emailInput.value);
+                if (!emailInput.value.trim()) return;
+                const err = checkEmail(emailInput.value.trim());
                 if (err) {
                     setBorder(emailInput, "error");
                     showErr(emailErr, emailErrTxt, err);
@@ -318,11 +340,12 @@
                     setBorder(emailInput, "ok");
                     clearErr(emailErr, emailErrTxt);
                 }
+                updateSubmitButton();
             });
 
             pwInput.addEventListener("blur", () => {
-                if (!pwInput.value) return;
-                const err = checkPassword(pwInput.value);
+                if (!pwInput.value.trim()) return;
+                const err = checkPassword(pwInput.value.trim());
                 if (err) {
                     setBorder(pwInput, "error");
                     showErr(pwErr, pwErrTxt, err);
@@ -330,100 +353,76 @@
                     setBorder(pwInput, "ok");
                     clearErr(pwErr, pwErrTxt);
                 }
+                updateSubmitButton();
             });
 
             // ── Password toggle ──
             const eyeIcon = document.getElementById("eye-icon");
             let pwVisible = false;
-            document
-                .getElementById("toggle-password")
-                .addEventListener("click", () => {
-                    pwVisible = !pwVisible;
-                    pwInput.type = pwVisible ? "text" : "password";
-                    eyeIcon.innerHTML = pwVisible
-                        ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`
-                        : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
-                });
 
-            // ── Block submit if invalid ──
-            document
-                .getElementById("login-form")
-                .addEventListener("htmx:beforeRequest", (evt) => {
-                    globalErr.classList.add("hidden");
-                    const eErr = checkEmail(emailInput.value);
-                    const pErr = checkPassword(pwInput.value);
-                    if (eErr) {
-                        setBorder(emailInput, "error");
-                        showErr(emailErr, emailErrTxt, eErr);
-                    }
-                    if (pErr) {
-                        setBorder(pwInput, "error");
-                        showErr(pwErr, pwErrTxt, pErr);
-                    }
-                    if (eErr || pErr) {
-                        evt.preventDefault();
-                        return;
-                    }
-                    submitBtn.disabled = true;
-                    submitBtn.textContent = "Signing in…";
-                });
+            document.getElementById("toggle-password").addEventListener("click", () => {
+                pwVisible = !pwVisible;
+                pwInput.type = pwVisible ? "text" : "password";
+                eyeIcon.innerHTML = pwVisible
+                    ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`
+                    : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+            });
+
+            // ── Prevent submission if invalid (backup) ──
+            document.getElementById("login-form").addEventListener("htmx:beforeRequest", (evt) => {
+                globalErr.classList.add("hidden");
+
+                const eErr = checkEmail(emailInput.value.trim());
+                const pErr = checkPassword(pwInput.value.trim());
+
+                if (eErr || pErr) {
+                    evt.preventDefault();
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = "Signing in…";
+            });
 
             // ── Handle response ──
             document.body.addEventListener("htmx:afterRequest", (evt) => {
                 if (evt.detail.elt.id !== "login-form") return;
+
                 submitBtn.disabled = false;
                 submitBtn.textContent = "Sign in";
+
                 const xhr = evt.detail.xhr;
 
-<<<<<<< HEAD
-                // Success — save token then redirect
                 if (xhr.status >= 200 && xhr.status < 300) {
                     try {
                         const res = JSON.parse(xhr.responseText);
-                        if (res.token) localStorage.setItem('kms_token', res.token);
-                    } catch (e) {}
-                    window.location.href = '/';
-                    return;
-                }
-=======
-                // Success — HTMX handles the HX-Redirect, nothing to do
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    try {
-                        const res = JSON.parse(xhr.responseText);
-                        if (res.token)
-                            localStorage.setItem("kms_token", res.token);
+                        if (res.token) localStorage.setItem("kms_token", res.token);
                     } catch (e) {}
                     window.location.href = "/";
                     return;
                 }
 
-                if (xhr.status >= 200 && xhr.status < 300) return;
->>>>>>> main
-
-                // Error — parse and show message
+                // Show error
                 try {
                     const res = JSON.parse(xhr.responseText);
-                    const msg =
-                        res.error ||
-                        res.message ||
-                        res.detail ||
-                        (xhr.status === 401
-                            ? "Incorrect email or password."
-                            : xhr.status === 422
-                              ? "Invalid email or password format."
-                              : xhr.status === 429
-                                ? "Too many attempts. Try again later."
-                                : "Login failed. Please try again.");
+                    const msg = res.error || res.message || res.detail || 
+                               (xhr.status === 401 ? "Incorrect email or password." : 
+                                xhr.status === 422 ? "Invalid email or password format." :
+                                xhr.status === 429 ? "Too many attempts. Try again later." :
+                                "Login failed. Please try again.");
                     globalErr.textContent = msg;
                     globalErr.classList.remove("hidden");
                 } catch {
-                    globalErr.textContent =
-                        xhr.status === 0
-                            ? "Connection error. Check your network."
+                    globalErr.textContent = 
+                        xhr.status === 0 
+                            ? "Connection error. Check your network." 
                             : "Login failed. Please try again.";
                     globalErr.classList.remove("hidden");
                 }
             });
+
+            // Initial button state
+            updateSubmitButton();
         </script>
     </body>
 </html>
