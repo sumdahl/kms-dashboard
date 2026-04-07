@@ -4,7 +4,12 @@ use chrono::{Duration, Utc};
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use uuid::Uuid;
 
-pub fn create_jwt(user_id: &str, email: &str, is_admin: bool) -> AppResult<String> {
+pub fn create_jwt(
+    user_id: &str,
+    email: &str,
+    is_admin: bool,
+    session_version: i32,
+) -> AppResult<String> {
     let secret = std::env::var("JWT_SECRET").expect("JWT_SECRET must be set");
 
     let exp = Utc::now() + Duration::hours(24);
@@ -12,6 +17,7 @@ pub fn create_jwt(user_id: &str, email: &str, is_admin: bool) -> AppResult<Strin
         sub: user_id.to_string(),
         email: email.to_string(),
         is_admin,
+        sv: session_version,
         exp: exp.timestamp() as usize,
         iat: Utc::now().timestamp() as usize,
         jti: Uuid::new_v4().to_string(), // ← new

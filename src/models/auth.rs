@@ -7,6 +7,7 @@ pub struct Claims {
     pub sub: String,
     pub email: String,
     pub is_admin: bool,
+    pub sv: i32,
     pub exp: usize,
     pub iat: usize,
     pub jti: String,
