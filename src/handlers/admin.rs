@@ -392,3 +392,123 @@ pub async fn get_role_detail(
 
     Ok(Json(RoleDetailResponse { role, assignments }))
 }
+
+#[derive(Deserialize)]
+pub struct DisableUserRequest {
+    pub reason: Option<String>,
+}
+
+pub async fn disable_user(
+    admin: AdminClaims,
+    State(pool): State<Db>,
+    Path(user_id): Path<Uuid>,
+    Json(payload): Json<DisableUserRequest>,
+) -> AppResult<Json<serde_json::Value>> {
+    let actor_id = Uuid::parse_str(&admin.0.sub).map_err(|_| AppError::Unauthorized)?;
+
+    // Prevent self-disable
+    if actor_id == user_id {
+        return Err(AppError::BadRequest(
+            "You cannot disable your own account.".into(),
+        ));
+    }
+
+    let mut tx = pool.begin().await?;
+
+    // Atomically disable + bump session_version
+    // WHERE is_active = TRUE prevents double-firing on race conditions
+    let updated = sqlx::query!(
+        r#"
+        UPDATE users
+        SET
+            is_active       = FALSE,
+            session_version = session_version + 1,
+            disabled_at     = NOW(),
+            disabled_by     = $1,
+            disabled_reason = $2
+        WHERE user_id = $3
+          AND is_active = TRUE
+        RETURNING user_id
+        "#,
+        actor_id,
+        payload.reason,
+        user_id
+    )
+    .fetch_optional(&mut *tx)
+    .await?;
+
+    if updated.is_none() {
+        tx.rollback().await?;
+        return Err(AppError::BadRequest(
+            "User not found or already disabled.".into(),
+        ));
+    }
+
+    // Write audit log
+    sqlx::query!(
+        r#"
+        INSERT INTO user_audit_log (target_user_id, actor_id, action, reason)
+        VALUES ($1, $2, 'disabled', $3)
+        "#,
+        user_id,
+        actor_id,
+        payload.reason
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    tx.commit().await?;
+
+    Ok(Json(serde_json::json!({
+        "status": "success",
+        "message": "User has been disabled. All active sessions are now invalid."
+    })))
+}
+
+pub async fn enable_user(
+    admin: AdminClaims,
+    State(pool): State<Db>,
+    Path(user_id): Path<Uuid>,
+) -> AppResult<Json<serde_json::Value>> {
+    let actor_id = Uuid::parse_str(&admin.0.sub).map_err(|_| AppError::Unauthorized)?;
+
+    let mut tx = pool.begin().await?;
+
+    let updated = sqlx::query!(
+        r#"
+        UPDATE users
+        SET
+            is_active       = TRUE,
+            disabled_at     = NULL,
+            disabled_by     = NULL,
+            disabled_reason = NULL
+        WHERE user_id = $1
+          AND is_active = FALSE
+        RETURNING user_id
+        "#,
+        user_id
+    )
+    .fetch_optional(&mut *tx)
+    .await?;
+
+    if updated.is_none() {
+        tx.rollback().await?;
+        return Err(AppError::BadRequest(
+            "User not found or already active.".into(),
+        ));
+    }
+
+    sqlx::query!(
+        "INSERT INTO user_audit_log (target_user_id, actor_id, action) VALUES ($1, $2, 'enabled')",
+        user_id,
+        actor_id
+    )
+    .execute(&mut *tx)
+    .await?;
+
+    tx.commit().await?;
+
+    Ok(Json(
+        serde_json::json!({ "status": "success", "message": "User re-enabled." }),
+    ))
+}

@@ -11,12 +11,13 @@ use crate::models::types::{AccessLevel, Resource};
 use crate::models::{Claims, Role, RolePermission};
 use axum::middleware;
 use axum::{
-    extract::{Form, Path, State},
+    extract::{Form, Path, Query, State},
     http::StatusCode,
     response::{Html, IntoResponse, Redirect, Response},
     routing::{delete, get, post},
     Router,
 };
+use std::collections::HashMap;
 
 use serde::Deserialize;
 
@@ -57,12 +58,18 @@ pub fn create_router(state: AppState) -> Router {
 
 #[derive(askama::Template)]
 #[template(path = "login.html")]
-struct LoginTemplate {}
-
-async fn login_page() -> impl IntoResponse {
-    LoginTemplate {}
+struct LoginTemplate {
+    pub account_disabled: bool,
 }
 
+async fn login_page(Query(params): Query<HashMap<String, String>>) -> impl IntoResponse {
+    LoginTemplate {
+        account_disabled: params
+            .get("reason")
+            .map(|r| r == "account_disabled")
+            .unwrap_or(false),
+    }
+}
 #[derive(askama::Template)]
 #[template(path = "signup.html")]
 struct SignupTemplate {}

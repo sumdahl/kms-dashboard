@@ -52,6 +52,28 @@ endblock %} {% block head_scripts %}
                         class="text-[11px] text-red-500 text-center bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2"
                     ></p>
                 </div>
+                <!-- Account disabled banner -->
+                {% if account_disabled %}
+                <div class="w-full mt-4" role="alert" aria-live="assertive">
+                    <div
+                        class="flex items-start gap-2.5 bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2.5"
+                    >
+                        <i
+                            data-lucide="shield-off"
+                            class="w-3.5 h-3.5 text-red-500 shrink-0 mt-0.5"
+                        ></i>
+                        <div>
+                            <p class="text-[11px] font-medium text-red-500">
+                                Account disabled
+                            </p>
+                            <p class="text-[11px] text-red-400 mt-0.5">
+                                Your account has been disabled by an
+                                administrator. Please contact support.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
 
             <!-- Form -->

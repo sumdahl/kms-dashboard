@@ -7,11 +7,13 @@ use crate::models::Claims;
 use axum::extract::State;
 use axum::{
     async_trait,
-    extract::{FromRef, FromRequestParts},
+    extract::{FromRef, FromRequestParts, Request},
     http::request::Parts,
+    middleware::Next,
+    response::Response,
 };
-use axum::{extract::Request, middleware::Next, response::Response};
 use axum_extra::extract::CookieJar;
+use uuid::Uuid;
 
 #[async_trait]
 impl<S> FromRequestParts<S> for Claims
@@ -29,12 +31,35 @@ where
             .map(|c| c.value().to_owned())
             .ok_or(AppError::Unauthorized)?;
 
-        // 2. Verify JWT
+        // 2. Verify JWT signature + expiry
         let claims = verify_jwt(&token)?;
 
-        // 3. Check blocklist
         let pool = Db::from_ref(state);
+
+        // 3. Check token blocklist (handles individual logouts)
         if is_blocklisted(&pool, &claims.jti).await? {
+            return Err(AppError::Unauthorized);
+        }
+
+        // 4. ✅ Check user is still active + session version matches
+        //    This is the account-disable enforcement — one indexed PK lookup
+        let user_id = Uuid::parse_str(&claims.sub).map_err(|_| AppError::Unauthorized)?;
+
+        let row = sqlx::query!(
+            "SELECT is_active, session_version FROM users WHERE user_id = $1",
+            user_id
+        )
+        .fetch_optional(&pool)
+        .await
+        .map_err(|_| AppError::Unauthorized)?
+        .ok_or(AppError::Unauthorized)?;
+
+        if !row.is_active {
+            return Err(AppError::AccountDisabled);
+        }
+
+        if claims.sv != row.session_version {
+            // Token is from an old session — silently treat as unauthorized
             return Err(AppError::Unauthorized);
         }
 
