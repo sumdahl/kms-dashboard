@@ -4,7 +4,7 @@ use crate::handlers::admin::{
     list_users, permission_row, roles_summary,
 };
 use axum::{
-    routing::{delete, get, post},
+    routing::{get, post},
     Router,
 };
 

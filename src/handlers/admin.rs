@@ -41,7 +41,9 @@ pub async fn list_users(
 ) -> AppResult<Json<Vec<UserSummary>>> {
     let users = sqlx::query_as::<_, UserSummary>(
         "SELECT user_id, email, full_name, is_admin, is_active, disabled_reason
-         FROM users ORDER BY created_at DESC",
+         FROM users
+         WHERE is_admin = FALSE
+         ORDER BY created_at DESC",
     )
     .fetch_all(&pool)
     .await?;
@@ -446,7 +448,7 @@ pub async fn disable_user(
         WHERE user_id = $3
           AND is_active = TRUE
         RETURNING user_id
-        "#
+        "#,
     )
     .bind(actor_id)
     .bind(&payload.reason)
@@ -466,7 +468,7 @@ pub async fn disable_user(
         r#"
         INSERT INTO user_audit_log (target_user_id, actor_id, action, reason)
         VALUES ($1, $2, 'disabled', $3)
-        "#
+        "#,
     )
     .bind(user_id)
     .bind(actor_id)
@@ -502,7 +504,7 @@ pub async fn enable_user(
         WHERE user_id = $1
           AND is_active = FALSE
         RETURNING user_id
-        "#
+        "#,
     )
     .bind(user_id)
     .fetch_optional(&mut *tx)
@@ -516,7 +518,7 @@ pub async fn enable_user(
     }
 
     sqlx::query(
-        "INSERT INTO user_audit_log (target_user_id, actor_id, action) VALUES ($1, $2, 'enabled')"
+        "INSERT INTO user_audit_log (target_user_id, actor_id, action) VALUES ($1, $2, 'enabled')",
     )
     .bind(user_id)
     .bind(actor_id)

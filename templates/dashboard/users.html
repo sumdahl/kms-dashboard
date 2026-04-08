@@ -376,10 +376,13 @@
                         data-user-email="${escHtml(user.email)}"
                         data-is-active="${user.is_active}"
                         onclick="event.stopPropagation(); handleToggle(this)"
+                        ${user.is_admin && user.is_active ? 'disabled title="Admin accounts cannot be disabled"' : ""}
                         class="h-7 px-3 rounded-sm text-[12px] font-medium border transition-colors ${
-                            user.is_active
-                                ? "border-red-300 text-red-600 hover:bg-red-500/8 bg-transparent"
-                                : "border-green-300 text-green-600 hover:bg-green-500/8 bg-transparent"
+                            user.is_admin && user.is_active
+                                ? "border-border-subtle text-text-placeholder bg-transparent cursor-not-allowed opacity-50"
+                                : user.is_active
+                                  ? "border-red-300 text-red-600 hover:bg-red-500/8 bg-transparent"
+                                  : "border-green-300 text-green-600 hover:bg-green-500/8 bg-transparent"
                         }">
                         ${user.is_active ? "Disable" : "Enable"}
                     </button>
@@ -554,17 +557,22 @@
                 <!-- Action -->
                 <div class="pt-2 border-t border-border-subtle">
                     ${
-                        user.is_active
-                            ? `<button onclick="openDisableModal('${escHtml(user.user_id)}','${escHtml(user.email)}')"
-                               class="w-full h-8 flex items-center justify-center gap-2 border border-red-300 text-red-600 text-[13px] font-medium rounded-sm hover:bg-red-500/8 transition-colors">
-                               <i data-lucide="shield-off" class="w-3.5 h-3.5 shrink-0"></i>
-                               Disable Account
-                           </button>`
-                            : `<button onclick="handleEnableFromPanel('${escHtml(user.user_id)}','${escHtml(user.email)}')"
-                               class="w-full h-8 flex items-center justify-center gap-2 border border-green-300 text-green-600 text-[13px] font-medium rounded-sm hover:bg-green-500/8 transition-colors">
-                               <i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i>
-                               Re-enable Account
-                           </button>`
+                        user.is_admin
+                            ? `<div class="flex items-center justify-center gap-1.5 py-1.5 text-[12px] text-text-secondary">
+                                   <i data-lucide="shield" class="w-3.5 h-3.5 shrink-0"></i>
+                                   Admin accounts cannot be disabled
+                               </div>`
+                            : user.is_active
+                              ? `<button onclick="openDisableModal('${escHtml(user.user_id)}','${escHtml(user.email)}')"
+                                       class="w-full h-8 flex items-center justify-center gap-2 border border-red-300 text-red-600 text-[13px] font-medium rounded-sm hover:bg-red-500/8 transition-colors">
+                                       <i data-lucide="shield-off" class="w-3.5 h-3.5 shrink-0"></i>
+                                       Disable Account
+                                   </button>`
+                              : `<button onclick="handleEnableFromPanel('${escHtml(user.user_id)}','${escHtml(user.email)}')"
+                                       class="w-full h-8 flex items-center justify-center gap-2 border border-green-300 text-green-600 text-[13px] font-medium rounded-sm hover:bg-green-500/8 transition-colors">
+                                       <i data-lucide="shield-check" class="w-3.5 h-3.5 shrink-0"></i>
+                                       Re-enable Account
+                                   </button>`
                     }
                 </div>
             </div>`;
@@ -699,4 +707,3 @@
     })();
 </script>
 {% endblock %}
-
