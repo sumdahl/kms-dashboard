@@ -1,8 +1,11 @@
 {% extends "layout.html" %} {% block title %}Users — KMS Dashboard{% endblock %}
 {% block content %}
-<div>
+<div class="max-w-[1200px] w-full mx-auto">
+    <!-- Action Banner Container -->
+    <div id="page-banner-container" class="mb-4 empty:hidden"></div>
+
     <!-- ── Header ── -->
-    <div class="flex flex-col gap-6 mb-8 max-w-[1200px] w-full mx-auto">
+    <div class="flex flex-col gap-6 mb-8 w-full">
         <div class="flex items-start justify-between">
             <div class="flex items-start gap-3">
                 <div class="text-icon-secondary mt-1">
@@ -286,6 +289,17 @@
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;");
+        }
+
+        function showToast(msg, ok = true) {
+            const toast = document.getElementById("toast");
+            document.getElementById("toast-msg").textContent = msg;
+            document.getElementById("toast-icon").innerHTML = ok
+                ? `<i data-lucide="circle-check" class="text-green-500 w-[15px] h-[15px] shrink-0"></i>`
+                : `<i data-lucide="circle-alert" class="text-red-500 w-[15px] h-[15px] shrink-0"></i>`;
+            toast.classList.remove("hidden");
+            if (window.lucide) window.lucide.createIcons();
+            setTimeout(() => toast.classList.add("hidden"), 3500);
         }
 
         // ── Status Badge ────────────────────────────────────────────────────
@@ -627,17 +641,17 @@
                         user.is_active = false;
                         user.disabled_reason = reason || null;
                     }
-                    notify(`${_pendingUserEmail} has been disabled.`);
+                    showToast(`${_pendingUserEmail} has been disabled.`);
                     closeDisableModal();
                     renderList();
                     showUserDetail(_pendingUserId);
                 } else {
-                    notify(data.error || "Failed to disable user.", "error");
+                    showToast(data.error || "Failed to disable user.", false);
                     btn.disabled = false;
                     btn.textContent = "Disable Account";
                 }
             } catch {
-                notify("Network error. Please try again.", "error");
+                showToast("Network error. Please try again.", false);
                 btn.disabled = false;
                 btn.textContent = "Disable Account";
             }
@@ -657,14 +671,14 @@
                         user.is_active = true;
                         user.disabled_reason = null;
                     }
-                    notify(`${email} has been re-enabled.`);
+                    showToast(`${email} has been re-enabled.`);
                     renderList();
                     showUserDetail(userId);
                 } else {
-                    notify(data.error || "Failed to enable user.", "error");
+                    showToast(data.error || "Failed to enable user.", false);
                 }
             } catch {
-                notify("Network error. Please try again.", "error");
+                showToast("Network error. Please try again.", false);
             }
         }
 
