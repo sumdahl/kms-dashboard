@@ -24,6 +24,20 @@
         <!-- HTMX -->
         <script src="/static/js/htmx.min.js" defer></script>
         {% block head_scripts %}{% endblock %}
+        <style>
+            @keyframes _notif-in {
+                from { opacity: 0; transform: translateY(-5px); }
+                to   { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes _notif-out {
+                0%   { opacity: 1; transform: translateY(0); }
+                100% { opacity: 0; transform: translateY(-3px); }
+            }
+            @keyframes _notif-progress {
+                from { transform: scaleX(1); }
+                to   { transform: scaleX(0); }
+            }
+        </style>
     </head>
     <body class="app-shell {% if sidebar_pinned %}sidebar-expanded{% endif %}">
         {% include "partials/sidebar.html" %}
@@ -37,6 +51,7 @@
             <main class="flex-1 flex flex-col bg-bg-page overflow-y-auto">
                 {% if show_banner %} {% include "partials/banner.html" %} {%
                 endif %}
+                <div id="notification-area" class="shrink-0" aria-live="polite" aria-atomic="false"></div>
                 <div class="px-4 md:px-8 py-4 md:py-6 flex-1">
                     {% block content %}{% endblock %}
                 </div>
@@ -123,6 +138,108 @@
         <script src="/static/js/sidebar.js"></script>
 
         <script>
+            // ── Notification System ──────────────────────────────────────────────
+            (function () {
+                let _seq = 0;
+                const DURATION_MS = 5000;
+
+                // Each type carries: accent color (CSS var), bg classes, SVG icon
+                // bg classes are listed here so Tailwind's scanner includes them:
+                // bg-green-50/60 dark:bg-green-950/10
+                // bg-red-50/60 dark:bg-red-950/10
+                // bg-amber-50/60 dark:bg-amber-950/10
+                // bg-blue-50/60 dark:bg-blue-950/10
+                const _cfg = {
+                    success: {
+                        color: "var(--color-status-green)",
+                        bg: "bg-green-50/60 dark:bg-green-950/10",
+                        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
+                    },
+                    error: {
+                        color: "var(--color-status-red)",
+                        bg: "bg-red-50/60 dark:bg-red-950/10",
+                        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+                    },
+                    warning: {
+                        color: "var(--color-status-yellow)",
+                        bg: "bg-amber-50/60 dark:bg-amber-950/10",
+                        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
+                    },
+                    info: {
+                        color: "var(--color-status-blue)",
+                        bg: "bg-blue-50/60 dark:bg-blue-950/10",
+                        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
+                    },
+                };
+
+                // notify(message, type?)
+                // type: "success" | "error" | "warning" | "info"  (default: "success")
+                window.notify = function (msg, type) {
+                    type = _cfg[type] ? type : "success";
+                    const c = _cfg[type];
+                    const id = "notif-" + (++_seq);
+
+                    // Root bar
+                    const el = document.createElement("div");
+                    el.id = id;
+                    el.setAttribute("role", "alert");
+                    el.className =
+                        "relative flex items-center gap-3 pl-4 pr-3 h-10 border-b border-border-subtle shrink-0 overflow-hidden " +
+                        c.bg;
+                    el.style.cssText =
+                        "border-left:3px solid " + c.color + ";" +
+                        "animation:_notif-in .2s cubic-bezier(.2,0,.4,1) both;";
+
+                    // Icon
+                    const iconWrap = document.createElement("span");
+                    iconWrap.className = "shrink-0";
+                    iconWrap.style.color = c.color;
+                    iconWrap.innerHTML = c.icon;
+
+                    // Message text (neutral color — accent carries the signal)
+                    const msgEl = document.createElement("span");
+                    msgEl.className = "flex-1 text-[13px] font-medium text-text-primary truncate";
+                    msgEl.textContent = msg;
+
+                    // Dismiss button
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.setAttribute("aria-label", "Dismiss");
+                    btn.className =
+                        "shrink-0 flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-text-primary hover:bg-surface-active transition-colors";
+                    btn.innerHTML =
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
+                    btn.onclick = function () { window.dismissNotif(id); };
+
+                    // Auto-dismiss progress bar (shrinks left→right over DURATION_MS)
+                    const progress = document.createElement("span");
+                    progress.className = "absolute bottom-0 left-0 right-0 h-[2px]";
+                    progress.style.cssText =
+                        "background:" + c.color + ";" +
+                        "opacity:0.3;" +
+                        "transform-origin:left center;" +
+                        "animation:_notif-progress " + (DURATION_MS / 1000) + "s linear both;";
+
+                    el.appendChild(iconWrap);
+                    el.appendChild(msgEl);
+                    el.appendChild(btn);
+                    el.appendChild(progress);
+
+                    document.getElementById("notification-area").appendChild(el);
+                    setTimeout(function () { window.dismissNotif(id); }, DURATION_MS);
+
+                    return id;
+                };
+
+                window.dismissNotif = function (id) {
+                    const el = document.getElementById(id);
+                    if (!el || el._leaving) return;
+                    el._leaving = true;
+                    el.style.animation = "_notif-out .16s cubic-bezier(.2,0,0,1) both";
+                    setTimeout(function () { el.parentNode && el.parentNode.removeChild(el); }, 170);
+                };
+            })();
+
             // ── Initialize Lucide Icons ──────────────────────────────────────────
             function initLucideIcons() {
                 if (window.lucide) {

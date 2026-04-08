@@ -25,7 +25,7 @@
                 <a
                     href="/docs"
                     target="_blank"
-                    class="inline-flex items-center justify-center h-8 px-4 rounded-md text-[13px] font-medium bg-(--color-doc-btn-bg) hover:bg-(--color-doc-btn-hover) border-doc-btn-border) transition-colors shadow-sm"
+                    class="inline-flex items-center justify-center h-8 px-4 rounded-md text-[13px] font-medium bg-(--color-doc-btn-bg) hover:bg-(--color-doc-btn-hover) border border-(--color-doc-btn-border) text-(--color-doc-btn-text) transition-colors shadow-sm"
                 >
                     Documentation
                 </a>
@@ -268,15 +268,6 @@
     </div>
 </div>
 
-<!-- ── Toast ── -->
-<div
-    id="toast"
-    class="hidden fixed bottom-6 right-6 z-[100] flex items-center gap-2.5 px-4 py-3 rounded-card border shadow-lg bg-surface-01 border-border-subtle text-[13px] text-text-primary min-w-[220px]"
->
-    <span id="toast-icon" class="shrink-0"></span>
-    <span id="toast-msg"></span>
-</div>
-
 {% endblock %} {% block body_scripts %}
 <script>
     (function () {
@@ -298,44 +289,6 @@
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;");
-        }
-
-        function showActionBanner(message, ok = true) {
-            const container = document.getElementById("page-banner-container");
-            if (!container) return;
-
-            const bannerId = "action-banner-" + Date.now();
-            const bgColor = ok ? "bg-banner-bg" : "bg-red-500/10";
-            const borderColor = ok ? "border-banner-border" : "border-red-500/20";
-            const textColor = ok ? "text-banner-text" : "text-red-600";
-
-            container.innerHTML = `
-                <div id="${bannerId}"
-                    class="relative flex flex-row items-center justify-between gap-4 px-4 py-2 ${bgColor} border ${borderColor} rounded-md sm:h-10 shrink-0 transition-all duration-300 scale-in"
-                    role="alert"
-                >
-                    <div class="flex-1 flex flex-row items-center justify-center sm:justify-start gap-2 min-w-0">
-                        <p class="text-xs sm:text-sm ${textColor} text-center sm:text-left font-medium leading-tight truncate">
-                            ${message}
-                        </p>
-                    </div>
-
-                    <button
-                        type="button"
-                        onclick="document.getElementById('${bannerId}').remove()"
-                        class="shrink-0 flex items-center justify-center w-7 h-7 rounded-sm ${textColor} hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                    >
-                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
-                    </button>
-                </div>
-            `;
-            if (window.lucide) window.lucide.createIcons();
-
-            // Auto-remove after 5 seconds
-            setTimeout(() => {
-                const el = document.getElementById(bannerId);
-                if (el) el.remove();
-            }, 5000);
         }
 
         function showToast(msg, ok = true) {
@@ -570,7 +523,7 @@
                     <span class="text-[12px] text-text-secondary">User ID</span>
                     <span class="text-[12px] font-mono text-text-primary flex items-center gap-1" title="${escHtml(user.user_id)}">
                         ${escHtml(user.user_id.substring(0, 8))}…
-                        <i data-lucide="copy" onclick="navigator.clipboard.writeText('${escHtml(user.user_id)}').then(()=>showToast('Copied!'))"
+                        <i data-lucide="copy" onclick="navigator.clipboard.writeText('${escHtml(user.user_id)}').then(()=>notify('Copied!'))"
                            class="text-icon-muted cursor-pointer hover:text-text-primary w-3 h-3 shrink-0"></i>
                     </span>
                 </div>
@@ -688,17 +641,17 @@
                         user.is_active = false;
                         user.disabled_reason = reason || null;
                     }
-                    showActionBanner(`${_pendingUserEmail} has been disabled.`);
+                    showToast(`${_pendingUserEmail} has been disabled.`);
                     closeDisableModal();
                     renderList();
                     showUserDetail(_pendingUserId);
                 } else {
-                    showActionBanner(data.error || "Failed to disable user.", false);
+                    showToast(data.error || "Failed to disable user.", false);
                     btn.disabled = false;
                     btn.textContent = "Disable Account";
                 }
             } catch {
-                showActionBanner("Network error. Please try again.", false);
+                showToast("Network error. Please try again.", false);
                 btn.disabled = false;
                 btn.textContent = "Disable Account";
             }
@@ -718,14 +671,14 @@
                         user.is_active = true;
                         user.disabled_reason = null;
                     }
-                    showActionBanner(`${email} has been re-enabled.`);
+                    showToast(`${email} has been re-enabled.`);
                     renderList();
                     showUserDetail(userId);
                 } else {
-                    showActionBanner(data.error || "Failed to enable user.", false);
+                    showToast(data.error || "Failed to enable user.", false);
                 }
             } catch {
-                showActionBanner("Network error. Please try again.", false);
+                showToast("Network error. Please try again.", false);
             }
         }
 

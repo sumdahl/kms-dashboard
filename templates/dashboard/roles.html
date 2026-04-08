@@ -54,7 +54,7 @@
                 <a
                     href="/docs"
                     target="_blank"
-                    class="inline-flex items-center justify-center h-8 px-4 rounded-md text-[13px] font-medium bg-(--color-doc-btn-bg) hover:bg-(--color-doc-btn-hover) border-doc-btn-border) transition-colors shadow-sm"
+                    class="inline-flex items-center justify-center h-8 px-4 rounded-md text-[13px] font-medium bg-(--color-doc-btn-bg) hover:bg-(--color-doc-btn-hover) border border-(--color-doc-btn-border) text-(--color-doc-btn-text) transition-colors shadow-sm"
                 >
                     Documentation
                 </a>
@@ -615,15 +615,6 @@
     </div>
 </div>
 
-<!-- ── Toast ────────────────────────────────────────────────────────────── -->
-<div
-    id="toast"
-    class="hidden fixed bottom-6 right-6 z-[100] flex items-center gap-2.5 px-4 py-3 rounded-card border shadow-lg bg-surface-01 border-border-subtle text-[13px] text-text-primary min-w-[220px]"
->
-    <span id="toast-icon" class="shrink-0"></span>
-    <span id="toast-msg"></span>
-</div>
-
 {% endblock %} {% block body_scripts %}
 <script>
     // ── Constants ─────────────────────────────────────────────────────────
@@ -758,26 +749,6 @@
             const el = document.getElementById(bannerId);
             if (el) el.remove();
         }, 5000);
-    }
-
-    // ── Toast ─────────────────────────────────────────────────────────────
-    function showToast(msg, ok = true) {
-        const toast = document.getElementById("toast");
-        document.getElementById("toast-msg").textContent = msg;
-        document.getElementById("toast-icon").innerHTML = ok
-            ? `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" stroke-width="2" class="text-green-500">
-                   <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-                   <polyline points="22 4 12 14.01 9 11.01"/>
-               </svg>`
-            : `<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"
-                   fill="none" stroke="currentColor" stroke-width="2" class="text-red-500">
-                   <circle cx="12" cy="12" r="10"/>
-                   <line x1="12" y1="8" x2="12" y2="12"/>
-                   <line x1="12" y1="16" x2="12.01" y2="16"/>
-               </svg>`;
-        toast.classList.remove("hidden");
-        setTimeout(() => toast.classList.add("hidden"), 3000);
     }
 
     // ── Submit create role ────────────────────────────────────────────────
@@ -1076,7 +1047,7 @@
             const menu = document.getElementById("role-action-menu");
             menu.classList.add("hidden");
             menu._activeRole = null;
-            showToast(`Copied "${name}" to clipboard.`);
+            notify(`Copied "${name}" to clipboard.`);
         });
     }
 
@@ -1128,7 +1099,7 @@
             const text = await res.text();
             console.log("[delete] Body:", text);
             if (res.ok) {
-                showActionBanner(`Role "${_pendingDeleteRole}" deleted successfully.`);
+                showToast(`Role "${_pendingDeleteRole}" deleted.`);
                 deleteOk = true;
             } else {
                 try {
@@ -1141,7 +1112,7 @@
             console.error("[delete] Fetch failed:", err);
         }
 
-        if (errMsg) showToast(errMsg, false);
+        if (errMsg) notify(errMsg, "error");
         closeDeleteConfirm();
         if (deleteOk) {
             _page = 1;

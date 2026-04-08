@@ -151,6 +151,11 @@
 
         --color-badge-bg: #393939;
         --color-badge-text: #c6c6c6;
+
+        --color-doc-btn-bg: #1a1a1a;
+        --color-doc-btn-hover: #262626;
+        --color-doc-btn-border: #333333;
+        --color-doc-btn-text: #ededed;
     }
 
     html {
