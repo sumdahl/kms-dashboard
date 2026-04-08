@@ -26,12 +26,16 @@
         {% block head_scripts %}{% endblock %}
         <style>
             @keyframes _notif-in {
-                from { opacity: 0; transform: translateY(-6px); }
+                from { opacity: 0; transform: translateY(-5px); }
                 to   { opacity: 1; transform: translateY(0); }
             }
             @keyframes _notif-out {
-                from { opacity: 1; transform: translateY(0); }
-                to   { opacity: 0; transform: translateY(-6px); }
+                0%   { opacity: 1; transform: translateY(0); }
+                100% { opacity: 0; transform: translateY(-3px); }
+            }
+            @keyframes _notif-progress {
+                from { transform: scaleX(1); }
+                to   { transform: scaleX(0); }
             }
         </style>
     </head>
@@ -47,7 +51,7 @@
             <main class="flex-1 flex flex-col bg-bg-page overflow-y-auto">
                 {% if show_banner %} {% include "partials/banner.html" %} {%
                 endif %}
-                <div id="notification-area" class="shrink-0"></div>
+                <div id="notification-area" class="shrink-0" aria-live="polite" aria-atomic="false"></div>
                 <div class="px-4 md:px-8 py-4 md:py-6 flex-1">
                     {% block content %}{% endblock %}
                 </div>
@@ -137,65 +141,102 @@
             // ── Notification System ──────────────────────────────────────────────
             (function () {
                 let _seq = 0;
+                const DURATION_MS = 5000;
+
+                // Each type carries: accent color (CSS var), bg classes, SVG icon
+                // bg classes are listed here so Tailwind's scanner includes them:
+                // bg-green-50/60 dark:bg-green-950/10
+                // bg-red-50/60 dark:bg-red-950/10
+                // bg-amber-50/60 dark:bg-amber-950/10
+                // bg-blue-50/60 dark:bg-blue-950/10
                 const _cfg = {
                     success: {
-                        bar: "bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800 text-green-800 dark:text-green-300",
-                        btn: "hover:bg-green-100 dark:hover:bg-green-900/40",
-                        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',
+                        color: "var(--color-status-green)",
+                        bg: "bg-green-50/60 dark:bg-green-950/10",
+                        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>',
                     },
                     error: {
-                        bar: "bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-800 text-red-800 dark:text-red-300",
-                        btn: "hover:bg-red-100 dark:hover:bg-red-900/40",
-                        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+                        color: "var(--color-status-red)",
+                        bg: "bg-red-50/60 dark:bg-red-950/10",
+                        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+                    },
+                    warning: {
+                        color: "var(--color-status-yellow)",
+                        bg: "bg-amber-50/60 dark:bg-amber-950/10",
+                        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>',
                     },
                     info: {
-                        bar: "bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-300",
-                        btn: "hover:bg-blue-100 dark:hover:bg-blue-900/40",
-                        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>',
+                        color: "var(--color-status-blue)",
+                        bg: "bg-blue-50/60 dark:bg-blue-950/10",
+                        icon: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>',
                     },
                 };
 
+                // notify(message, type?)
+                // type: "success" | "error" | "warning" | "info"  (default: "success")
                 window.notify = function (msg, type) {
-                    type = type || "success";
-                    const c = _cfg[type] || _cfg.success;
-                    const id = "notif-" + ++_seq;
+                    type = _cfg[type] ? type : "success";
+                    const c = _cfg[type];
+                    const id = "notif-" + (++_seq);
 
+                    // Root bar
                     const el = document.createElement("div");
                     el.id = id;
                     el.setAttribute("role", "alert");
                     el.className =
-                        "relative flex items-center justify-between gap-4 px-4 py-2 sm:px-12 sm:h-10 shrink-0 border-b text-[13px] font-medium " +
-                        c.bar;
-                    el.style.cssText = "animation:_notif-in 0.2s ease both";
+                        "relative flex items-center gap-3 pl-4 pr-3 h-10 border-b border-border-subtle shrink-0 overflow-hidden " +
+                        c.bg;
+                    el.style.cssText =
+                        "border-left:3px solid " + c.color + ";" +
+                        "animation:_notif-in .2s cubic-bezier(.2,0,.4,1) both;";
 
-                    const left = document.createElement("div");
-                    left.className = "flex items-center gap-2.5";
-                    left.innerHTML = c.icon;
-                    const text = document.createElement("span");
-                    text.textContent = msg;
-                    left.appendChild(text);
+                    // Icon
+                    const iconWrap = document.createElement("span");
+                    iconWrap.className = "shrink-0";
+                    iconWrap.style.color = c.color;
+                    iconWrap.innerHTML = c.icon;
 
-                    const closeBtn = document.createElement("button");
-                    closeBtn.type = "button";
-                    closeBtn.setAttribute("aria-label", "Dismiss");
-                    closeBtn.className =
-                        "shrink-0 flex items-center justify-center w-8 h-8 rounded-sm transition-colors " +
-                        c.btn;
-                    closeBtn.innerHTML =
-                        '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
-                    closeBtn.onclick = function () { window.dismissNotif(id); };
+                    // Message text (neutral color — accent carries the signal)
+                    const msgEl = document.createElement("span");
+                    msgEl.className = "flex-1 text-[13px] font-medium text-text-primary truncate";
+                    msgEl.textContent = msg;
 
-                    el.appendChild(left);
-                    el.appendChild(closeBtn);
+                    // Dismiss button
+                    const btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.setAttribute("aria-label", "Dismiss");
+                    btn.className =
+                        "shrink-0 flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-text-primary hover:bg-surface-active transition-colors";
+                    btn.innerHTML =
+                        '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
+                    btn.onclick = function () { window.dismissNotif(id); };
+
+                    // Auto-dismiss progress bar (shrinks left→right over DURATION_MS)
+                    const progress = document.createElement("span");
+                    progress.className = "absolute bottom-0 left-0 right-0 h-[2px]";
+                    progress.style.cssText =
+                        "background:" + c.color + ";" +
+                        "opacity:0.3;" +
+                        "transform-origin:left center;" +
+                        "animation:_notif-progress " + (DURATION_MS / 1000) + "s linear both;";
+
+                    el.appendChild(iconWrap);
+                    el.appendChild(msgEl);
+                    el.appendChild(btn);
+                    el.appendChild(progress);
+
                     document.getElementById("notification-area").appendChild(el);
-                    setTimeout(function () { window.dismissNotif(id); }, 4000);
+                    setTimeout(function () { window.dismissNotif(id); }, DURATION_MS);
+
+                    return id;
                 };
 
                 window.dismissNotif = function (id) {
                     const el = document.getElementById(id);
-                    if (!el) return;
-                    el.style.animation = "_notif-out 0.2s ease both";
-                    setTimeout(function () { if (el.parentNode) el.parentNode.removeChild(el); }, 200);
+                    if (!el || el._leaving) return;
+                    el._leaving = true;
+                    el.style.animation = "_notif-out .16s cubic-bezier(.2,0,0,1) both";
+                    setTimeout(function () { el.parentNode && el.parentNode.removeChild(el); }, 170);
                 };
             })();
 
