@@ -251,14 +251,26 @@ pub async fn create_role(
             .unwrap_or("read")
             .to_string();
 
-        sqlx::query(
+        let perm_result = sqlx::query(
             "INSERT INTO role_permissions (role_id, resource, access_level) VALUES ($1, $2, $3)",
         )
         .bind(role_id)
-        .bind(resource_str)
-        .bind(access_str)
+        .bind(&resource_str)
+        .bind(&access_str)
         .execute(&mut *tx)
-        .await?;
+        .await;
+
+        if let Err(sqlx::Error::Database(db_err)) = perm_result {
+            if db_err.code().as_deref() == Some("23505") {
+                return Err(AppError::Conflict(format!(
+                    "Duplicate permission detected: resource '{}' with access '{}' is already assigned to this role.",
+                    resource_str, access_str
+                )));
+            }
+            return Err(sqlx::Error::Database(db_err).into());
+        } else if let Err(e) = perm_result {
+            return Err(e.into());
+        }
     }
 
     tx.commit().await?;

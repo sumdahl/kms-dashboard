@@ -15,9 +15,12 @@
 {% endblock %} {% block content %}
 
 <!-- ── LIGHT THEME OVERRIDE WRAPPER ────────────────────────────────────────── -->
-<div>
+<div class="max-w-[1200px] w-full mx-auto">
+    <!-- Action Banner Container -->
+    <div id="page-banner-container" class="mb-4 empty:hidden"></div>
+
     <!-- ── Header ── -->
-    <div class="flex flex-col gap-6 mb-8 max-w-[1200px] w-full mx-auto">
+    <div class="flex flex-col gap-6 mb-8 w-full">
         <div
             class="flex flex-col md:flex-row md:items-start justify-between gap-4"
         >
@@ -56,7 +59,7 @@
                     Documentation
                 </a>
                 <button
-                    onclick="window.location.href = '/roles/new'"
+                    onclick="openCreationSelectionModal()"
                     class="inline-flex items-center justify-center w-full sm:w-[145px] h-8 border border-transparent bg-[var(--color-btn-primary)] hover:bg-[var(--color-btn-primary-hover)] text-white rounded-md text-[13px] font-medium transition-colors shadow-sm box-border leading-none"
                 >
                     Create Application
@@ -349,6 +352,75 @@
     class="hidden fixed z-50 w-44 bg-surface-01 border border-border-subtle rounded-sm shadow-lg py-1 overflow-hidden"
 ></div>
 
+<!-- ── Creation Method Selection Modal ────────────────────────────────────── -->
+<div
+    id="creation-selection-modal"
+    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]"
+>
+    <div
+        class="w-full max-w-lg mx-4 bg-surface-01 border border-border-subtle rounded-card shadow-xl overflow-hidden"
+    >
+        <!-- Header -->
+        <div
+            class="flex items-center justify-between px-5 h-12 border-b border-border-subtle bg-surface-02"
+        >
+            <span class="text-[13px] font-semibold text-text-primary"
+                >Choose Creation Method</span
+            >
+            <button
+                onclick="closeCreationSelectionModal()"
+                class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-text-primary hover:bg-surface-hover transition-colors"
+            >
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Option 1: Wizard (feat/logo_issue style) -->
+            <button
+                onclick="goToWizard()"
+                class="group flex flex-col text-left p-5 border border-border-strong rounded-md bg-surface-01 hover:border-btn-primary hover:bg-surface-hover transition-all"
+            >
+                <div class="w-10 h-10 rounded-lg bg-btn-primary/10 text-btn-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <h3 class="text-[15px] font-bold text-text-primary mb-1">Guided Wizard</h3>
+                <p class="text-[12px] text-text-secondary leading-normal">
+                    Step-by-step setup process. Ideal for complex roles.
+                </p>
+            </button>
+
+            <!-- Option 2: Current Modal -->
+            <button
+                onclick="openQuickCreate()"
+                class="group flex flex-col text-left p-5 border border-border-strong rounded-md bg-surface-01 hover:border-btn-primary hover:bg-surface-hover transition-all"
+            >
+                <div class="w-10 h-10 rounded-lg bg-icon-secondary/10 text-icon-secondary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                </div>
+                <h3 class="text-[15px] font-bold text-text-primary mb-1">Quick Setup</h3>
+                <p class="text-[12px] text-text-secondary leading-normal">
+                    Create a role instantly using a single form.
+                </p>
+            </button>
+        </div>
+    </div>
+</div>
+
 <!-- ── Delete Confirmation Dialog ────────────────────────────────────────── -->
 <div
     id="delete-confirm-modal"
@@ -615,6 +687,26 @@
     // Seed one default row when page loads
     addPermissionRow("inventory", "read");
 
+    // ── Creation Selection Modal ──────────────────────────────────────────
+    function openCreationSelectionModal() {
+        document.getElementById("creation-selection-modal").classList.remove("hidden");
+        document.body.classList.add("overflow-hidden");
+    }
+
+    function closeCreationSelectionModal() {
+        document.getElementById("creation-selection-modal").classList.add("hidden");
+        document.body.classList.remove("overflow-hidden");
+    }
+
+    function goToWizard() {
+        window.location.href = "/roles/new";
+    }
+
+    function openQuickCreate() {
+        closeCreationSelectionModal();
+        openCreateModal();
+    }
+
     // ── Modal open / close ────────────────────────────────────────────────
     function openCreateModal() {
         document.getElementById("create-role-modal").classList.remove("hidden");
@@ -629,6 +721,43 @@
         document.getElementById("role-desc").value = "";
         document.getElementById("create-role-error").classList.add("hidden");
         addPermissionRow("inventory", "read");
+    }
+
+    function showActionBanner(message, ok = true) {
+        const container = document.getElementById("page-banner-container");
+        if (!container) return;
+
+        const bannerId = "action-banner-" + Date.now();
+        const bgColor = ok ? "bg-banner-bg" : "bg-red-500/10";
+        const borderColor = ok ? "border-banner-border" : "border-red-500/20";
+        const textColor = ok ? "text-banner-text" : "text-red-600";
+
+        container.innerHTML = `
+            <div id="${bannerId}"
+                class="relative flex flex-row items-center justify-between gap-4 px-4 py-2 ${bgColor} border ${borderColor} rounded-md sm:h-10 shrink-0 transition-all duration-300 scale-in"
+                role="alert"
+            >
+                <div class="flex-1 flex flex-row items-center justify-center sm:justify-start gap-2 min-w-0">
+                    <p class="text-xs sm:text-sm ${textColor} text-center sm:text-left font-medium leading-tight truncate">
+                        ${message}
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    onclick="document.getElementById('${bannerId}').remove()"
+                    class="shrink-0 flex items-center justify-center w-7 h-7 rounded-sm ${textColor} hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                </button>
+            </div>
+        `;
+
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            const el = document.getElementById(bannerId);
+            if (el) el.remove();
+        }, 5000);
     }
 
     // ── Toast ─────────────────────────────────────────────────────────────
@@ -677,6 +806,18 @@
             })
             .filter((p) => p.resource && p.access);
 
+        // Check for duplicates
+        const seen = new Set();
+        for (const p of permissions) {
+            const key = `${p.resource}:${p.access}`;
+            if (seen.has(key)) {
+                errEl.textContent = `Duplicate permission detected: "${p.resource}:${p.access}". Please remove redundant entries.`;
+                errEl.classList.remove("hidden");
+                return;
+            }
+            seen.add(key);
+        }
+
         btn.disabled = true;
         btn.textContent = "Creating…";
 
@@ -693,7 +834,7 @@
                 errEl.classList.remove("hidden");
             } else {
                 closeCreateModal();
-                showToast(`Role "${name}" created successfully.`);
+                showActionBanner(`Role "${name}" created successfully.`);
                 await loadRoles();
             }
         } catch {
@@ -987,7 +1128,7 @@
             const text = await res.text();
             console.log("[delete] Body:", text);
             if (res.ok) {
-                showToast(`Role "${_pendingDeleteRole}" deleted.`);
+                showActionBanner(`Role "${_pendingDeleteRole}" deleted successfully.`);
                 deleteOk = true;
             } else {
                 try {

@@ -1,8 +1,11 @@
 {% extends "layout.html" %} {% block title %}Users — KMS Dashboard{% endblock %}
 {% block content %}
-<div>
+<div class="max-w-[1200px] w-full mx-auto">
+    <!-- Action Banner Container -->
+    <div id="page-banner-container" class="mb-4 empty:hidden"></div>
+
     <!-- ── Header ── -->
-    <div class="flex flex-col gap-6 mb-8 max-w-[1200px] w-full mx-auto">
+    <div class="flex flex-col gap-6 mb-8 w-full">
         <div class="flex items-start justify-between">
             <div class="flex items-start gap-3">
                 <div class="text-icon-secondary mt-1">
@@ -295,6 +298,44 @@
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;");
+        }
+
+        function showActionBanner(message, ok = true) {
+            const container = document.getElementById("page-banner-container");
+            if (!container) return;
+
+            const bannerId = "action-banner-" + Date.now();
+            const bgColor = ok ? "bg-banner-bg" : "bg-red-500/10";
+            const borderColor = ok ? "border-banner-border" : "border-red-500/20";
+            const textColor = ok ? "text-banner-text" : "text-red-600";
+
+            container.innerHTML = `
+                <div id="${bannerId}"
+                    class="relative flex flex-row items-center justify-between gap-4 px-4 py-2 ${bgColor} border ${borderColor} rounded-md sm:h-10 shrink-0 transition-all duration-300 scale-in"
+                    role="alert"
+                >
+                    <div class="flex-1 flex flex-row items-center justify-center sm:justify-start gap-2 min-w-0">
+                        <p class="text-xs sm:text-sm ${textColor} text-center sm:text-left font-medium leading-tight truncate">
+                            ${message}
+                        </p>
+                    </div>
+
+                    <button
+                        type="button"
+                        onclick="document.getElementById('${bannerId}').remove()"
+                        class="shrink-0 flex items-center justify-center w-7 h-7 rounded-sm ${textColor} hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                    >
+                        <i data-lucide="x" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            `;
+            if (window.lucide) window.lucide.createIcons();
+
+            // Auto-remove after 5 seconds
+            setTimeout(() => {
+                const el = document.getElementById(bannerId);
+                if (el) el.remove();
+            }, 5000);
         }
 
         function showToast(msg, ok = true) {
@@ -647,17 +688,17 @@
                         user.is_active = false;
                         user.disabled_reason = reason || null;
                     }
-                    showToast(`${_pendingUserEmail} has been disabled.`);
+                    showActionBanner(`${_pendingUserEmail} has been disabled.`);
                     closeDisableModal();
                     renderList();
                     showUserDetail(_pendingUserId);
                 } else {
-                    showToast(data.error || "Failed to disable user.", false);
+                    showActionBanner(data.error || "Failed to disable user.", false);
                     btn.disabled = false;
                     btn.textContent = "Disable Account";
                 }
             } catch {
-                showToast("Network error. Please try again.", false);
+                showActionBanner("Network error. Please try again.", false);
                 btn.disabled = false;
                 btn.textContent = "Disable Account";
             }
@@ -677,14 +718,14 @@
                         user.is_active = true;
                         user.disabled_reason = null;
                     }
-                    showToast(`${email} has been re-enabled.`);
+                    showActionBanner(`${email} has been re-enabled.`);
                     renderList();
                     showUserDetail(userId);
                 } else {
-                    showToast(data.error || "Failed to enable user.", false);
+                    showActionBanner(data.error || "Failed to enable user.", false);
                 }
             } catch {
-                showToast("Network error. Please try again.", false);
+                showActionBanner("Network error. Please try again.", false);
             }
         }
 
