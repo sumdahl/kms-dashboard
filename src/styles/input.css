@@ -71,9 +71,17 @@
     --color-status-yellow: #f1c21b;
 
     /* ── Colors: Banner ─────────────────────────────────────────────────── */
-    --color-banner-bg: #dbeafe;
-    --color-banner-border: #bfdbfe;
-    --color-banner-text: #1e40af;
+    --color-banner-bg: #f0f7ff;
+    --color-banner-border: #c6e2ff;
+    --color-banner-text: #005bd1;
+
+    --color-banner-success-bg: #f0fdf4;
+    --color-banner-success-border: #bbf7d0;
+    --color-banner-success-text: #15803d;
+
+    --color-banner-danger-bg: #fff1f1;
+    --color-banner-danger-border: #ffd7d7;
+    --color-banner-danger-text: #161616;
 
     /* ── Colors: Badges ─────────────────────────────────────────────────── */
     --color-badge-bg: #e0e0e0;
@@ -145,9 +153,17 @@
         --color-icon-secondary: #c6c6c6;
         --color-icon-primary: #f4f4f4;
 
-        --color-banner-bg: #1e3a8a;
-        --color-banner-border: #1e40af;
-        --color-banner-text: #dbeafe;
+        --color-banner-bg: #002d9c20;
+        --color-banner-border: #005bd140;
+        --color-banner-text: #78a9ff;
+
+        --color-banner-success-bg: #052e1620;
+        --color-banner-success-border: #15803d40;
+        --color-banner-success-text: #4ade80;
+
+        --color-banner-danger-bg: #450a0a40;
+        --color-banner-danger-border: #991b1b60;
+        --color-banner-danger-text: #fca5a5;
 
         --color-badge-bg: #393939;
         --color-badge-text: #c6c6c6;

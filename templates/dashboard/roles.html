@@ -733,8 +733,7 @@
     }
 
     function openQuickCreate() {
-        closeCreationSelectionModal();
-        openCreateModal();
+        window.location.href = "/roles/quick";
     }
 
     // ── Modal open / close ────────────────────────────────────────────────
@@ -753,21 +752,45 @@
         addPermissionRow("inventory", "read");
     }
 
-    function showActionBanner(message, ok = true) {
+    function showActionBanner(message, type = "success") {
         const container = document.getElementById("page-banner-container");
         if (!container) return;
 
         const bannerId = "action-banner-" + Date.now();
-        const bgColor = ok ? "bg-banner-bg" : "bg-red-500/10";
-        const borderColor = ok ? "border-banner-border" : "border-red-500/20";
-        const textColor = ok ? "text-banner-text" : "text-red-600";
+        let bgColor, borderColor, textColor, icon;
+
+        if (type === "success") {
+            bgColor = "bg-[var(--color-banner-success-bg)]";
+            borderColor = "border-[var(--color-banner-success-border)]";
+            textColor = "text-[var(--color-banner-success-text)]";
+            icon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+        } else if (type === "danger") {
+            bgColor = "bg-[var(--color-banner-danger-bg)]";
+            borderColor = "border-[var(--color-banner-danger-border)]";
+            textColor = "text-[var(--color-banner-danger-text)]";
+            icon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>`;
+        } else if (type === "error") {
+            bgColor = "bg-red-500/10";
+            borderColor = "border-red-500/20";
+            textColor = "text-red-600";
+            icon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+        } else {
+            // info (blue)
+            bgColor = "bg-banner-bg";
+            borderColor = "border-banner-border";
+            textColor = "text-banner-text";
+            icon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`;
+        }
 
         container.innerHTML = `
             <div id="${bannerId}"
                 class="relative flex flex-row items-center justify-between gap-4 px-4 py-2 ${bgColor} border ${borderColor} rounded-md sm:h-10 shrink-0 transition-all duration-300 scale-in"
                 role="alert"
             >
-                <div class="flex-1 flex flex-row items-center justify-center sm:justify-start gap-2 min-w-0">
+                <div class="flex-1 flex flex-row items-center justify-center sm:justify-start gap-2.5 min-w-0">
+                    <span class="${textColor} hidden sm:flex items-center">
+                        ${icon}
+                    </span>
                     <p class="text-xs sm:text-sm ${textColor} text-center sm:text-left font-medium leading-tight truncate">
                         ${message}
                     </p>
@@ -844,7 +867,7 @@
                 errEl.classList.remove("hidden");
             } else {
                 closeCreateModal();
-                notify(`Role "${name}" created successfully.`);
+                showActionBanner(`Role "${name}" created successfully.`, "success");
                 await loadRoles();
             }
         } catch {
@@ -1086,7 +1109,7 @@
             const menu = document.getElementById("role-action-menu");
             menu.classList.add("hidden");
             menu._activeRole = null;
-            notify(`Copied "${name}" to clipboard.`);
+            showActionBanner(`Copied "${name}" to clipboard.`, "info");
         });
     }
 
@@ -1155,11 +1178,11 @@
         closeDeleteConfirm();
 
         if (deleteOk) {
-            notify(`Role "${roleName}" deleted.`, "error");
+            showActionBanner(`Role "${roleName}" deleted successfully.`, "danger");
             _page = 1;
             await loadRoles();
         } else if (errMsg) {
-            notify(errMsg, "error");
+            showActionBanner(errMsg, "error");
         }
     }
 

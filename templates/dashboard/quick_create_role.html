@@ -1,0 +1,300 @@
+{% extends "layout.html" %} {% block title %}Quick Create Role — KMS Dashboard{% endblock %}
+{% block content %}
+
+<div class="max-w-2xl mx-auto py-8">
+    <!-- Action Banner Container -->
+    <div id="page-banner-container" class="mb-6 empty:hidden"></div>
+
+    <!-- Header -->
+    <div class="mb-8 flex flex-col gap-2">
+        <div class="flex items-center gap-2 text-[13px] text-text-secondary mb-2">
+            <a href="/roles" class="hover:text-text-primary transition-colors">Roles</a>
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            <span class="text-text-primary font-medium">Quick Setup</span>
+        </div>
+        <h1 class="text-2xl font-bold text-text-primary">Quick Create Role</h1>
+        <p class="text-[14px] text-text-secondary">
+            Configure and establish a new system role instantly using this simplified form.
+        </p>
+    </div>
+
+    <!-- Main Card -->
+    <div class="bg-surface-01 border border-border-strong rounded-card shadow-sm overflow-hidden">
+        <!-- Body -->
+        <div class="p-6 space-y-6">
+            <p
+                id="create-role-error"
+                class="hidden text-[12px] text-red-500 bg-red-500/5 border border-red-500/20 rounded-md px-4 py-3 font-medium"
+            ></p>
+
+            <div>
+                <label
+                    class="block text-[15px] font-bold text-text-secondary uppercase tracking-widest mb-1"
+                >
+                    Role Name
+                </label>
+                <p class="text-[11px] text-text-helper mb-2">Each role must have a unique, descriptive name.</p>
+                <input
+                    id="role-name"
+                    type="text"
+                    placeholder="e.g. Inventory Manager"
+                    class="w-full px-4 py-2.5 h-10 border border-border-subtle rounded-md bg-surface-02 text-[14px] text-text-primary placeholder:text-text-placeholder focus:border-btn-primary focus:bg-surface-01 focus:outline-none transition-all shadow-sm"
+                />
+            </div>
+
+            <div>
+                <label
+                    class="block text-[15px] font-bold text-text-secondary uppercase tracking-widest mb-1"
+                >
+                    Description
+                </label>
+                <p class="text-[11px] text-text-helper mb-2">Provide a brief overview of what this role's responsibilities include.</p>
+                <textarea
+                    id="role-desc"
+                    rows="3"
+                    placeholder="Short description of this role's purpose"
+                    class="w-full px-4 py-2.5 border border-border-subtle rounded-md bg-surface-02 text-[14px] text-text-primary placeholder:text-text-placeholder focus:border-btn-primary focus:bg-surface-01 focus:outline-none transition-all shadow-sm resize-none"
+                ></textarea>
+            </div>
+
+            <div>
+                <div class="flex items-center justify-between mb-1">
+                    <label
+                        class="text-[15px] font-bold text-text-secondary uppercase tracking-widest"
+                    >
+                        Permissions
+                    </label>
+                    <button
+                        type="button"
+                        onclick="addPermissionRow()"
+                        class="inline-flex items-center gap-1.5 text-[11px] font-bold text-btn-primary hover:underline transition-colors"
+                    >
+                        <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+                        Add permission
+                    </button>
+                </div>
+                <p class="text-[11px] text-text-helper mb-3">Define the specific resources and access levels granted to this role.</p>
+                <div
+                    id="permissions-list"
+                    class="flex flex-col gap-2.5"
+                ></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div
+            class="flex items-center justify-end gap-3 px-6 py-4 bg-surface-02 border-t border-border-subtle"
+        >
+            <a
+                href="/roles"
+                class="px-5 h-9 inline-flex items-center justify-center border border-border-subtle rounded-md text-[13px] font-medium text-text-secondary bg-surface-01 hover:bg-surface-hover transition-colors shadow-sm"
+            >
+                Cancel
+            </a>
+            <button
+                id="create-role-btn"
+                onclick="submitCreateRole()"
+                class="px-8 h-9 bg-btn-primary text-white rounded-md text-[13px] font-bold hover:bg-btn-primary-hover transition-all shadow-md active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+                Create Role Now
+            </button>
+        </div>
+    </div>
+
+    <!-- Success Feedback (Hidden by default) -->
+    <div id="success-state" class="hidden flex flex-col items-center justify-center py-12 text-center scale-in">
+        <div class="w-16 h-16 rounded-full bg-status-green/10 text-status-green flex items-center justify-center mb-6 border border-status-green/20">
+            <i data-lucide="party-popper" class="w-8 h-8"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-text-primary">Role Created!</h2>
+        <p class="text-text-secondary mt-2 max-w-sm mx-auto">
+            The new role has been established and is ready for assignment.
+        </p>
+        <div class="mt-8 flex flex-col gap-3 w-full max-w-xs">
+            <a href="/roles" class="w-full h-10 inline-flex items-center justify-center bg-btn-primary text-white rounded-md font-bold shadow-sm hover:bg-btn-primary-hover transition-all active:scale-95">
+                Go to Roles List
+            </a>
+            <button onclick="window.location.reload()" class="text-xs text-text-helper hover:text-text-primary font-medium underline-offset-4 hover:underline">
+                Create Another Role
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .scale-in { animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+    @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+</style>
+
+{% endblock %} {% block body_scripts %}
+<script>
+    const RESOURCES = ["orders", "customers", "reports", "inventory", "admin_panel"];
+    const ACCESS_LEVELS = ["read", "write", "admin"];
+
+    function makeSelectHTML(id) {
+        const arrow = "url('data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'12\\' height=\\'12\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'%238d8d8d\\' stroke-width=\\'2\\'><path d=\\'m6 9 6 6 6-6\\'/></svg>')";
+        return `<div class="flex-1">
+            <select id="${id}"
+                class="w-full px-3 h-9 border border-border-subtle rounded-md bg-surface-02 text-[13px] text-text-primary focus:border-btn-primary focus:outline-none transition-all appearance-none cursor-pointer shadow-sm"
+                style="background-image:${arrow};background-repeat:no-repeat;background-position:right 10px center;background-size:12px">
+            </select>
+        </div>`;
+    }
+
+    function addPermissionRow(resource = "inventory", access = "read") {
+        const list = document.getElementById("permissions-list");
+        const row = document.createElement("div");
+        row.className = "flex items-center gap-2 group animate-in slide-in-from-top-1 duration-200";
+        const rid = "ps-res-" + Date.now();
+        const aid = "ps-acc-" + (Date.now() + 1);
+        row.innerHTML =
+            makeSelectHTML(rid) +
+            makeSelectHTML(aid) +
+            `
+            <button type="button" onclick="this.parentElement.remove()"
+                class="flex items-center justify-center w-8 h-8 rounded-md text-icon-muted hover:text-red-500 hover:bg-red-500/10 transition-all shrink-0">
+                <i data-lucide="x" class="w-4 h-4"></i>
+            </button>`;
+        list.appendChild(row);
+        
+        const resSelect = row.querySelector(`#${rid}`);
+        const accSelect = row.querySelector(`#${aid}`);
+        
+        resSelect.innerHTML = RESOURCES.map(r => `<option value="${r}" ${r === resource ? "selected" : ""}>${r}</option>`).join("");
+        accSelect.innerHTML = ACCESS_LEVELS.map(a => `<option value="${a}" ${a === access ? "selected" : ""}>${a}</option>`).join("");
+        
+        if (window.lucide) window.lucide.createIcons();
+    }
+
+    // Seed one row
+    addPermissionRow("inventory", "read");
+
+    function showActionBanner(message, type = "success") {
+        const container = document.getElementById("page-banner-container");
+        if (!container) return;
+
+        const bannerId = "action-banner-" + Date.now();
+        let bgColor, borderColor, textColor, icon;
+
+        if (type === "success") {
+            bgColor = "bg-[var(--color-banner-success-bg)]";
+            borderColor = "border-[var(--color-banner-success-border)]";
+            textColor = "text-[var(--color-banner-success-text)]";
+            icon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`;
+        } else if (type === "danger") {
+            bgColor = "bg-[var(--color-banner-danger-bg)]";
+            borderColor = "border-[var(--color-banner-danger-border)]";
+            textColor = "text-[var(--color-banner-danger-text)]";
+            icon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>`;
+        } else if (type === "error") {
+            bgColor = "bg-red-500/10";
+            borderColor = "border-red-500/20";
+            textColor = "text-red-600";
+            icon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+        } else {
+            bgColor = "bg-banner-bg";
+            borderColor = "border-banner-border";
+            textColor = "text-banner-text";
+            icon = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="shrink-0"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>`;
+        }
+
+        container.innerHTML = `
+            <div id="${bannerId}"
+                class="relative flex flex-row items-center justify-between gap-4 px-4 py-2 ${bgColor} border ${borderColor} rounded-md sm:h-10 shrink-0 transition-all duration-300 scale-in"
+                role="alert"
+            >
+                <div class="flex-1 flex flex-row items-center justify-center sm:justify-start gap-2.5 min-w-0">
+                    <span class="${textColor} hidden sm:flex items-center">
+                        ${icon}
+                    </span>
+                    <p class="text-xs sm:text-sm ${textColor} text-center sm:text-left font-medium leading-tight truncate">
+                        ${message}
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    onclick="document.getElementById('${bannerId}').remove()"
+                    class="shrink-0 flex items-center justify-center w-7 h-7 rounded-sm ${textColor} hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></svg>
+                </button>
+            </div>
+        `;
+
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            const el = document.getElementById(bannerId);
+            if (el) el.remove();
+        }, 5000);
+    }
+
+    async function submitCreateRole() {
+        const name = document.getElementById("role-name").value.trim();
+        const desc = document.getElementById("role-desc").value.trim();
+        const errEl = document.getElementById("create-role-error");
+        const btn = document.getElementById("create-role-btn");
+        const card = document.querySelector(".bg-surface-01");
+
+        errEl.classList.add("hidden");
+        if (!name) {
+            errEl.innerHTML = `<i data-lucide="alert-circle" class="w-3.5 h-3.5 inline mr-1"></i> Role name is required.`;
+            errEl.classList.remove("hidden");
+            if (window.lucide) window.lucide.createIcons();
+            return;
+        }
+
+        const permissions = [...document.querySelectorAll("#permissions-list > div")].map(row => {
+            const s = row.querySelectorAll("select");
+            return { resource: s[0]?.value || "", access: s[1]?.value || "" };
+        }).filter(p => p.resource && p.access);
+
+        if (permissions.length === 0) {
+            errEl.innerHTML = `<i data-lucide="alert-circle" class="w-3.5 h-3.5 inline mr-1"></i> At least one permission is required.`;
+            errEl.classList.remove("hidden");
+            if (window.lucide) window.lucide.createIcons();
+            return;
+        }
+
+        // Duplicates check
+        const seen = new Set();
+        for (const p of permissions) {
+            const key = `${p.resource}:${p.access}`;
+            if (seen.has(key)) {
+                errEl.innerHTML = `<i data-lucide="alert-circle" class="w-3.5 h-3.5 inline mr-1"></i> Duplicate permission: "${p.resource}:${p.access}".`;
+                errEl.classList.remove("hidden");
+                if (window.lucide) window.lucide.createIcons();
+                return;
+            }
+            seen.add(key);
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Establishing Role...";
+
+        try {
+            const res = await fetch("/admin/roles", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name, description: desc, permissions }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                errEl.textContent = data.error || data.message || "Failed to create role.";
+                errEl.classList.remove("hidden");
+            } else {
+                showActionBanner(`Role "${name}" created successfully.`, "success");
+                card.classList.add("hidden");
+                document.getElementById("success-state").classList.remove("hidden");
+                if (window.lucide) window.lucide.createIcons();
+            }
+        } catch {
+            errEl.textContent = "Network error. Please try again.";
+            errEl.classList.remove("hidden");
+        } finally {
+            btn.disabled = false;
+            btn.textContent = "Create Role Now";
+        }
+    }
+</script>
+{% endblock %}

@@ -29,6 +29,7 @@ pub fn create_router(state: AppState) -> Router {
         .route("/roles", get(roles_page))
         .route("/users", get(users_page))
         .route("/roles/new", get(create_role_wizard_page))
+        .route("/roles/quick", get(quick_create_role_page))
         .route("/roles/:name", get(role_detail_page))
         .route("/assign", get(assign_page))
         .route("/ui/sidebar/pin", post(sidebar_pin))
@@ -133,6 +134,30 @@ async fn create_role_wizard_page(claims: Option<Claims>) -> Response {
     match claims {
         None => Redirect::to("/login").into_response(),
         Some(c) => CreateRoleWizardTemplate {
+            sidebar_pinned: true,
+            user_email: c.email,
+            show_banner: false,
+            css_version: env!("CSS_VERSION"),
+            is_admin: c.is_admin,
+        }
+        .into_response(),
+    }
+}
+
+#[derive(askama::Template)]
+#[template(path = "dashboard/quick_create_role.html")]
+struct QuickCreateRoleTemplate {
+    sidebar_pinned: bool,
+    user_email: String,
+    show_banner: bool,
+    css_version: &'static str,
+    is_admin: bool,
+}
+
+async fn quick_create_role_page(claims: Option<Claims>) -> Response {
+    match claims {
+        None => Redirect::to("/login").into_response(),
+        Some(c) => QuickCreateRoleTemplate {
             sidebar_pinned: true,
             user_email: c.email,
             show_banner: false,
