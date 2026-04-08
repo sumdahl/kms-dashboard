@@ -1,24 +1,27 @@
 <div
     id="announcement-banner"
-    class="flex items-center gap-3 px-8 h-10 min-h-10 bg-banner-bg border-b border-banner-border relative"
+    class="relative flex flex-row items-center justify-between gap-4 px-4 py-2 bg-banner-bg border-b border-banner-border sm:px-12 sm:py-0 sm:h-10 shrink-0"
     role="alert"
 >
-    <p class="text-sm text-banner-text">
-        Dynamically optimize, clip, and resize video from any origin with Media
-        Transformations.
-    </p>
+    <!-- Content Area: Wraps on small screens, stays row on larger -->
+    <div class="flex-1 flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-2 sm:gap-6 min-w-0">
+        <p class="text-xs sm:text-sm text-banner-text text-center sm:text-left font-medium leading-tight">
+            Dynamically optimize, clip, and resize video from any origin with Media Transformations.
+        </p>
+        
+        <a
+            href="#"
+            class="shrink-0 inline-flex items-center justify-center px-3 py-1 text-2xs sm:text-xs font-semibold border border-banner-text rounded-sm text-banner-text bg-transparent hover:bg-banner-text hover:text-white dark:hover:text-banner-bg transition-colors whitespace-nowrap"
+        >
+            Enable Now
+        </a>
+    </div>
 
-    <a
-        href="#"
-        class="inline-flex items-center px-3 py-1 border border-banner-text rounded-sm text-xs font-medium text-banner-text bg-transparent hover:bg-banner-text hover:text-white dark:hover:text-banner-bg transition-colors whitespace-nowrap"
-    >
-        Enable Now
-    </a>
-
+    <!-- Dismiss Button: Always accessible and part of the flow -->
     <button
-        class="absolute right-4 flex items-center justify-center w-7 h-7 rounded-sm text-banner-text hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
         type="button"
         aria-label="Dismiss"
+        class="shrink-0 flex items-center justify-center w-8 h-8 rounded-sm text-banner-text hover:bg-black/10 dark:hover:bg-white/10 transition-colors"
         hx-delete="/ui/banner"
         hx-target="#announcement-banner"
         hx-swap="outerHTML"
