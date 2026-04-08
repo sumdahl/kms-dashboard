@@ -395,10 +395,28 @@
                 onclick="goToWizard()"
                 class="group flex flex-col text-left p-5 border border-border-strong rounded-md bg-surface-01 hover:border-btn-primary hover:bg-surface-hover transition-all"
             >
-                <div class="w-10 h-10 rounded-lg bg-btn-primary/10 text-btn-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                <div
+                    class="w-10 h-10 rounded-lg bg-btn-primary/10 text-btn-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path
+                            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
+                        />
+                    </svg>
                 </div>
-                <h3 class="text-[15px] font-bold text-text-primary mb-1">Professional Way</h3>
+                <h3 class="text-[15px] font-bold text-text-primary mb-1">
+                    Professional Way
+                </h3>
                 <p class="text-[12px] text-text-secondary leading-normal">
                     Step-by-step setup process. Ideal for complex roles.
                 </p>
@@ -409,10 +427,27 @@
                 onclick="openQuickCreate()"
                 class="group flex flex-col text-left p-5 border border-border-strong rounded-md bg-surface-01 hover:border-btn-primary hover:bg-surface-hover transition-all"
             >
-                <div class="w-10 h-10 rounded-lg bg-icon-secondary/10 text-icon-secondary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M5 12h14"/></svg>
+                <div
+                    class="w-10 h-10 rounded-lg bg-icon-secondary/10 text-icon-secondary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M12 5v14" />
+                        <path d="M5 12h14" />
+                    </svg>
                 </div>
-                <h3 class="text-[15px] font-bold text-text-primary mb-1">Quick Setup</h3>
+                <h3 class="text-[15px] font-bold text-text-primary mb-1">
+                    Quick Setup
+                </h3>
                 <p class="text-[12px] text-text-secondary leading-normal">
                     Create a role instantly using a single form.
                 </p>
@@ -680,12 +715,16 @@
 
     // ── Creation Selection Modal ──────────────────────────────────────────
     function openCreationSelectionModal() {
-        document.getElementById("creation-selection-modal").classList.remove("hidden");
+        document
+            .getElementById("creation-selection-modal")
+            .classList.remove("hidden");
         document.body.classList.add("overflow-hidden");
     }
 
     function closeCreationSelectionModal() {
-        document.getElementById("creation-selection-modal").classList.add("hidden");
+        document
+            .getElementById("creation-selection-modal")
+            .classList.add("hidden");
         document.body.classList.remove("overflow-hidden");
     }
 
@@ -805,7 +844,7 @@
                 errEl.classList.remove("hidden");
             } else {
                 closeCreateModal();
-                showActionBanner(`Role "${name}" created successfully.`);
+                notify(`Role "${name}" created successfully.`);
                 await loadRoles();
             }
         } catch {
@@ -1086,20 +1125,21 @@
         btn.disabled = true;
         btn.textContent = "Deleting…";
 
+        const roleName = _pendingDeleteRole;
+        const roleId = _pendingDeleteRoleId;
+
         let deleteOk = false;
         let errMsg = "";
         try {
-            const url = `/admin/roles/${encodeURIComponent(_pendingDeleteRoleId)}`;
-            console.log("[delete] URL:", url, "Role ID:", _pendingDeleteRoleId);
-            const res = await fetch(url, {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json" },
-            });
-            console.log("[delete] Status:", res.status);
+            const res = await fetch(
+                `/admin/roles/${encodeURIComponent(roleId)}`,
+                {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                },
+            );
             const text = await res.text();
-            console.log("[delete] Body:", text);
             if (res.ok) {
-                showToast(`Role "${_pendingDeleteRole}" deleted.`);
                 deleteOk = true;
             } else {
                 try {
@@ -1112,11 +1152,14 @@
             console.error("[delete] Fetch failed:", err);
         }
 
-        if (errMsg) notify(errMsg, "error");
         closeDeleteConfirm();
+
         if (deleteOk) {
+            notify(`Role "${roleName}" deleted.`, "error");
             _page = 1;
             await loadRoles();
+        } else if (errMsg) {
+            notify(errMsg, "error");
         }
     }
 
