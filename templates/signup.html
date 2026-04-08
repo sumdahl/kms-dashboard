@@ -1,702 +1,445 @@
-{% extends "auth_layout.html" %} {% block title %}Sign up - KMS Dashboard{%
-endblock %} {% block head_scripts %}
-<script src="https://unpkg.com/htmx.org/dist/ext/json-enc.js" defer></script>
-{% endblock %} {% block content %}
-<div class="w-full max-w-md">
-    <!-- Brand -->
-    <div class="flex items-center justify-center gap-2 mb-6" aria-hidden="true">
-        <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
-        <span
-            class="text-[11px] text-text-helper tracking-widest uppercase font-medium"
-            >KMS Dashboard</span
-        >
-    </div>
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Sign up - KMS Dashboard</title>
+        <link rel="stylesheet" href="/static/css/output.css" />
+        <script src="/static/js/htmx.min.js" defer></script>
+        <script src="/static/js/json-enc.js" defer></script>
+    </head>
+    <body class="bg-bg-page flex items-center justify-center min-h-screen px-4">
+        <div class="w-full max-w-md">
+            <div class="flex items-center justify-center gap-2 mb-6">
+                <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                <span
+                    class="text-[11px] text-text-helper tracking-widest uppercase font-medium"
+                    >KMS Dashboard</span
+                >
+            </div>
 
-    <div
-        class="bg-surface-01 border border-border-subtle rounded-card shadow-sm overflow-hidden"
-    >
-        <div
-            class="h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent"
-        ></div>
-
-        <div class="p-8">
-            <!-- Header -->
-            <div class="flex flex-col items-center mb-6">
+            <div
+                class="bg-surface-01 border border-border-subtle rounded-card shadow-sm overflow-hidden"
+            >
                 <div
-                    class="w-11 h-11 bg-surface-02 border border-border-subtle rounded-md flex items-center justify-center mb-5"
-                    aria-hidden="true"
-                >
-                    <i
-                        data-lucide="shield"
-                        class="w-5 h-5 text-icon-secondary shrink-0"
-                    ></i>
-                </div>
-                <h1
-                    class="text-xl font-semibold text-text-primary tracking-tight"
-                >
-                    Create an account
-                </h1>
-                <p class="text-[13px] text-text-helper mt-1.5">
-                    Join KMS to manage your keys securely
-                </p>
-            </div>
+                    class="h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent"
+                ></div>
 
-            <!-- Global error -->
-            <div
-                id="signup-error"
-                role="alert"
-                aria-live="assertive"
-                aria-atomic="true"
-                class="hidden mb-4"
-            >
-                <p
-                    class="text-[11px] text-red-500 text-center bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2"
-                ></p>
-            </div>
-
-            <!-- Global success -->
-            <div
-                id="signup-success"
-                role="status"
-                aria-live="polite"
-                aria-atomic="true"
-                class="hidden mb-4"
-            >
-                <p
-                    class="text-[11px] text-green-500 text-center bg-green-500/5 border border-green-500/20 rounded-sm px-3 py-2 flex items-center justify-center gap-1.5"
-                >
-                    <i data-lucide="circle-check" class="w-3 h-3 shrink-0"></i>
-                    <span></span>
-                </p>
-            </div>
-
-            <form
-                id="signup-form"
-                hx-post="/auth/signup"
-                hx-ext="json-enc"
-                hx-swap="none"
-                novalidate
-                aria-label="Create account form"
-                class="space-y-4"
-            >
-                <!-- Full Name -->
-                <div class="space-y-1.5">
-                    <label
-                        for="full_name"
-                        class="block text-[11px] font-medium text-text-secondary tracking-wider uppercase"
-                    >
-                        Full Name
-                        <span class="text-red-500 ml-0.5" aria-hidden="true"
-                            >*</span
-                        >
-                    </label>
-                    <div class="relative">
-                        <input
-                            type="text"
-                            name="full_name"
-                            id="full_name"
-                            autocomplete="name"
-                            placeholder="John Doe"
-                            aria-required="true"
-                            aria-describedby="name-error"
-                            aria-invalid="false"
-                            class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors duration-150"
-                        />
-                        <span
-                            id="name-status-icon"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 hidden"
-                            aria-hidden="true"
-                        ></span>
-                    </div>
-                    <p
-                        id="name-error"
-                        role="alert"
-                        aria-live="polite"
-                        class="hidden text-[11px] text-red-500 flex items-center gap-1"
-                    >
-                        <i
-                            data-lucide="circle-alert"
-                            class="w-[11px] h-[11px] shrink-0"
-                        ></i>
-                        <span id="name-error-text"></span>
-                    </p>
-                </div>
-
-                <!-- Email -->
-                <div class="space-y-1.5">
-                    <label
-                        for="email"
-                        class="block text-[11px] font-medium text-text-secondary tracking-wider uppercase"
-                    >
-                        Email address
-                        <span class="text-red-500 ml-0.5" aria-hidden="true"
-                            >*</span
-                        >
-                    </label>
-                    <div class="relative">
-                        <input
-                            type="email"
-                            name="email"
-                            id="email"
-                            autocomplete="email"
-                            placeholder="you@example.com"
-                            aria-required="true"
-                            aria-describedby="email-error"
-                            aria-invalid="false"
-                            class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors duration-150"
-                        />
-                        <span
-                            id="email-status-icon"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 hidden"
-                            aria-hidden="true"
-                        ></span>
-                    </div>
-                    <p
-                        id="email-error"
-                        role="alert"
-                        aria-live="polite"
-                        class="hidden text-[11px] text-red-500 flex items-center gap-1"
-                    >
-                        <i
-                            data-lucide="circle-alert"
-                            class="w-[11px] h-[11px] shrink-0"
-                        ></i>
-                        <span id="email-error-text"></span>
-                    </p>
-                </div>
-
-                <!-- Password -->
-                <div class="space-y-1.5">
-                    <label
-                        for="password"
-                        class="block text-[11px] font-medium text-text-secondary tracking-wider uppercase"
-                    >
-                        Password
-                        <span class="text-red-500 ml-0.5" aria-hidden="true"
-                            >*</span
-                        >
-                    </label>
-                    <div class="relative">
-                        <input
-                            type="password"
-                            name="password"
-                            id="password"
-                            autocomplete="new-password"
-                            placeholder="••••••••"
-                            aria-required="true"
-                            aria-describedby="password-error password-strength-label"
-                            aria-invalid="false"
-                            class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors duration-150 pr-10"
-                        />
-                        <button
-                            type="button"
-                            id="toggle-password"
-                            aria-label="Show password"
-                            aria-pressed="false"
-                            class="absolute right-3 top-1/2 -translate-y-1/2 text-icon-secondary hover:text-text-primary transition-colors focus:outline-none focus:text-text-primary"
-                        >
-                            <i
-                                id="eye-icon"
-                                data-lucide="eye"
-                                class="w-4 h-4 shrink-0"
-                            ></i>
-                        </button>
-                    </div>
-
-                    <!-- Password strength meter -->
-                    <div
-                        id="strength-meter"
-                        class="hidden space-y-1"
-                        aria-live="polite"
-                    >
+                <div class="p-8">
+                    <div class="flex flex-col items-center mb-6">
                         <div
-                            class="flex gap-1"
-                            role="progressbar"
-                            aria-valuemin="0"
-                            aria-valuemax="4"
-                            aria-valuenow="0"
-                            aria-label="Password strength"
+                            class="w-11 h-11 bg-surface-02 border border-border-subtle rounded-md flex items-center justify-center mb-5"
                         >
-                            <div
-                                id="bar-1"
-                                class="h-1 flex-1 rounded-full bg-surface-02 transition-all duration-300"
-                            ></div>
-                            <div
-                                id="bar-2"
-                                class="h-1 flex-1 rounded-full bg-surface-02 transition-all duration-300"
-                            ></div>
-                            <div
-                                id="bar-3"
-                                class="h-1 flex-1 rounded-full bg-surface-02 transition-all duration-300"
-                            ></div>
-                            <div
-                                id="bar-4"
-                                class="h-1 flex-1 rounded-full bg-surface-02 transition-all duration-300"
-                            ></div>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="text-icon-secondary"
+                            >
+                                <path
+                                    d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                                />
+                            </svg>
                         </div>
-                        <p
-                            id="password-strength-label"
-                            class="text-[11px] text-text-helper"
-                        ></p>
+                        <h1
+                            class="text-xl font-semibold text-text-primary tracking-tight"
+                        >
+                            Create an account
+                        </h1>
+                        <p class="text-[13px] text-text-helper mt-1.5">
+                            Join KMS to manage your keys securely
+                        </p>
                     </div>
 
+                    <!-- Global error / success — sits between header and form -->
                     <p
-                        id="password-error"
-                        role="alert"
-                        aria-live="polite"
-                        class="hidden text-[11px] text-red-500 flex items-center gap-1"
+                        id="signup-error"
+                        class="hidden text-[11px] text-red-500 text-center bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2 mb-4"
+                    ></p>
+                    <p
+                        id="signup-success"
+                        class="hidden text-[11px] text-green-500 text-center bg-green-500/5 border border-green-500/20 rounded-sm px-3 py-2 mb-4"
+                    ></p>
+
+                    <form
+                        id="signup-form"
+                        hx-post="/auth/signup"
+                        hx-ext="json-enc"
+                        hx-swap="none"
+                        class="space-y-4"
                     >
-                        <i
-                            data-lucide="circle-alert"
-                            class="w-[11px] h-[11px] shrink-0"
-                        ></i>
-                        <span id="password-error-text"></span>
-                    </p>
+                        <!-- Full Name -->
+                        <div>
+                            <label
+                                for="full_name"
+                                class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase"
+                                >Full Name</label
+                            >
+                            <input
+                                type="text"
+                                name="full_name"
+                                id="full_name"
+                                autocomplete="name"
+                                placeholder="John Doe"
+                                class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors"
+                            />
+                            <p
+                                id="name-error"
+                                class="hidden mt-1.5 text-[11px] text-red-500 flex items-center gap-1"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="11"
+                                    height="11"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="12" y1="8" x2="12" y2="12" />
+                                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                                </svg>
+                                <span id="name-error-text"></span>
+                            </p>
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label
+                                for="email"
+                                class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase"
+                                >Email address</label
+                            >
+                            <input
+                                type="email"
+                                name="email"
+                                id="email"
+                                autocomplete="email"
+                                placeholder="you@example.com"
+                                class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors"
+                            />
+                            <p
+                                id="email-error"
+                                class="hidden mt-1.5 text-[11px] text-red-500 flex items-center gap-1"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="11"
+                                    height="11"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="12" y1="8" x2="12" y2="12" />
+                                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                                </svg>
+                                <span id="email-error-text"></span>
+                            </p>
+                        </div>
+
+                        <!-- Password -->
+                        <div>
+                            <label
+                                for="password"
+                                class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase"
+                                >Password</label
+                            >
+                            <div class="relative">
+                                <input
+                                    type="password"
+                                    name="password"
+                                    id="password"
+                                    autocomplete="new-password"
+                                    placeholder="••••••••"
+                                    class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors pr-10"
+                                />
+                                <button
+                                    type="button"
+                                    id="toggle-password"
+                                    class="absolute right-3 top-1/2 -translate-y-1/2 text-icon-secondary hover:text-text-primary transition-colors focus:outline-none"
+                                >
+                                    <svg
+                                        id="eye-icon"
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        width="16"
+                                        height="16"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="2"
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                    >
+                                        <path
+                                            d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"
+                                        ></path>
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                    </svg>
+                                </button>
+                            </div>
+                            <p
+                                id="password-error"
+                                class="hidden mt-1.5 text-[11px] text-red-500 flex items-center gap-1"
+                            >
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    width="11"
+                                    height="11"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="2"
+                                >
+                                    <circle cx="12" cy="12" r="10" />
+                                    <line x1="12" y1="8" x2="12" y2="12" />
+                                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                                </svg>
+                                <span id="password-error-text"></span>
+                            </p>
+                        </div>
+
+                        <button
+                            type="submit"
+                            id="submit-btn"
+                            class="w-full h-9 bg-btn-primary text-white text-[13px] font-medium rounded-sm hover:bg-btn-primary-hover transition-colors mt-1"
+                        >
+                            Create account
+                        </button>
+                    </form>
+
+                    <div class="mt-6 text-center">
+                        <p class="text-[13px] text-text-helper">
+                            Already have an account?
+                            <a
+                                href="/login"
+                                class="text-link-primary hover:underline font-medium"
+                                >Log in</a
+                            >
+                        </p>
+                    </div>
                 </div>
 
-                <!-- Submit -->
-                <button
-                    type="submit"
-                    id="submit-btn"
-                    disabled
-                    aria-disabled="true"
-                    class="w-full h-9 bg-btn-primary text-white text-[13px] font-medium rounded-sm transition-all duration-150 mt-1 opacity-40 cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-btn-primary"
+                <div
+                    class="px-8 py-4 bg-surface-02 border-t border-border-subtle flex items-center justify-center gap-1.5"
                 >
-                    Create account
-                </button>
-            </form>
-
-            <div class="mt-6 text-center">
-                <p class="text-[13px] text-text-helper">
-                    Already have an account?
-
-                    <a
-                        href="/login"
-                        class="text-link-primary hover:underline font-medium focus:outline-none focus:underline"
-                        >Log in</a
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="11"
+                        height="11"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-text-helper"
                     >
-                </p>
+                        <rect
+                            x="3"
+                            y="11"
+                            width="18"
+                            height="11"
+                            rx="2"
+                            ry="2"
+                        ></rect>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    <span class="text-[11px] text-text-helper tracking-wide"
+                        >End-to-end encrypted</span
+                    >
+                </div>
             </div>
         </div>
 
-        <!-- Footer -->
-        <div
-            class="px-8 py-4 bg-surface-02 border-t border-border-subtle flex items-center justify-center gap-1.5"
-        >
-            <i
-                data-lucide="lock"
-                class="w-[11px] h-[11px] text-text-helper shrink-0"
-            ></i>
-            <span class="text-[11px] text-text-helper tracking-wide"
-                >End-to-end encrypted</span
-            >
-        </div>
-    </div>
-</div>
-{% endblock %} {% block body_scripts %}
-<script>
-    (function () {
-        const form = document.getElementById("signup-form");
-        const nameInput = document.getElementById("full_name");
-        const emailInput = document.getElementById("email");
-        const pwInput = document.getElementById("password");
-        const nameErr = document.getElementById("name-error");
-        const nameErrTxt = document.getElementById("name-error-text");
-        const emailErr = document.getElementById("email-error");
-        const emailErrTxt = document.getElementById("email-error-text");
-        const pwErr = document.getElementById("password-error");
-        const pwErrTxt = document.getElementById("password-error-text");
-        const globalErrEl = document.getElementById("signup-error");
-        const globalErrP = globalErrEl.querySelector("p");
-        const globalSuccEl = document.getElementById("signup-success");
-        const globalSuccTxt = globalSuccEl.querySelector("span");
-        const submitBtn = document.getElementById("submit-btn");
-        const eyeIcon = document.getElementById("eye-icon");
-        const toggleBtn = document.getElementById("toggle-password");
-        const nameIcon = document.getElementById("name-status-icon");
-        const emailIcon = document.getElementById("email-status-icon");
-        const strengthMeter = document.getElementById("strength-meter");
-        const strengthLabel = document.getElementById(
-            "password-strength-label",
-        );
-        const strengthBar = strengthMeter.querySelector("[role='progressbar']");
-        const bars = [1, 2, 3, 4].map((i) =>
-            document.getElementById(`bar-${i}`),
-        );
+        <script>
+            const nameInput = document.getElementById("full_name");
+            const emailInput = document.getElementById("email");
+            const pwInput = document.getElementById("password");
+            const nameErr = document.getElementById("name-error");
+            const nameErrTxt = document.getElementById("name-error-text");
+            const emailErr = document.getElementById("email-error");
+            const emailErrTxt = document.getElementById("email-error-text");
+            const pwErr = document.getElementById("password-error");
+            const pwErrTxt = document.getElementById("password-error-text");
+            const globalErr = document.getElementById("signup-error");
+            const globalSucc = document.getElementById("signup-success");
+            const submitBtn = document.getElementById("submit-btn");
 
-        let isSubmitting = false;
-        let nameDirty = false;
-        let emailDirty = false;
-        let pwDirty = false;
+            const BASE = ["border-border-subtle"];
+            const RED = ["border-red-500"];
+            const GREEN = ["border-green-500"];
 
-        const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-        function validateName(val) {
-            if (!val) return "Full name is required.";
-            if (val.trim().length < 2) return "Full name is too short.";
-            if (!/^[a-zA-Z\s'-]+$/.test(val.trim()))
-                return "Name contains invalid characters.";
-            return "";
-        }
-
-        function validateEmail(val) {
-            if (!val) return "Email is required.";
-            if (!val.includes("@")) return "Email must contain @.";
-            if (!EMAIL_RE.test(val)) return "Enter a valid email address.";
-            return "";
-        }
-
-        function validatePassword(val) {
-            if (!val) return "Password is required.";
-            if (val.length < 6)
-                return `At least 6 characters (${val.length}/6).`;
-            return "";
-        }
-
-        const STRENGTH = [
-            { label: "Very weak", color: "bg-red-500", text: "text-red-500" },
-            { label: "Weak", color: "bg-orange-400", text: "text-orange-400" },
-            { label: "Fair", color: "bg-yellow-400", text: "text-yellow-500" },
-            { label: "Strong", color: "bg-green-500", text: "text-green-500" },
-        ];
-
-        function getStrengthScore(val) {
-            let score = 0;
-            if (val.length >= 8) score++;
-            if (val.length >= 12) score++;
-            if (/[A-Z]/.test(val) && /[a-z]/.test(val)) score++;
-            if (/[0-9]/.test(val)) score++;
-            if (/[^A-Za-z0-9]/.test(val)) score++;
-            return Math.min(Math.max(score - 1, 0), 3);
-        }
-
-        function updateStrengthMeter(val) {
-            if (!val) {
-                strengthMeter.classList.add("hidden");
-                bars.forEach(
-                    (b) =>
-                        (b.className =
-                            "h-1 flex-1 rounded-full bg-surface-02 transition-all duration-300"),
-                );
-                return;
+            function setBorder(input, state) {
+                input.classList.remove(...BASE, ...RED, ...GREEN);
+                if (state === "error") input.classList.add(...RED);
+                else if (state === "ok") input.classList.add(...GREEN);
+                else input.classList.add(...BASE);
             }
-            strengthMeter.classList.remove("hidden");
-            const score = getStrengthScore(val);
-            const filled = score + 1;
-            const s = STRENGTH[score];
-            bars.forEach((b, i) => {
-                b.className = `h-1 flex-1 rounded-full transition-all duration-300 ${i < filled ? s.color : "bg-surface-02"}`;
-            });
-            strengthLabel.textContent = s.label;
-            strengthLabel.className = `text-[11px] font-medium ${s.text}`;
-            strengthBar.setAttribute("aria-valuenow", filled);
-            strengthBar.setAttribute(
-                "aria-label",
-                `Password strength: ${s.label}`,
-            );
-        }
 
-        const BORDER = {
-            default: ["border-border-subtle"],
-            error: ["border-red-500"],
-            ok: ["border-green-500"],
-        };
-
-        function setBorder(el, state) {
-            Object.values(BORDER).forEach((cls) => el.classList.remove(...cls));
-            el.classList.add(...BORDER[state]);
-        }
-
-        function setStatusIcon(iconEl, state) {
-            if (state === "ok") {
-                iconEl.innerHTML = `<i data-lucide="circle-check" class="w-3.5 h-3.5 text-green-500 shrink-0"></i>`;
-                iconEl.classList.remove("hidden");
-                if (window.lucide) window.lucide.createIcons();
-            } else {
-                iconEl.classList.add("hidden");
-                iconEl.innerHTML = "";
+            function showErr(errEl, txtEl, msg) {
+                txtEl.textContent = msg;
+                errEl.classList.remove("hidden");
             }
-        }
-
-        function showFieldError(errEl, txtEl, input, msg) {
-            txtEl.textContent = msg;
-            errEl.classList.remove("hidden");
-            input.setAttribute("aria-invalid", "true");
-            setBorder(input, "error");
-        }
-
-        function clearFieldError(errEl, txtEl, input) {
-            txtEl.textContent = "";
-            errEl.classList.add("hidden");
-            input.setAttribute("aria-invalid", "false");
-        }
-
-        function showGlobalError(msg) {
-            globalErrP.textContent = msg;
-            globalErrEl.classList.remove("hidden");
-            globalSuccEl.classList.add("hidden");
-            globalErrEl.scrollIntoView({
-                behavior: "smooth",
-                block: "nearest",
-            });
-        }
-
-        function showGlobalSuccess(msg) {
-            globalSuccTxt.textContent = msg;
-            globalSuccEl.classList.remove("hidden");
-            globalErrEl.classList.add("hidden");
-            if (window.lucide) window.lucide.createIcons();
-        }
-
-        function clearGlobalMessages() {
-            globalErrEl.classList.add("hidden");
-            globalSuccEl.classList.add("hidden");
-        }
-
-        function updateSubmitState() {
-            const ok =
-                validateName(nameInput.value) === "" &&
-                validateEmail(emailInput.value) === "" &&
-                validatePassword(pwInput.value) === "" &&
-                !isSubmitting;
-
-            submitBtn.disabled = !ok;
-            submitBtn.setAttribute("aria-disabled", String(!ok));
-
-            if (ok) {
-                submitBtn.classList.remove("opacity-40", "cursor-not-allowed");
-                submitBtn.classList.add(
-                    "hover:bg-btn-primary-hover",
-                    "cursor-pointer",
-                );
-            } else {
-                submitBtn.classList.add("opacity-40", "cursor-not-allowed");
-                submitBtn.classList.remove(
-                    "hover:bg-btn-primary-hover",
-                    "cursor-pointer",
-                );
+            function clearErr(errEl, txtEl) {
+                txtEl.textContent = "";
+                errEl.classList.add("hidden");
             }
-        }
 
-        function setLoading(loading) {
-            isSubmitting = loading;
-            submitBtn.disabled = loading;
-            submitBtn.setAttribute("aria-disabled", String(loading));
-
-            if (loading) {
-                submitBtn.innerHTML = `
-                    <span class="flex items-center justify-center gap-2">
-                        <svg class="animate-spin w-3.5 h-3.5 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                        </svg>
-                        Creating account…
-                    </span>`;
-                submitBtn.classList.add("opacity-70", "cursor-not-allowed");
-                submitBtn.classList.remove("hover:bg-btn-primary-hover");
-            } else {
-                submitBtn.textContent = "Create account";
-                submitBtn.classList.remove("opacity-70", "cursor-not-allowed");
-                updateSubmitState();
+            function checkName(val) {
+                if (!val) return "Full name is required.";
+                if (val.length < 2) return "Full name is too short.";
+                return "";
             }
-        }
-
-        function handleNameValidation() {
-            const val = nameInput.value;
-            const err = validateName(val);
-            if (!val) {
-                setBorder(nameInput, "default");
-                clearFieldError(nameErr, nameErrTxt, nameInput);
-                setStatusIcon(nameIcon, null);
-            } else if (err) {
-                showFieldError(nameErr, nameErrTxt, nameInput, err);
-                setStatusIcon(nameIcon, null);
-            } else {
-                clearFieldError(nameErr, nameErrTxt, nameInput);
-                setBorder(nameInput, "ok");
-                setStatusIcon(nameIcon, "ok");
+            function checkEmail(val) {
+                if (!val) return "Email is required.";
+                if (!val.includes("@")) return "Email must contain @.";
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val))
+                    return "Enter a valid email address.";
+                return "";
             }
-            updateSubmitState();
-        }
-
-        function handleEmailValidation() {
-            const val = emailInput.value;
-            const err = validateEmail(val);
-            if (!val) {
-                setBorder(emailInput, "default");
-                clearFieldError(emailErr, emailErrTxt, emailInput);
-                setStatusIcon(emailIcon, null);
-            } else if (err) {
-                showFieldError(emailErr, emailErrTxt, emailInput, err);
-                setStatusIcon(emailIcon, null);
-            } else {
-                clearFieldError(emailErr, emailErrTxt, emailInput);
-                setBorder(emailInput, "ok");
-                setStatusIcon(emailIcon, "ok");
+            function checkPassword(val) {
+                if (!val) return "Password is required.";
+                if (val.length < 6)
+                    return `Password must be at least 6 characters (${val.length}/6).`;
+                return "";
             }
-            updateSubmitState();
-        }
 
-        function handlePasswordValidation() {
-            const val = pwInput.value;
-            const err = validatePassword(val);
-            updateStrengthMeter(val);
-            if (!val) {
-                setBorder(pwInput, "default");
-                clearFieldError(pwErr, pwErrTxt, pwInput);
-            } else if (err) {
-                showFieldError(pwErr, pwErrTxt, pwInput, err);
-            } else {
-                clearFieldError(pwErr, pwErrTxt, pwInput);
-                setBorder(pwInput, "ok");
-            }
-            updateSubmitState();
-        }
-
-        nameInput.addEventListener("input", () => {
-            nameDirty = true;
-            handleNameValidation();
-            clearGlobalMessages();
-        });
-        nameInput.addEventListener("blur", () => {
-            if (nameDirty) handleNameValidation();
-        });
-        emailInput.addEventListener("input", () => {
-            emailDirty = true;
-            handleEmailValidation();
-            clearGlobalMessages();
-        });
-        emailInput.addEventListener("blur", () => {
-            if (emailDirty) handleEmailValidation();
-        });
-        pwInput.addEventListener("input", () => {
-            pwDirty = true;
-            handlePasswordValidation();
-            clearGlobalMessages();
-        });
-        pwInput.addEventListener("blur", () => {
-            if (pwDirty) handlePasswordValidation();
-        });
-
-        let pwVisible = false;
-        toggleBtn.addEventListener("click", () => {
-            pwVisible = !pwVisible;
-            pwInput.type = pwVisible ? "text" : "password";
-            eyeIcon.setAttribute("data-lucide", pwVisible ? "eye-off" : "eye");
-            toggleBtn.setAttribute(
-                "aria-label",
-                pwVisible ? "Hide password" : "Show password",
-            );
-            toggleBtn.setAttribute("aria-pressed", String(pwVisible));
-            if (window.lucide) window.lucide.createIcons();
-            pwInput.focus();
-        });
-
-        form.addEventListener("htmx:beforeRequest", (evt) => {
-            clearGlobalMessages();
-            const nErr = validateName(nameInput.value);
-            const eErr = validateEmail(emailInput.value);
-            const pErr = validatePassword(pwInput.value);
-            if (nErr) showFieldError(nameErr, nameErrTxt, nameInput, nErr);
-            if (eErr) showFieldError(emailErr, emailErrTxt, emailInput, eErr);
-            if (pErr) showFieldError(pwErr, pwErrTxt, pwInput, pErr);
-            if (nErr || eErr || pErr || isSubmitting) {
-                evt.preventDefault();
-                return;
-            }
-            setLoading(true);
-        });
-
-        document.body.addEventListener("htmx:afterRequest", (evt) => {
-            if (evt.detail.elt.id !== "signup-form") return;
-            setLoading(false);
-            const xhr = evt.detail.xhr;
-
-            try {
-                const res = JSON.parse(xhr.responseText);
-
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    submitBtn.innerHTML = `
-                        <span class="flex items-center justify-center gap-2">
-                            <i data-lucide="circle-check" class="w-3.5 h-3.5 shrink-0"></i>
-                            Account created!
-                        </span>`;
-                    submitBtn.classList.add("bg-green-600");
-                    submitBtn.disabled = true;
-                    if (window.lucide) window.lucide.createIcons();
-                    showGlobalSuccess("Account created! Redirecting to login…");
-                    setTimeout(() => {
-                        window.location.href = "/login";
-                    }, 1500);
+            nameInput.addEventListener("input", () => {
+                const val = nameInput.value;
+                if (!val) {
+                    setBorder(nameInput, "default");
+                    clearErr(nameErr, nameErrTxt);
                     return;
                 }
+                const err = checkName(val);
+                if (err) {
+                    setBorder(nameInput, "error");
+                    showErr(nameErr, nameErrTxt, err);
+                } else {
+                    setBorder(nameInput, "ok");
+                    clearErr(nameErr, nameErrTxt);
+                }
+            });
 
-                const msg =
-                    res.error ||
-                    res.message ||
-                    res.detail ||
-                    "Signup failed. Please try again.";
-                showGlobalError(msg);
-
-                if (xhr.status === 409) {
-                    emailInput.focus();
+            emailInput.addEventListener("input", () => {
+                const val = emailInput.value;
+                if (!val) {
+                    setBorder(emailInput, "default");
+                    clearErr(emailErr, emailErrTxt);
+                    return;
+                }
+                const err = checkEmail(val);
+                if (err) {
                     setBorder(emailInput, "error");
-                    showFieldError(
-                        emailErr,
-                        emailErrTxt,
-                        emailInput,
-                        "This email is already registered.",
-                    );
+                    showErr(emailErr, emailErrTxt, err);
+                } else {
+                    setBorder(emailInput, "ok");
+                    clearErr(emailErr, emailErrTxt);
                 }
+            });
 
-                const card = form.closest(".bg-surface-01");
-                if (card) {
-                    card.classList.add("animate-shake");
-                    setTimeout(
-                        () => card.classList.remove("animate-shake"),
-                        500,
-                    );
+            pwInput.addEventListener("input", () => {
+                const val = pwInput.value;
+                if (!val) {
+                    setBorder(pwInput, "default");
+                    clearErr(pwErr, pwErrTxt);
+                    return;
                 }
-            } catch {
-                showGlobalError(
-                    xhr.status === 0
-                        ? "Connection error. Check your network."
-                        : "Unexpected error. Please try again.",
-                );
-            }
-        });
+                const err = checkPassword(val);
+                if (err) {
+                    setBorder(pwInput, "error");
+                    showErr(pwErr, pwErrTxt, err);
+                } else {
+                    setBorder(pwInput, "ok");
+                    clearErr(pwErr, pwErrTxt);
+                }
+            });
 
-        updateSubmitState();
-    })();
-</script>
+            const eyeIcon = document.getElementById("eye-icon");
+            let pwVisible = false;
+            document
+                .getElementById("toggle-password")
+                .addEventListener("click", () => {
+                    pwVisible = !pwVisible;
+                    pwInput.type = pwVisible ? "text" : "password";
+                    eyeIcon.innerHTML = pwVisible
+                        ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>`
+                        : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>`;
+                });
 
-<style>
-    @keyframes shake {
-        0%,
-        100% {
-            transform: translateX(0);
-        }
-        15% {
-            transform: translateX(-5px);
-        }
-        30% {
-            transform: translateX(5px);
-        }
-        45% {
-            transform: translateX(-4px);
-        }
-        60% {
-            transform: translateX(4px);
-        }
-        75% {
-            transform: translateX(-2px);
-        }
-        90% {
-            transform: translateX(2px);
-        }
-    }
-    .animate-shake {
-        animation: shake 0.45s ease-in-out;
-    }
-</style>
-{% endblock %}
+            document
+                .getElementById("signup-form")
+                .addEventListener("htmx:beforeRequest", (evt) => {
+                    globalErr.classList.add("hidden");
+                    globalSucc.classList.add("hidden");
+                    const nErr = checkName(nameInput.value);
+                    const eErr = checkEmail(emailInput.value);
+                    const pErr = checkPassword(pwInput.value);
+
+                    if (nErr) {
+                        setBorder(nameInput, "error");
+                        showErr(nameErr, nameErrTxt, nErr);
+                    }
+                    if (eErr) {
+                        setBorder(emailInput, "error");
+                        showErr(emailErr, emailErrTxt, eErr);
+                    }
+                    if (pErr) {
+                        setBorder(pwInput, "error");
+                        showErr(pwErr, pwErrTxt, pErr);
+                    }
+
+                    if (nErr || eErr || pErr) {
+                        evt.preventDefault();
+                        return;
+                    }
+
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = "Creating account…";
+                });
+
+            document.body.addEventListener("htmx:afterRequest", (evt) => {
+                if (evt.detail.elt.id !== "signup-form") return;
+
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Create account";
+
+                const xhr = evt.detail.xhr;
+                try {
+                    const res = JSON.parse(xhr.responseText);
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        globalSucc.textContent =
+                            "Account created! Redirecting to login...";
+                        globalSucc.classList.remove("hidden");
+                        setTimeout(() => {
+                            window.location.href = "/login";
+                        }, 1500);
+                    } else {
+                        const msg =
+                            res.error ||
+                            res.message ||
+                            res.detail ||
+                            "Signup failed. Please try again.";
+                        globalErr.textContent = msg;
+                        globalErr.classList.remove("hidden");
+                    }
+                } catch {
+                    globalErr.textContent =
+                        xhr.status === 0
+                            ? "Connection error. Check your network."
+                            : "Unexpected error.";
+                    globalErr.classList.remove("hidden");
+                }
+            });
+        </script>
+    </body>
+</html>

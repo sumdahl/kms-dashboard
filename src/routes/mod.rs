@@ -28,6 +28,7 @@ pub fn create_router(state: AppState) -> Router {
         .route("/signup", get(signup_page))
         .route("/roles", get(roles_page))
         .route("/users", get(users_page))
+        .route("/roles/new", get(create_role_wizard_page))
         .route("/roles/:name", get(role_detail_page))
         .route("/assign", get(assign_page))
         .route("/ui/sidebar/pin", post(sidebar_pin))
@@ -119,6 +120,30 @@ async fn reset_password_page() -> impl IntoResponse {
     ResetPasswordTemplate {}
 }
 #[derive(askama::Template)]
+#[template(path = "dashboard/create_role_wizard.html")]
+struct CreateRoleWizardTemplate {
+    sidebar_pinned: bool,
+    user_email: String,
+    show_banner: bool,
+    css_version: &'static str,
+    is_admin: bool,
+}
+
+async fn create_role_wizard_page(claims: Option<Claims>) -> Response {
+    match claims {
+        None => Redirect::to("/login").into_response(),
+        Some(c) => CreateRoleWizardTemplate {
+            sidebar_pinned: true,
+            user_email: c.email,
+            show_banner: false,
+            css_version: env!("CSS_VERSION"),
+            is_admin: c.is_admin,
+        }
+        .into_response(),
+    }
+}
+
+#[derive(askama::Template)]
 #[template(path = "dashboard/home.html")]
 struct HomeTemplate {
     sidebar_pinned: bool,
@@ -128,17 +153,39 @@ struct HomeTemplate {
     is_admin: bool,
 }
 
-async fn home(claims: Option<Claims>) -> Response {
+#[derive(askama::Template)]
+#[template(path = "dashboard/onboarding.html")]
+struct OnboardingTemplate {
+    sidebar_pinned: bool,
+    user_email: String,
+    show_banner: bool,
+    css_version: &'static str,
+    is_admin: bool,
+    current_step: u8,
+}
+
+#[derive(serde::Deserialize)]
+pub struct HomeParams {
+    pub skip_onboarding: Option<bool>,
+}
+
+async fn home(
+    claims: Option<Claims>,
+    axum::extract::Query(_params): axum::extract::Query<HomeParams>,
+) -> Response {
     match claims {
         None => Redirect::to("/login").into_response(),
-        Some(c) => HomeTemplate {
-            sidebar_pinned: true,
-            user_email: c.email,
-            show_banner: true,
-            css_version: env!("CSS_VERSION"),
-            is_admin: c.is_admin,
+        Some(c) => {
+            // Default to the full dashboard (HomeTemplate) now
+            HomeTemplate {
+                sidebar_pinned: true,
+                user_email: c.email,
+                show_banner: true,
+                css_version: env!("CSS_VERSION"),
+                is_admin: c.is_admin,
+            }
+            .into_response()
         }
-        .into_response(),
     }
 }
 
@@ -152,7 +199,10 @@ struct RolesTemplate {
     is_admin: bool,
 }
 
-async fn roles_page(claims: Option<Claims>) -> Response {
+async fn roles_page(
+    claims: Option<Claims>,
+    axum::extract::Query(_params): axum::extract::Query<HomeParams>,
+) -> Response {
     match claims {
         None => Redirect::to("/login").into_response(),
         Some(c) => RolesTemplate {
@@ -176,17 +226,36 @@ struct AssignTemplate {
     is_admin: bool,
 }
 
-async fn assign_page(claims: Option<Claims>) -> Response {
+async fn assign_page(
+    claims: Option<Claims>,
+    axum::extract::Query(params): axum::extract::Query<HomeParams>,
+) -> Response {
     match claims {
         None => Redirect::to("/login").into_response(),
-        Some(c) => AssignTemplate {
-            sidebar_pinned: true,
-            user_email: c.email,
-            show_banner: false,
-            css_version: env!("CSS_VERSION"),
-            is_admin: c.is_admin,
+        Some(c) => {
+            let skip = params.skip_onboarding.unwrap_or(false);
+
+            if skip {
+                AssignTemplate {
+                    sidebar_pinned: true,
+                    user_email: c.email,
+                    show_banner: false,
+                    css_version: env!("CSS_VERSION"),
+                    is_admin: c.is_admin,
+                }
+                .into_response()
+            } else {
+                OnboardingTemplate {
+                    sidebar_pinned: true,
+                    user_email: c.email,
+                    show_banner: false,
+                    css_version: env!("CSS_VERSION"),
+                    is_admin: c.is_admin,
+                    current_step: 2,
+                }
+                .into_response()
+            }
         }
-        .into_response(),
     }
 }
 

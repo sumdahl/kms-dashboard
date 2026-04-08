@@ -10,10 +10,14 @@
   const sidebar = document.getElementById("sidebar");
   const toggleBtn = document.getElementById("sidebar-toggle");
   const appShell = document.querySelector(".app-shell");
+  const mobileToggleBtn = document.getElementById("mobile-sidebar-toggle");
+  const overlay = document.getElementById("sidebar-overlay");
+
   if (!sidebar || !toggleBtn) return;
 
   // Read initial state from the server-rendered data attribute.
   let expanded = sidebar.dataset.pinned === "true";
+  let mobileOpen = false;
 
   // ── State Mutations ────────────────────────────────────────────────────
   function expand() {
@@ -26,6 +30,21 @@
     sidebar.classList.remove("is-expanded");
     document.body.classList.remove("sidebar-expanded");
     if (appShell) appShell.classList.remove("sidebar-expanded");
+  }
+
+  // ── Mobile State Mutations ─────────────────────────────────────────────
+  function openMobile() {
+    mobileOpen = true;
+    sidebar.classList.add("mobile-open");
+    if (overlay) overlay.classList.add("mobile-open");
+    document.body.style.overflow = "hidden"; // prevent scrolling behind
+  }
+
+  function closeMobile() {
+    mobileOpen = false;
+    sidebar.classList.remove("mobile-open");
+    if (overlay) overlay.classList.remove("mobile-open");
+    document.body.style.overflow = ""; // restore scrolling
   }
 
   // Apply initial state immediately on page load.
@@ -42,17 +61,19 @@
   }
 
   // ── Hover Expand (peek) ────────────────────────────────────────────────
-  // Only peeks when not pinned. Does NOT affect the pinned state.
+  // Only peeks when not pinned and not on mobile.
   sidebar.addEventListener("mouseenter", function () {
+    if (window.innerWidth <= 768) return;
     if (!expanded) expand();
   });
 
   sidebar.addEventListener("mouseleave", function () {
+    if (window.innerWidth <= 768) return;
     if (!expanded) collapse();
   });
 
   // ── Toggle Button ──────────────────────────────────────────────────────
-  // The ONLY control that changes the pinned state.
+  // The ONLY control that changes the pinned state (desktop).
   toggleBtn.addEventListener("click", function () {
     expanded = !expanded;
     sidebar.dataset.pinned = String(expanded);
@@ -62,5 +83,28 @@
       collapse();
     }
     syncWithServer(expanded);
+  });
+
+  // ── Mobile Toggle Button ───────────────────────────────────────────────
+  if (mobileToggleBtn) {
+    mobileToggleBtn.addEventListener("click", function () {
+      if (mobileOpen) {
+        closeMobile();
+      } else {
+        openMobile();
+      }
+    });
+  }
+
+  // Close mobile sidebar when clicking the overlay
+  if (overlay) {
+    overlay.addEventListener("click", closeMobile);
+  }
+
+  // Close mobile sidebar on resize if window becomes desktop
+  window.addEventListener("resize", function() {
+    if (window.innerWidth > 768 && mobileOpen) {
+      closeMobile();
+    }
   });
 })();

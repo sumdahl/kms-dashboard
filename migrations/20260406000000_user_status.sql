@@ -1,15 +1,13 @@
--- Migration fixed to be idempotent and avoid conflicts with 20260406000000
+-- Add status and session versioning to users
 ALTER TABLE users ADD COLUMN IF NOT EXISTS is_active BOOLEAN NOT NULL DEFAULT TRUE;
-ALTER TABLE users ADD COLUMN IF NOT EXISTS session_version INT NOT NULL DEFAULT 1;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS disabled_reason TEXT;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS disabled_at TIMESTAMPTZ;
 ALTER TABLE users ADD COLUMN IF NOT EXISTS disabled_by UUID REFERENCES users(user_id);
-ALTER TABLE users ADD COLUMN IF NOT EXISTS disabled_reason TEXT;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS session_version INTEGER NOT NULL DEFAULT 1;
 
-CREATE INDEX IF NOT EXISTS idx_users_is_active ON users(is_active);
-
--- The table might already exist from 20260406000000
+-- User Audit Log table for tracking admin actions
 CREATE TABLE IF NOT EXISTS user_audit_log (
-    log_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    log_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     target_user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     actor_id UUID REFERENCES users(user_id) ON DELETE SET NULL,
     action VARCHAR(50) NOT NULL,

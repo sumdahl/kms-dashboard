@@ -13,6 +13,7 @@ use axum::{
     response::Response,
 };
 use axum_extra::extract::CookieJar;
+use tracing::error;
 use uuid::Uuid;
 
 #[async_trait]
@@ -45,20 +46,27 @@ where
         //    This is the account-disable enforcement — one indexed PK lookup
         let user_id = Uuid::parse_str(&claims.sub).map_err(|_| AppError::Unauthorized)?;
 
-        let row = sqlx::query!(
-            "SELECT is_active, session_version FROM users WHERE user_id = $1",
-            user_id
+        let row = sqlx::query(
+            "SELECT is_active, session_version FROM users WHERE user_id = $1"
         )
+        .bind(user_id)
         .fetch_optional(&pool)
         .await
-        .map_err(|_| AppError::Unauthorized)?
+        .map_err(|e| {
+            error!("Auth DB lookup failed: {}", e);
+            AppError::Unauthorized
+        })?
         .ok_or(AppError::Unauthorized)?;
 
-        if !row.is_active {
+        use sqlx::Row;
+        let is_active: bool = row.get("is_active");
+        let session_version: i32 = row.get("session_version");
+
+        if !is_active {
             return Err(AppError::AccountDisabled);
         }
 
-        if claims.sv != row.session_version {
+        if claims.sv != session_version {
             // Token is from an old session — silently treat as unauthorized
             return Err(AppError::Unauthorized);
         }

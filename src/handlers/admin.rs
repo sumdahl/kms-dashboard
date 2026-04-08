@@ -21,6 +21,20 @@ pub struct UserSummary {
     pub disabled_reason: Option<String>,
 }
 
+#[derive(askama::Template)]
+#[template(path = "partials/permission_row.html")]
+pub struct PermissionRowTemplate {
+    pub resources: Vec<&'static str>,
+    pub access_levels: Vec<&'static str>,
+}
+
+pub async fn permission_row() -> PermissionRowTemplate {
+    PermissionRowTemplate {
+        resources: vec!["orders", "customers", "reports", "inventory", "admin_panel"],
+        access_levels: vec!["read", "write", "admin"],
+    }
+}
+
 pub async fn list_users(
     _admin: AdminClaims,
     State(pool): State<Db>,
@@ -420,7 +434,7 @@ pub async fn disable_user(
 
     // Atomically disable + bump session_version
     // WHERE is_active = TRUE prevents double-firing on race conditions
-    let updated = sqlx::query!(
+    let updated = sqlx::query(
         r#"
         UPDATE users
         SET
@@ -432,11 +446,11 @@ pub async fn disable_user(
         WHERE user_id = $3
           AND is_active = TRUE
         RETURNING user_id
-        "#,
-        actor_id,
-        payload.reason,
-        user_id
+        "#
     )
+    .bind(actor_id)
+    .bind(&payload.reason)
+    .bind(user_id)
     .fetch_optional(&mut *tx)
     .await?;
 
@@ -448,15 +462,15 @@ pub async fn disable_user(
     }
 
     // Write audit log
-    sqlx::query!(
+    sqlx::query(
         r#"
         INSERT INTO user_audit_log (target_user_id, actor_id, action, reason)
         VALUES ($1, $2, 'disabled', $3)
-        "#,
-        user_id,
-        actor_id,
-        payload.reason
+        "#
     )
+    .bind(user_id)
+    .bind(actor_id)
+    .bind(&payload.reason)
     .execute(&mut *tx)
     .await?;
 
@@ -477,7 +491,7 @@ pub async fn enable_user(
 
     let mut tx = pool.begin().await?;
 
-    let updated = sqlx::query!(
+    let updated = sqlx::query(
         r#"
         UPDATE users
         SET
@@ -488,9 +502,9 @@ pub async fn enable_user(
         WHERE user_id = $1
           AND is_active = FALSE
         RETURNING user_id
-        "#,
-        user_id
+        "#
     )
+    .bind(user_id)
     .fetch_optional(&mut *tx)
     .await?;
 
@@ -501,11 +515,11 @@ pub async fn enable_user(
         ));
     }
 
-    sqlx::query!(
-        "INSERT INTO user_audit_log (target_user_id, actor_id, action) VALUES ($1, $2, 'enabled')",
-        user_id,
-        actor_id
+    sqlx::query(
+        "INSERT INTO user_audit_log (target_user_id, actor_id, action) VALUES ($1, $2, 'enabled')"
     )
+    .bind(user_id)
+    .bind(actor_id)
     .execute(&mut *tx)
     .await?;
 
