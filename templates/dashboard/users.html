@@ -265,15 +265,6 @@
     </div>
 </div>
 
-<!-- ── Toast ── -->
-<div
-    id="toast"
-    class="hidden fixed bottom-6 right-6 z-[100] flex items-center gap-2.5 px-4 py-3 rounded-card border shadow-lg bg-surface-01 border-border-subtle text-[13px] text-text-primary min-w-[220px]"
->
-    <span id="toast-icon" class="shrink-0"></span>
-    <span id="toast-msg"></span>
-</div>
-
 {% endblock %} {% block body_scripts %}
 <script>
     (function () {
@@ -295,17 +286,6 @@
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;");
-        }
-
-        function showToast(msg, ok = true) {
-            const toast = document.getElementById("toast");
-            document.getElementById("toast-msg").textContent = msg;
-            document.getElementById("toast-icon").innerHTML = ok
-                ? `<i data-lucide="circle-check" class="text-green-500 w-[15px] h-[15px] shrink-0"></i>`
-                : `<i data-lucide="circle-alert" class="text-red-500 w-[15px] h-[15px] shrink-0"></i>`;
-            toast.classList.remove("hidden");
-            if (window.lucide) window.lucide.createIcons();
-            setTimeout(() => toast.classList.add("hidden"), 3500);
         }
 
         // ── Status Badge ────────────────────────────────────────────────────
@@ -529,7 +509,7 @@
                     <span class="text-[12px] text-text-secondary">User ID</span>
                     <span class="text-[12px] font-mono text-text-primary flex items-center gap-1" title="${escHtml(user.user_id)}">
                         ${escHtml(user.user_id.substring(0, 8))}…
-                        <i data-lucide="copy" onclick="navigator.clipboard.writeText('${escHtml(user.user_id)}').then(()=>showToast('Copied!'))"
+                        <i data-lucide="copy" onclick="navigator.clipboard.writeText('${escHtml(user.user_id)}').then(()=>notify('Copied!'))"
                            class="text-icon-muted cursor-pointer hover:text-text-primary w-3 h-3 shrink-0"></i>
                     </span>
                 </div>
@@ -647,17 +627,17 @@
                         user.is_active = false;
                         user.disabled_reason = reason || null;
                     }
-                    showToast(`${_pendingUserEmail} has been disabled.`);
+                    notify(`${_pendingUserEmail} has been disabled.`);
                     closeDisableModal();
                     renderList();
                     showUserDetail(_pendingUserId);
                 } else {
-                    showToast(data.error || "Failed to disable user.", false);
+                    notify(data.error || "Failed to disable user.", "error");
                     btn.disabled = false;
                     btn.textContent = "Disable Account";
                 }
             } catch {
-                showToast("Network error. Please try again.", false);
+                notify("Network error. Please try again.", "error");
                 btn.disabled = false;
                 btn.textContent = "Disable Account";
             }
@@ -677,14 +657,14 @@
                         user.is_active = true;
                         user.disabled_reason = null;
                     }
-                    showToast(`${email} has been re-enabled.`);
+                    notify(`${email} has been re-enabled.`);
                     renderList();
                     showUserDetail(userId);
                 } else {
-                    showToast(data.error || "Failed to enable user.", false);
+                    notify(data.error || "Failed to enable user.", "error");
                 }
             } catch {
-                showToast("Network error. Please try again.", false);
+                notify("Network error. Please try again.", "error");
             }
         }
 
