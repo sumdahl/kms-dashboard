@@ -1,11 +1,8 @@
 {% extends "layout.html" %} {% block title %}Users — KMS Dashboard{% endblock %}
 {% block content %}
-<div class="max-w-[1200px] w-full mx-auto">
-    <!-- Action Banner Container -->
-    <div id="page-banner-container" class="mb-4 empty:hidden"></div>
-
+<div>
     <!-- ── Header ── -->
-    <div class="flex flex-col gap-6 mb-8 w-full">
+    <div class="flex flex-col gap-6 mb-8 max-w-[1200px] w-full mx-auto">
         <div class="flex items-start justify-between">
             <div class="flex items-start gap-3">
                 <div class="text-icon-secondary mt-1">
@@ -25,7 +22,7 @@
                 <a
                     href="/docs"
                     target="_blank"
-                    class="inline-flex items-center justify-center h-8 px-4 rounded-md text-[13px] font-medium bg-(--color-doc-btn-bg) hover:bg-(--color-doc-btn-hover) border border-(--color-doc-btn-border) text-(--color-doc-btn-text) transition-colors shadow-sm"
+                    class="inline-flex items-center justify-center h-8 px-4 rounded-md text-[13px] font-medium bg-(--color-doc-btn-bg) hover:bg-(--color-doc-btn-hover) border-doc-btn-border) transition-colors shadow-sm"
                 >
                     Documentation
                 </a>
@@ -289,17 +286,6 @@
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;");
-        }
-
-        function showToast(msg, ok = true) {
-            const toast = document.getElementById("toast");
-            document.getElementById("toast-msg").textContent = msg;
-            document.getElementById("toast-icon").innerHTML = ok
-                ? `<i data-lucide="circle-check" class="text-green-500 w-[15px] h-[15px] shrink-0"></i>`
-                : `<i data-lucide="circle-alert" class="text-red-500 w-[15px] h-[15px] shrink-0"></i>`;
-            toast.classList.remove("hidden");
-            if (window.lucide) window.lucide.createIcons();
-            setTimeout(() => toast.classList.add("hidden"), 3500);
         }
 
         // ── Status Badge ────────────────────────────────────────────────────
@@ -641,17 +627,17 @@
                         user.is_active = false;
                         user.disabled_reason = reason || null;
                     }
-                    showToast(`${_pendingUserEmail} has been disabled.`);
+                    notify(`${_pendingUserEmail} has been disabled.`);
                     closeDisableModal();
                     renderList();
                     showUserDetail(_pendingUserId);
                 } else {
-                    showToast(data.error || "Failed to disable user.", false);
+                    notify(data.error || "Failed to disable user.", "error");
                     btn.disabled = false;
                     btn.textContent = "Disable Account";
                 }
             } catch {
-                showToast("Network error. Please try again.", false);
+                notify("Network error. Please try again.", "error");
                 btn.disabled = false;
                 btn.textContent = "Disable Account";
             }
@@ -671,14 +657,14 @@
                         user.is_active = true;
                         user.disabled_reason = null;
                     }
-                    showToast(`${email} has been re-enabled.`);
+                    notify(`${email} has been re-enabled.`);
                     renderList();
                     showUserDetail(userId);
                 } else {
-                    showToast(data.error || "Failed to enable user.", false);
+                    notify(data.error || "Failed to enable user.", "error");
                 }
             } catch {
-                showToast("Network error. Please try again.", false);
+                notify("Network error. Please try again.", "error");
             }
         }
 
