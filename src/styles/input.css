@@ -59,6 +59,11 @@
     --color-btn-primary-hover: #0057d9;
     --color-btn-primary-press: #0043b0;
 
+    /*  Colors: Documentation Buttons */
+    --color-doc-btn-bg: #ffffff;
+    --color-doc-btn-hover: #fafafa;
+    --color-doc-btn-border: #eaeaea;
+
     /* ── Colors: Status ─────────────────────────────────────────────────── */
     --color-status-green: #24a148;
     --color-status-red: #da1e28;
@@ -208,7 +213,9 @@
     /* ── Sidebar Width Transition ────────────────────────────────────── */
     .sidebar {
         width: var(--spacing-sidebar);
-        transition: width 220ms cubic-bezier(0.2, 0, 0, 1), transform 220ms cubic-bezier(0.2, 0, 0, 1);
+        transition:
+            width 220ms cubic-bezier(0.2, 0, 0, 1),
+            transform 220ms cubic-bezier(0.2, 0, 0, 1);
     }
 
     .sidebar.is-expanded {
