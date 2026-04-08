@@ -21,7 +21,6 @@
     --color-amber-950: oklch(27.9% 0.077 45.635);
     --color-yellow-400: oklch(85.2% 0.199 91.936);
     --color-yellow-500: oklch(79.5% 0.184 86.047);
-    --color-yellow-600: oklch(68.1% 0.162 75.834);
     --color-green-50: oklch(98.2% 0.018 155.826);
     --color-green-300: oklch(87.1% 0.15 154.449);
     --color-green-500: oklch(72.3% 0.219 149.579);
@@ -103,6 +102,7 @@
     --color-btn-primary-press: #0043b0;
     --color-doc-btn-bg: #ffffff;
     --color-doc-btn-hover: #fafafa;
+    --color-doc-btn-border: #eaeaea;
     --color-status-green: #24a148;
     --color-status-red: #da1e28;
     --color-status-blue: #046dff;
@@ -956,6 +956,9 @@
     --tw-border-style: none;
     border-style: none;
   }
+  .border-\(--color-doc-btn-border\) {
+    border-color: var(--color-doc-btn-border);
+  }
   .border-border-strong {
     border-color: var(--color-border-strong);
   }
@@ -1503,6 +1506,9 @@
   }
   .whitespace-nowrap {
     white-space: nowrap;
+  }
+  .text-\(--color-doc-btn-text\) {
+    color: var(--color-doc-btn-text);
   }
   .text-amber-600 {
     color: var(--color-amber-600);
@@ -2194,6 +2200,10 @@
     --color-banner-text: #dbeafe;
     --color-badge-bg: #393939;
     --color-badge-text: #c6c6c6;
+    --color-doc-btn-bg: #1a1a1a;
+    --color-doc-btn-hover: #262626;
+    --color-doc-btn-border: #333333;
+    --color-doc-btn-text: #ededed;
   }
   html {
     -webkit-font-smoothing: antialiased;
