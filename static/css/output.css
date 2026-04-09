@@ -78,7 +78,7 @@
     --font-family-sans: "IBM Plex Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
         sans-serif;
     --font-size-base: 0.8125rem;
-    --color-bg-page: #ffffff;
+    --color-bg-page: #fafafa;
     --color-surface-01: #fafafa;
     --color-surface-02: #f7f7f7;
     --color-surface-active: #e8e8e8;
@@ -985,9 +985,6 @@
   .border-banner-text {
     border-color: var(--color-banner-text);
   }
-  .border-blue-100 {
-    border-color: var(--color-blue-100);
-  }
   .border-border-strong {
     border-color: var(--color-border-strong);
   }
@@ -1097,12 +1094,6 @@
     background-color: color-mix(in srgb, #000 40%, transparent);
     @supports (color: color-mix(in lab, red, red)) {
       background-color: color-mix(in oklab, var(--color-black) 40%, transparent);
-    }
-  }
-  .bg-blue-50\/30 {
-    background-color: color-mix(in srgb, oklch(97% 0.014 254.604) 30%, transparent);
-    @supports (color: color-mix(in lab, red, red)) {
-      background-color: color-mix(in oklab, var(--color-blue-50) 30%, transparent);
     }
   }
   .bg-border-subtle {
@@ -1587,9 +1578,6 @@
   }
   .text-status-red {
     color: var(--color-status-red);
-  }
-  .text-status-yellow {
-    color: var(--color-status-yellow);
   }
   .text-text-helper {
     color: var(--color-text-helper);
@@ -2272,22 +2260,6 @@
   .lg\:flex-row {
     @media (width >= 64rem) {
       flex-direction: row;
-    }
-  }
-  .dark\:border-blue-800\/30 {
-    @media (prefers-color-scheme: dark) {
-      border-color: color-mix(in srgb, oklch(42.4% 0.199 265.638) 30%, transparent);
-      @supports (color: color-mix(in lab, red, red)) {
-        border-color: color-mix(in oklab, var(--color-blue-800) 30%, transparent);
-      }
-    }
-  }
-  .dark\:bg-blue-900\/10 {
-    @media (prefers-color-scheme: dark) {
-      background-color: color-mix(in srgb, oklch(37.9% 0.146 265.522) 10%, transparent);
-      @supports (color: color-mix(in lab, red, red)) {
-        background-color: color-mix(in oklab, var(--color-blue-900) 10%, transparent);
-      }
     }
   }
   .dark\:hover\:bg-white\/5 {
