@@ -53,13 +53,10 @@
                         <p class="text-[13px] text-text-helper mt-1.5">
                             Log in to manage your keys and roles
                         </p>
-
-                        <!-- Global error -->
-                        <p
-                            id="login-error"
-                            class="hidden text-[11px] text-red-500 text-center bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2 mt-4 w-full max-w-[280px]"
-                        ></p>
                     </div>
+
+                    <!-- Banner messages -->
+                    <div id="banner-area" style="display:none;margin-bottom:16px;"></div>
 
                     <form
                         id="login-form"
@@ -232,13 +229,50 @@
         </div>
 
         <script>
+            // ── Inline Banner ────────────────────────────────────────────────────
+            (function () {
+                var _seq = 0;
+                var _cfg = {
+                    success: { accent: "var(--color-status-green)", bg: "var(--color-banner-success-bg)", icon: '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>' },
+                    error:   { accent: "var(--color-status-red)",   bg: "var(--color-banner-danger-bg)",  icon: '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>' },
+                    info:    { accent: "var(--color-status-blue)",  bg: "var(--color-banner-bg)",         icon: '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>' },
+                };
+                window.showBanner = function (msg, type) {
+                    type = _cfg[type] ? type : "error";
+                    var c = _cfg[type];
+                    var area = document.getElementById("banner-area");
+                    if (!area) return;
+                    area.innerHTML = "";
+                    var el = document.createElement("div");
+                    el.setAttribute("role", "alert");
+                    el.style.cssText = "display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border-radius:4px;border-left:3px solid " + c.accent + ";background:" + c.bg + ";";
+                    var iconWrap = document.createElement("span");
+                    iconWrap.style.cssText = "flex-shrink:0;color:" + c.accent + ";margin-top:1px";
+                    iconWrap.innerHTML = c.icon;
+                    var textEl = document.createElement("p");
+                    textEl.style.cssText = "font-size:12px;font-weight:500;color:var(--color-text-primary);flex:1;line-height:1.5;overflow-wrap:break-word;";
+                    textEl.textContent = msg;
+                    var btn = document.createElement("button");
+                    btn.type = "button";
+                    btn.setAttribute("aria-label", "Dismiss");
+                    btn.style.cssText = "flex-shrink:0;background:none;border:none;cursor:pointer;padding:0;color:var(--color-icon-muted);display:flex;margin-top:1px;";
+                    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>';
+                    btn.onclick = function () { area.innerHTML = ""; area.style.display = "none"; };
+                    el.appendChild(iconWrap);
+                    el.appendChild(textEl);
+                    el.appendChild(btn);
+                    area.appendChild(el);
+                    area.style.display = "block";
+                    setTimeout(function () { area.innerHTML = ""; area.style.display = "none"; }, 3000);
+                };
+            })();
+
             const emailInput = document.getElementById("email");
             const pwInput = document.getElementById("password");
             const emailErr = document.getElementById("email-error");
             const emailErrTxt = document.getElementById("email-error-text");
             const pwErr = document.getElementById("password-error");
             const pwErrTxt = document.getElementById("password-error-text");
-            const globalErr = document.getElementById("login-error");
             const submitBtn = document.getElementById("submit-btn");
 
             // ── Border state helpers ──
@@ -370,7 +404,9 @@
 
             // ── Prevent submission if invalid (backup) ──
             document.getElementById("login-form").addEventListener("htmx:beforeRequest", (evt) => {
-                globalErr.classList.add("hidden");
+                window.clearBanners && window.clearBanners();
+                const bannerArea = document.getElementById("banner-area");
+                if (bannerArea) { bannerArea.innerHTML = ""; bannerArea.style.display = "none"; }
 
                 const eErr = checkEmail(emailInput.value.trim());
                 const pErr = checkPassword(pwInput.value.trim());
@@ -405,19 +441,19 @@
                 // Show error
                 try {
                     const res = JSON.parse(xhr.responseText);
-                    const msg = res.error || res.message || res.detail || 
-                               (xhr.status === 401 ? "Incorrect email or password." : 
+                    const msg = res.error || res.message || res.detail ||
+                               (xhr.status === 401 ? "Incorrect email or password." :
                                 xhr.status === 422 ? "Invalid email or password format." :
                                 xhr.status === 429 ? "Too many attempts. Try again later." :
                                 "Login failed. Please try again.");
-                    globalErr.textContent = msg;
-                    globalErr.classList.remove("hidden");
+                    window.showBanner(msg, "error");
                 } catch {
-                    globalErr.textContent = 
-                        xhr.status === 0 
-                            ? "Connection error. Check your network." 
-                            : "Login failed. Please try again.";
-                    globalErr.classList.remove("hidden");
+                    window.showBanner(
+                        xhr.status === 0
+                            ? "Connection error. Check your network."
+                            : "Login failed. Please try again.",
+                        "error"
+                    );
                 }
             });
 
