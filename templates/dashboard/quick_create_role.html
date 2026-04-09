@@ -72,9 +72,10 @@ endblock %} {% block content %}
                                 Permissions
                             </label>
                             <button
+                                id="add-permission-btn"
                                 type="button"
                                 onclick="addPermissionRow()"
-                                class="inline-flex items-center gap-1.5 text-[11px] font-bold text-btn-primary hover:underline transition-colors"
+                                class="inline-flex items-center gap-1.5 text-[11px] font-bold text-btn-primary hover:underline transition-colors disabled:opacity-40 disabled:pointer-events-none disabled:cursor-not-allowed"
                             >
                                 <i data-lucide="plus" class="w-3.5 h-3.5"></i>
                                 Add permission
@@ -219,56 +220,140 @@ endblock %} {% block content %}
 
 {% endblock %} {% block body_scripts %}
 <script>
-    const RESOURCES = [
-        "orders",
-        "customers",
-        "reports",
-        "inventory",
-        "admin_panel",
-    ];
+    const RESOURCES    = ["orders", "customers", "reports", "inventory", "admin_panel"];
     const ACCESS_LEVELS = ["read", "write", "admin"];
+    const MAX_PERMS    = 10;
 
-    function makeSelectHTML(id) {
-        const arrow =
-            "url('data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'12\\' height=\\'12\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'%238d8d8d\\' stroke-width=\\'2\\'><path d=\\'m6 9 6 6 6-6\\'/></svg>')";
-        return `<div class="flex-1">
-            <select id="${id}"
-                class="w-full px-3 h-9 border border-border-subtle rounded-md bg-surface-02 text-[13px] text-text-primary focus:border-btn-primary focus:outline-none transition-all appearance-none cursor-pointer shadow-sm"
-                style="background-image:${arrow};background-repeat:no-repeat;background-position:right 10px center;background-size:12px">
-            </select>
-        </div>`;
+    const _ARROW = "url('data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'12\\' height=\\'12\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'%238d8d8d\\' stroke-width=\\'2\\'><path d=\\'m6 9 6 6 6-6\\'/></svg>')";
+    const _SEL_STYLE = `background-image:${_ARROW};background-repeat:no-repeat;background-position:right 10px center;background-size:12px`;
+    const _SEL_CLASS = "w-full px-3 h-9 border border-border-subtle rounded-md bg-surface-02 text-[13px] text-text-primary focus:border-btn-primary focus:outline-none transition-all appearance-none cursor-pointer shadow-sm";
+
+    // All (resource:access) pairs currently selected in every row
+    function getAllTaken() {
+        const s = new Set();
+        document.querySelectorAll("#permissions-list > div").forEach(row => {
+            const [r, a] = row.querySelectorAll("select");
+            if (r?.value && a?.value) s.add(`${r.value}:${a.value}`);
+        });
+        return s;
     }
 
-    function addPermissionRow(resource = "inventory", access = "read") {
-        const list = document.getElementById("permissions-list");
+    // All pairs taken by rows OTHER than excludeRow
+    function getTakenExcluding(excludeRow) {
+        const s = new Set();
+        document.querySelectorAll("#permissions-list > div").forEach(row => {
+            if (row === excludeRow) return;
+            const [r, a] = row.querySelectorAll("select");
+            if (r?.value && a?.value) s.add(`${r.value}:${a.value}`);
+        });
+        return s;
+    }
+
+    // Rebuild one row's options, disabling already-taken combos
+    function syncRow(row) {
+        const taken = getTakenExcluding(row);
+        const [resSelect, accSelect] = row.querySelectorAll("select");
+        if (!resSelect || !accSelect) return;
+
+        const prevRes = resSelect.value;
+        const prevAcc = accSelect.value;
+
+        // Resource dropdown: disable resources where every access level is taken
+        resSelect.innerHTML = RESOURCES.map(r => {
+            const exhausted = ACCESS_LEVELS.every(a => taken.has(`${r}:${a}`));
+            return `<option value="${r}"${r === prevRes ? " selected" : ""}${exhausted ? " disabled" : ""}>${r}</option>`;
+        }).join("");
+
+        // If the selected resource is now disabled, auto-pick first available
+        if (resSelect.selectedOptions[0]?.disabled) {
+            const first = Array.from(resSelect.options).find(o => !o.disabled);
+            if (first) resSelect.value = first.value;
+        }
+
+        const currentRes = resSelect.value;
+
+        // Access dropdown: disable accesses already taken for the current resource
+        accSelect.innerHTML = ACCESS_LEVELS.map(a => {
+            const isTaken = taken.has(`${currentRes}:${a}`);
+            return `<option value="${a}"${a === prevAcc ? " selected" : ""}${isTaken ? " disabled" : ""}>${a}</option>`;
+        }).join("");
+
+        // If the selected access is now disabled, auto-pick first available
+        if (accSelect.selectedOptions[0]?.disabled) {
+            const first = Array.from(accSelect.options).find(o => !o.disabled);
+            if (first) accSelect.value = first.value;
+        }
+    }
+
+    // Sync every row and update the Add button state
+    function syncAllRows() {
+        document.querySelectorAll("#permissions-list > div").forEach(syncRow);
+
+        const count   = document.querySelectorAll("#permissions-list > div").length;
+        const maxCombos = RESOURCES.length * ACCESS_LEVELS.length;
+        const addBtn  = document.getElementById("add-permission-btn");
+        if (addBtn) addBtn.disabled = count >= Math.min(MAX_PERMS, maxCombos);
+    }
+
+    function removePermissionRow(btn) {
+        btn.parentElement.remove();
+        syncAllRows();
+    }
+
+    function addPermissionRow(preferredRes, preferredAcc) {
+        const list  = document.getElementById("permissions-list");
+        const count = list.querySelectorAll(":scope > div").length;
+        const maxCombos = RESOURCES.length * ACCESS_LEVELS.length;
+        if (count >= Math.min(MAX_PERMS, maxCombos)) return;
+
+        // Default to the first available (resource, access) pair
+        const taken = getAllTaken();
+        let resource = preferredRes, access = preferredAcc;
+
+        if (!resource || !access || taken.has(`${resource}:${access}`)) {
+            resource = null; access = null;
+            outer: for (const r of RESOURCES) {
+                for (const a of ACCESS_LEVELS) {
+                    if (!taken.has(`${r}:${a}`)) { resource = r; access = a; break outer; }
+                }
+            }
+        }
+        if (!resource) return; // all combinations exhausted
+
         const row = document.createElement("div");
-        row.className =
-            "flex items-center gap-2 group animate-in slide-in-from-top-1 duration-200";
+        row.className = "flex items-center gap-2 group";
         const rid = "ps-res-" + Date.now();
         const aid = "ps-acc-" + (Date.now() + 1);
-        row.innerHTML =
-            makeSelectHTML(rid) +
-            makeSelectHTML(aid) +
-            `
-            <button type="button" onclick="this.parentElement.remove()"
+
+        row.innerHTML = `
+            <div class="flex-1">
+                <select id="${rid}" class="${_SEL_CLASS}" style="${_SEL_STYLE}"></select>
+            </div>
+            <div class="flex-1">
+                <select id="${aid}" class="${_SEL_CLASS}" style="${_SEL_STYLE}"></select>
+            </div>
+            <button type="button" onclick="removePermissionRow(this)"
                 class="flex items-center justify-center w-8 h-8 rounded-md text-icon-muted hover:text-red-500 hover:bg-red-500/10 transition-all shrink-0">
                 <i data-lucide="x" class="w-4 h-4"></i>
             </button>`;
+
         list.appendChild(row);
 
-        const resSelect = row.querySelector(`#${rid}`);
-        const accSelect = row.querySelector(`#${aid}`);
+        const resSelect = document.getElementById(rid);
+        const accSelect = document.getElementById(aid);
 
-        resSelect.innerHTML = RESOURCES.map(
-            (r) =>
-                `<option value="${r}" ${r === resource ? "selected" : ""}>${r}</option>`,
+        resSelect.innerHTML = RESOURCES.map(r =>
+            `<option value="${r}"${r === resource ? " selected" : ""}>${r}</option>`
         ).join("");
-        accSelect.innerHTML = ACCESS_LEVELS.map(
-            (a) =>
-                `<option value="${a}" ${a === access ? "selected" : ""}>${a}</option>`,
+        accSelect.innerHTML = ACCESS_LEVELS.map(a =>
+            `<option value="${a}"${a === access ? " selected" : ""}>${a}</option>`
         ).join("");
+
+        resSelect.addEventListener("change", syncAllRows);
+        accSelect.addEventListener("change", syncAllRows);
 
         if (window.lucide) window.lucide.createIcons();
+        syncAllRows();
     }
 
     // Seed one row
@@ -330,13 +415,11 @@ endblock %} {% block content %}
                     "success",
                 );
 
-                // Reset form instead of hiding card
+                // Reset form
                 document.getElementById("role-name").value = "";
                 document.getElementById("role-desc").value = "";
                 document.getElementById("permissions-list").innerHTML = "";
                 addPermissionRow("inventory", "read");
-
-                if (window.lucide) window.lucide.createIcons();
             }
         } catch {
             window.showBanner("Network error. Please try again.", "error");
