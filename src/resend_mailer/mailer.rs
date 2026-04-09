@@ -3,9 +3,12 @@ use crate::error::{AppError, AppResult};
 use resend_rs::types::CreateEmailBaseOptions;
 use resend_rs::Resend;
 
-pub async fn send_reset_email(resend: &Resend, to_email: &str, token: &str) -> AppResult<()> {
-    let base_url =
-        std::env::var("APP_BASE_URL").unwrap_or_else(|_| "http://localhost:3000".to_string());
+pub async fn send_reset_email(
+    resend: &Resend,
+    to_email: &str,
+    token: &str,
+    base_url: &str,
+) -> AppResult<()> {
     let reset_link = format!("{base_url}/reset-password?token={token}");
     let html = reset_password_email(&reset_link);
 

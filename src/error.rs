@@ -67,7 +67,7 @@ impl IntoResponse for AppError {
             AppError::Conflict(_) => StatusCode::CONFLICT,
             AppError::Internal(_) => StatusCode::INTERNAL_SERVER_ERROR,
             AppError::BadRequest(_) => StatusCode::BAD_REQUEST,
-            AppError::AccountDisabled => StatusCode::FORBIDDEN,
+            AppError::AccountDisabled => unreachable!("handled by early return above"),
         };
 
         (status, Json(json!({ "error": self.to_string() }))).into_response()

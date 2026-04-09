@@ -57,13 +57,7 @@ pub async fn login(
     }
 
     if !user.is_active {
-        return Ok((
-            StatusCode::FORBIDDEN,
-            Json(serde_json::json!({
-                "error": "Your account has been disabled. Please contact an administrator."
-            })),
-        )
-            .into_response());
+        return Err(AppError::AccountDisabled);
     }
 
     let token = create_jwt(
