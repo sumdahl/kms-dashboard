@@ -17,7 +17,9 @@ use axum::{
     routing::{delete, get, post},
     Router,
 };
+use chrono::Utc;
 use std::collections::HashMap;
+use uuid::Uuid;
 
 use serde::Deserialize;
 
@@ -113,12 +115,46 @@ async fn forgot_password_page() -> impl IntoResponse {
     ForgotPasswordTemplate {}
 }
 
+#[derive(Deserialize)]
+struct ResetTokenQuery {
+    token: Option<String>,
+}
+
 #[derive(askama::Template)]
 #[template(path = "reset_password.html")]
-struct ResetPasswordTemplate {}
+struct ResetPasswordTemplate {
+    token_valid: bool,
+    token: String,
+}
 
-async fn reset_password_page() -> impl IntoResponse {
-    ResetPasswordTemplate {}
+async fn reset_password_page(
+    State(state): State<AppState>,
+    Query(query): Query<ResetTokenQuery>,
+) -> impl IntoResponse {
+    let (token_valid, token) = match query.token {
+        None => (false, String::new()),
+        Some(ref t) => match Uuid::parse_str(t) {
+            Err(_) => (false, String::new()),
+            Ok(token_uuid) => {
+                let result = sqlx::query!(
+                    "SELECT expires_at, used_at FROM password_reset_tokens WHERE token = $1",
+                    token_uuid
+                )
+                .fetch_optional(&state.db)
+                .await;
+
+                match result {
+                    Ok(Some(record)) => {
+                        let valid = record.used_at.is_none() && Utc::now() < record.expires_at;
+                        (valid, if valid { t.clone() } else { String::new() })
+                    }
+                    _ => (false, String::new()),
+                }
+            }
+        },
+    };
+
+    ResetPasswordTemplate { token_valid, token }
 }
 #[derive(askama::Template)]
 #[template(path = "dashboard/create_role_wizard.html")]
