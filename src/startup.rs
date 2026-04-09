@@ -32,9 +32,11 @@ pub async fn init(config: &Config) -> AppResult<Router> {
     let cleanup_pool = pool.clone();
 
     // 3. App state
+    crate::auth::jwt::init_jwt_secret(config.jwt_secret.clone());
     let state = AppState {
         db: pool,
         resend: Resend::default(),
+        app_base_url: config.app_base_url.clone(),
     };
 
     // 4. Router

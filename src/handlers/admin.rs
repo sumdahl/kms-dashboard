@@ -153,13 +153,10 @@ pub async fn list_roles(
                 use sqlx::Row;
                 let res_str: String = p.get("resource");
                 let acc_str: String = p.get("access_level");
-
-                let resource = serde_json::from_value(serde_json::Value::String(res_str))
-                    .unwrap_or(Resource::Orders);
-                let access = serde_json::from_value(serde_json::Value::String(acc_str))
-                    .unwrap_or(AccessLevel::Read);
-
-                RolePermission { resource, access }
+                RolePermission {
+                    resource: res_str.parse().unwrap_or(Resource::Orders),
+                    access: acc_str.parse().unwrap_or(AccessLevel::Read),
+                }
             })
             .collect();
     }
@@ -242,34 +239,26 @@ pub async fn create_role(
     }
 
     for perm in payload.permissions {
-        let resource_str = serde_json::to_value(&perm.resource)?
-            .as_str()
-            .unwrap_or("unknown")
-            .to_string();
-        let access_str = serde_json::to_value(&perm.access)?
-            .as_str()
-            .unwrap_or("read")
-            .to_string();
+        let resource_str = perm.resource.to_string();
+        let access_str = perm.access.to_string();
 
-        let perm_result = sqlx::query(
+        match sqlx::query(
             "INSERT INTO role_permissions (role_id, resource, access_level) VALUES ($1, $2, $3)",
         )
         .bind(role_id)
         .bind(&resource_str)
         .bind(&access_str)
         .execute(&mut *tx)
-        .await;
-
-        if let Err(sqlx::Error::Database(db_err)) = perm_result {
-            if db_err.code().as_deref() == Some("23505") {
+        .await
+        {
+            Ok(_) => {}
+            Err(sqlx::Error::Database(db_err)) if db_err.code().as_deref() == Some("23505") => {
                 return Err(AppError::Conflict(format!(
-                    "Duplicate permission detected: resource '{}' with access '{}' is already assigned to this role.",
+                    "Duplicate permission: '{}' with '{}' is already assigned to this role.",
                     resource_str, access_str
                 )));
             }
-            return Err(sqlx::Error::Database(db_err).into());
-        } else if let Err(e) = perm_result {
-            return Err(e.into());
+            Err(e) => return Err(e.into()),
         }
     }
 
@@ -333,14 +322,10 @@ pub async fn delete_role(
     State(pool): State<Db>,
     Path(role_id): Path<Uuid>,
 ) -> AppResult<Json<serde_json::Value>> {
-    eprintln!("[delete_role] Deleting role_id: {:?}", role_id);
-
     let result = sqlx::query("DELETE FROM roles WHERE role_id = $1")
         .bind(role_id)
         .execute(&pool)
         .await?;
-
-    eprintln!("[delete_role] rows_affected: {}", result.rows_affected());
 
     if result.rows_affected() == 0 {
         return Err(AppError::RoleNotFound);
@@ -391,11 +376,10 @@ pub async fn get_role_detail(
         .map(|p| {
             let res_str: String = p.get("resource");
             let acc_str: String = p.get("access_level");
-            let resource = serde_json::from_value(serde_json::Value::String(res_str))
-                .unwrap_or(Resource::Orders);
-            let access = serde_json::from_value(serde_json::Value::String(acc_str))
-                .unwrap_or(AccessLevel::Read);
-            RolePermission { resource, access }
+            RolePermission {
+                resource: res_str.parse().unwrap_or(Resource::Orders),
+                access: acc_str.parse().unwrap_or(AccessLevel::Read),
+            }
         })
         .collect();
 

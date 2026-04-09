@@ -54,10 +54,8 @@ where
             let acc_str: String = row.get("access_level");
             let role_name: String = row.get("role_name");
             
-            let resource: Resource = serde_json::from_value(serde_json::Value::String(res_str))
-                .unwrap_or(Resource::Orders);
-            let access: AccessLevel = serde_json::from_value(serde_json::Value::String(acc_str))
-                .unwrap_or(AccessLevel::Read);
+            let resource: Resource = res_str.parse().unwrap_or(Resource::Orders);
+            let access: AccessLevel = acc_str.parse().unwrap_or(AccessLevel::Read);
 
             if let Some(existing) = resolved.iter_mut().find(|p| p.resource == resource) {
                 if access > existing.access {

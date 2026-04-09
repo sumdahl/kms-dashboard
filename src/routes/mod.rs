@@ -386,28 +386,17 @@ async fn role_detail_page(
         .map(|p| {
             let res_str: String = p.get("resource");
             let acc_str: String = p.get("access_level");
-            let resource = serde_json::from_value(serde_json::Value::String(res_str.clone()))
-                .unwrap_or(Resource::Orders);
-            let access = serde_json::from_value(serde_json::Value::String(acc_str.clone()))
-                .unwrap_or(AccessLevel::Read);
-            RolePermission { resource, access }
+            RolePermission {
+                resource: res_str.parse().unwrap_or(Resource::Orders),
+                access: acc_str.parse().unwrap_or(AccessLevel::Read),
+            }
         })
         .collect();
 
     let permissions: Vec<(String, String)> = role
         .permissions
         .iter()
-        .map(|p| {
-            let res = serde_json::to_value(&p.resource)
-                .ok()
-                .and_then(|v| v.as_str().map(String::from))
-                .unwrap_or_default();
-            let acc = serde_json::to_value(&p.access)
-                .ok()
-                .and_then(|v| v.as_str().map(String::from))
-                .unwrap_or_default();
-            (res, acc)
-        })
+        .map(|p| (p.resource.to_string(), p.access.to_string()))
         .collect();
 
     // Load assignments
@@ -455,7 +444,7 @@ async fn role_detail_page(
         is_admin: c.is_admin,
         role_name: role.name,
         role_description: role.description,
-        role_id_short: role.role_id.to_string()[..8].to_string(),
+        role_id_short: role.role_id.to_string().chars().take(8).collect(),
         created_at_display: role.created_at.format("%b %d, %Y").to_string(),
         permissions_len: permissions.len(),
         permissions,

@@ -6,10 +6,9 @@ use resend_rs::Resend;
 pub struct AppState {
     pub db: Db,
     pub resend: Resend,
+    pub app_base_url: String,
 }
 
-// This allows Axum to automatically extract the DB pool
-// from our AppState when a handler or extractor asks for it.
 impl FromRef<AppState> for Db {
     fn from_ref(state: &AppState) -> Self {
         state.db.clone()

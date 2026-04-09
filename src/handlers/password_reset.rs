@@ -63,7 +63,7 @@ pub async fn forgot_password(
         .execute(&state.db)
         .await?;
 
-        send_reset_email(&state.resend, &payload.email, &token.to_string()).await?;
+        send_reset_email(&state.resend, &payload.email, &token.to_string(), &state.app_base_url).await?;
     }
 
     Ok((
