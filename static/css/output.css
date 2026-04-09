@@ -20,10 +20,6 @@
     --color-green-300: oklch(87.1% 0.15 154.449);
     --color-green-500: oklch(72.3% 0.219 149.579);
     --color-green-600: oklch(62.7% 0.194 149.214);
-    --color-blue-50: oklch(97% 0.014 254.604);
-    --color-blue-100: oklch(93.2% 0.032 255.585);
-    --color-blue-800: oklch(42.4% 0.199 265.638);
-    --color-blue-900: oklch(37.9% 0.146 265.522);
     --color-indigo-400: oklch(67.3% 0.182 276.935);
     --color-indigo-500: oklch(58.5% 0.233 277.117);
     --color-zinc-900: oklch(21% 0.006 285.885);
@@ -103,7 +99,6 @@
     --color-status-green: #24a148;
     --color-status-red: #da1e28;
     --color-status-blue: #046dff;
-    --color-status-yellow: #f1c21b;
     --color-banner-bg: #f0f7ff;
     --color-banner-border: #c6e2ff;
     --color-banner-text: #005bd1;
