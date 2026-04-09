@@ -10,6 +10,7 @@ pub struct User {
     pub password_hash: String,
     pub is_admin: bool,
     pub is_active: bool,
+    pub disabled_reason: Option<String>,
     pub session_version: i32,
     pub created_at: DateTime<Utc>,
 }
@@ -23,6 +24,7 @@ impl User {
             password_hash: password_hash.to_string(),
             is_admin: false,
             is_active: true,
+            disabled_reason: None,
             session_version: 0,
             created_at: Utc::now(),
         }

@@ -1565,6 +1565,9 @@
   .text-red-600 {
     color: var(--color-red-600);
   }
+  .text-red-700 {
+    color: var(--color-red-700);
+  }
   .text-status-blue {
     color: var(--color-status-blue);
   }

@@ -263,7 +263,9 @@
                     el.appendChild(btn);
                     area.appendChild(el);
                     area.style.display = "block";
-                    setTimeout(function () { area.innerHTML = ""; area.style.display = "none"; }, 3000);
+                    if (type !== "error") {
+                        setTimeout(function () { area.innerHTML = ""; area.style.display = "none"; }, 3000);
+                    }
                 };
             })();
 

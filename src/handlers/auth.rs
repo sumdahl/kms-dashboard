@@ -57,7 +57,7 @@ pub async fn login(
     }
 
     if !user.is_active {
-        return Err(AppError::AccountDisabled);
+        return Err(AppError::AccountDisabled(user.disabled_reason));
     }
 
     let token = create_jwt(

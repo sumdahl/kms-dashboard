@@ -33,7 +33,7 @@ pub enum AppError {
     #[error("Bad request: {0}")]
     BadRequest(String),
     #[error("Account disabled")]
-    AccountDisabled,
+    AccountDisabled(Option<String>),
 }
 
 impl From<sqlx::Error> for AppError {
@@ -50,8 +50,8 @@ impl From<serde_json::Error> for AppError {
 
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        if let AppError::AccountDisabled = self {
-            return disabled_response();
+        if let AppError::AccountDisabled(ref reason) = self {
+            return disabled_response(reason.clone());
         }
 
         let status = match &self {
@@ -67,23 +67,24 @@ impl IntoResponse for AppError {
             AppError::Conflict(_) => StatusCode::CONFLICT,
             AppError::Internal(_) => StatusCode::INTERNAL_SERVER_ERROR,
             AppError::BadRequest(_) => StatusCode::BAD_REQUEST,
-            AppError::AccountDisabled => unreachable!("handled by early return above"),
+            AppError::AccountDisabled(_) => unreachable!("handled by early return above"),
         };
 
         (status, Json(json!({ "error": self.to_string() }))).into_response()
     }
 }
 
-fn disabled_response() -> Response {
+fn disabled_response(reason: Option<String>) -> Response {
     let mut headers = HeaderMap::new();
-    headers.insert(
-        axum::http::header::LOCATION,
-        HeaderValue::from_static("/login?reason=account_disabled"),
-    );
     headers.insert(
         "HX-Redirect",
         HeaderValue::from_static("/login?reason=account_disabled"),
     );
-    (StatusCode::FOUND, headers).into_response()
+    let message = match &reason {
+        Some(r) => format!("Your account has been disabled. Reason: {}", r),
+        None => "Your account has been disabled. Contact an administrator.".to_string(),
+    };
+    let body = Json(json!({ "error": message }));
+    (StatusCode::FORBIDDEN, headers, body).into_response()
 }
 pub type AppResult<T> = Result<T, AppError>;
