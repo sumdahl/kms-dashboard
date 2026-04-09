@@ -145,19 +145,16 @@
 
             // ── Theme Management ────────────────────────────────────────────────
             (function () {
-                const btn = document.getElementById("theme-toggle");
-                const sun = document.getElementById("icon-sun");
-                const moon = document.getElementById("icon-moon");
-                const textEl = document.getElementById("theme-text");
                 const html = document.documentElement;
 
                 function syncThemeUI() {
                     const isDark = html.classList.contains("dark");
+                    const sun = document.getElementById("icon-sun");
+                    const moon = document.getElementById("icon-moon");
+                    const textEl = document.getElementById("theme-text");
                     if (sun) sun.classList.toggle("hidden", !isDark);
                     if (moon) moon.classList.toggle("hidden", isDark);
-                    if (textEl) {
-                        textEl.textContent = isDark ? "Light mode" : "Dark mode";
-                    }
+                    if (textEl) textEl.textContent = isDark ? "Light mode" : "Dark mode";
                 }
 
                 // Initial sync
