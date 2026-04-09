@@ -1,4 +1,4 @@
-use crate::email_templates::reset_password_email;
+use super::email_templates::reset_password_email;
 use crate::error::{AppError, AppResult};
 use resend_rs::types::CreateEmailBaseOptions;
 use resend_rs::Resend;
