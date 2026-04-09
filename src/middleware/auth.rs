@@ -47,7 +47,7 @@ where
         let user_id = Uuid::parse_str(&claims.sub).map_err(|_| AppError::Unauthorized)?;
 
         let row = sqlx::query(
-            "SELECT is_active, session_version FROM users WHERE user_id = $1"
+            "SELECT is_active, disabled_reason, session_version FROM users WHERE user_id = $1"
         )
         .bind(user_id)
         .fetch_optional(&pool)
@@ -60,10 +60,11 @@ where
 
         use sqlx::Row;
         let is_active: bool = row.get("is_active");
+        let disabled_reason: Option<String> = row.get("disabled_reason");
         let session_version: i32 = row.get("session_version");
 
         if !is_active {
-            return Err(AppError::AccountDisabled);
+            return Err(AppError::AccountDisabled(disabled_reason));
         }
 
         if claims.sv != session_version {
