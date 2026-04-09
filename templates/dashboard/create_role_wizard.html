@@ -41,7 +41,7 @@ endblock %} {% block content %}
                 <div class="flex flex-col items-center gap-2">
                     <div
                         id="step-2-dot"
-                        class="w-10 h-10 rounded-full bg-surface-02 border border-border-subtle text-text-helper flex items-center justify-center font-bold transition-all duration-500"
+                        class="w-10 h-10 rounded-full bg-surface-02 text-text-helper flex items-center justify-center font-bold transition-all duration-500"
                     >
                         2
                     </div>
@@ -54,7 +54,7 @@ endblock %} {% block content %}
                 <div class="flex flex-col items-center gap-2">
                     <div
                         id="step-3-dot"
-                        class="w-10 h-10 rounded-full bg-surface-02 border border-border-subtle text-text-helper flex items-center justify-center font-bold transition-all duration-500"
+                        class="w-10 h-10 rounded-full bg-surface-02 text-text-helper flex items-center justify-center font-bold transition-all duration-500"
                     >
                         3
                     </div>
@@ -66,7 +66,7 @@ endblock %} {% block content %}
             </div>
             <!-- Background Line -->
             <div
-                class="absolute top-5 left-0 right-0 h-px bg-border-subtle -z-0 mx-12"
+                class="absolute top-5 left-0 right-0 h-px bg-surface-02 -z-0 mx-12"
             >
                 <div
                     id="progress-line"
@@ -77,22 +77,22 @@ endblock %} {% block content %}
         </div>
     </div>
 
-    <!-- Two Column Layout -->
+    <!-- Original Layout Alignment -->
     <div class="flex flex-col lg:flex-row gap-10 items-start">
-        <!-- Left Column: Wizard Cards -->
+        <!-- Wizard Cards -->
         <div
             class="w-full lg:max-w-2xl flex flex-col gap-6"
             id="wizard-container"
         >
             <!-- Step 1: Role Identity -->
             <div
-                class="onboarding-card bg-surface-01 border border-border-strong rounded-card overflow-hidden shadow-sm active-step"
+                class="onboarding-card bg-surface-01 rounded-card overflow-hidden"
                 id="card-identity"
             >
                 <div class="p-8">
                     <div class="flex items-center gap-4 mb-8">
                         <div
-                            class="w-12 h-12 rounded-lg bg-surface-02 flex items-center justify-center text-icon-secondary border border-border-subtle"
+                            class="w-12 h-12 rounded-lg bg-surface-02 flex items-center justify-center text-icon-secondary"
                         >
                             <i data-lucide="tag" class="w-6 h-6"></i>
                         </div>
@@ -119,7 +119,7 @@ endblock %} {% block content %}
                                 type="text"
                                 id="role-name"
                                 placeholder="e.g. Security Auditor"
-                                class="w-full px-4 py-3 bg-surface-02 border border-border-subtle rounded-md text-[15px] text-text-primary outline-none focus:border-btn-primary transition-all shadow-sm"
+                                class="w-full px-4 py-3 bg-surface-02 rounded-md text-[15px] text-text-primary outline-none focus:ring-1 focus:ring-btn-primary transition-all shadow-sm"
                             />
                         </div>
                         <div>
@@ -135,7 +135,7 @@ endblock %} {% block content %}
                                 id="role-desc"
                                 rows="3"
                                 placeholder="What is this role for?"
-                                class="w-full px-4 py-3 bg-surface-02 border border-border-subtle rounded-md text-[15px] text-text-primary outline-none focus:border-btn-primary transition-all shadow-sm resize-none"
+                                class="w-full px-4 py-3 bg-surface-02 rounded-md text-[15px] text-text-primary outline-none focus:ring-1 focus:ring-btn-primary transition-all shadow-sm resize-none"
                             ></textarea>
                         </div>
                         <div class="flex justify-end pt-4">
@@ -152,13 +152,13 @@ endblock %} {% block content %}
 
             <!-- Step 2: Permissions -->
             <div
-                class="onboarding-card bg-surface-01 border border-border-subtle rounded-card overflow-hidden shadow-sm hidden"
+                class="onboarding-card bg-surface-01 rounded-card overflow-hidden shadow-sm hidden"
                 id="card-permissions"
             >
                 <div class="p-8">
                     <div class="flex items-center gap-4 mb-8">
                         <div
-                            class="w-12 h-12 rounded-lg bg-surface-02 flex items-center justify-center text-icon-secondary border border-border-subtle"
+                            class="w-12 h-12 rounded-lg bg-surface-02 flex items-center justify-center text-icon-secondary"
                         >
                             <i data-lucide="key" class="w-6 h-6"></i>
                         </div>
@@ -174,7 +174,7 @@ endblock %} {% block content %}
 
                     <div class="space-y-6">
                         <div
-                            class="flex items-center justify-between border-b border-border-subtle pb-3"
+                            class="flex items-center justify-between pb-3"
                         >
                             <span
                                 class="text-[14px] font-bold text-text-secondary uppercase tracking-widest"
@@ -224,13 +224,13 @@ endblock %} {% block content %}
 
             <!-- Step 3: Review & Finalize -->
             <div
-                class="onboarding-card bg-surface-01 border border-border-subtle rounded-card overflow-hidden shadow-sm hidden"
+                class="onboarding-card bg-surface-01 rounded-card overflow-hidden shadow-sm hidden"
                 id="card-review"
             >
                 <div class="p-8">
                     <div class="flex items-center gap-4 mb-8">
                         <div
-                            class="w-12 h-12 rounded-lg bg-surface-02 flex items-center justify-center text-icon-secondary border border-border-subtle"
+                            class="w-12 h-12 rounded-lg bg-surface-02 flex items-center justify-center text-icon-secondary"
                         >
                             <i
                                 data-lucide="clipboard-check"
@@ -249,7 +249,7 @@ endblock %} {% block content %}
 
                     <div class="space-y-6">
                         <div
-                            class="bg-surface-02 rounded-lg p-6 border border-border-subtle space-y-4"
+                            class="bg-surface-02 rounded-lg p-6 space-y-4"
                         >
                             <div>
                                 <span
@@ -306,79 +306,10 @@ endblock %} {% block content %}
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Right Column: Guidance/Tips (Closer to form) -->
-        <div class="w-full lg:w-72 shrink-0 space-y-6">
+            <!-- "Need it faster?" section (Now below the cards) -->
             <div
-                class="bg-surface-01 border border-border-subtle rounded-card p-5 shadow-sm"
-            >
-                <h3
-                    class="text-[13px] font-bold text-text-primary uppercase tracking-wider mb-4 flex items-center gap-2"
-                >
-                    <i
-                        data-lucide="shield-check"
-                        class="w-4 h-4 text-btn-primary"
-                    ></i>
-                    Professional Tips
-                </h3>
-                <ul class="space-y-4">
-                    <li class="flex gap-3">
-                        <div class="text-btn-primary mt-0.5">
-                            <i
-                                data-lucide="check-circle-2"
-                                class="w-3.5 h-3.5"
-                            ></i>
-                        </div>
-                        <p
-                            class="text-[12px] text-text-secondary leading-normal"
-                        >
-                            <span class="font-bold text-text-primary"
-                                >Granular Access:</span
-                            >
-                            Use the professional wizard to define precise,
-                            multi-resource permissions.
-                        </p>
-                    </li>
-                    <li class="flex gap-3">
-                        <div class="text-btn-primary mt-0.5">
-                            <i
-                                data-lucide="check-circle-2"
-                                class="w-3.5 h-3.5"
-                            ></i>
-                        </div>
-                        <p
-                            class="text-[12px] text-text-secondary leading-normal"
-                        >
-                            <span class="font-bold text-text-primary"
-                                >Audit Log:</span
-                            >
-                            Roles created here are tracked with full
-                            descriptions for security audits.
-                        </p>
-                    </li>
-                    <li class="flex gap-3">
-                        <div class="text-btn-primary mt-0.5">
-                            <i
-                                data-lucide="check-circle-2"
-                                class="w-3.5 h-3.5"
-                            ></i>
-                        </div>
-                        <p
-                            class="text-[12px] text-text-secondary leading-normal"
-                        >
-                            <span class="font-bold text-text-primary"
-                                >Review Step:</span
-                            >
-                            Always double-check the 'Review' step to ensure no
-                            excessive access is granted.
-                        </p>
-                    </li>
-                </ul>
-            </div>
-
-            <div
-                class="bg-surface-01 border border-border-strong rounded-card p-5"
+                class="bg-surface-01 rounded-card p-5"
             >
                 <h3
                     class="text-[13px] font-bold text-text-primary mb-2 flex items-center gap-2"
@@ -404,10 +335,6 @@ endblock %} {% block content %}
 <style>
     .onboarding-card {
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .active-step {
-        border-color: var(--color-btn-primary) !important;
-        border-width: 1px !important;
     }
     .scale-in {
         animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
@@ -514,7 +441,6 @@ endblock %} {% block content %}
 
             cardIdentity.classList.add("hidden");
             cardPermissions.classList.remove("hidden");
-            cardPermissions.classList.add("active-step");
 
             dot2.classList.replace("bg-surface-02", "bg-btn-primary");
             dot2.classList.replace("text-text-helper", "text-white");
@@ -563,14 +489,13 @@ endblock %} {% block content %}
             perms.forEach((p) => {
                 const tag = document.createElement("span");
                 tag.className =
-                    "px-2.5 py-1 bg-surface-02 border border-border-subtle rounded text-[12px] font-medium text-text-secondary flex items-center gap-1.5";
+                    "px-2.5 py-1 bg-surface-02 rounded text-[12px] font-medium text-text-secondary flex items-center gap-1.5";
                 tag.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-btn-primary"></span> ${p.resource} • <span class="text-text-primary font-bold uppercase text-[10px]">${p.access}</span>`;
                 summaryPerms.appendChild(tag);
             });
 
             cardPermissions.classList.add("hidden");
             cardReview.classList.remove("hidden");
-            cardReview.classList.add("active-step");
 
             dot3.classList.replace("bg-surface-02", "bg-btn-primary");
             dot3.classList.replace("text-text-helper", "text-white");
