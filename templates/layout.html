@@ -123,6 +123,11 @@
         <script src="/static/js/sidebar.js"></script>
 
         <script>
+            // ── Global HTMX Network Error Handler ───────────────────────────────
+            document.addEventListener("htmx:sendError", function () {
+                window.showBanner("Network error. The server may be unreachable.", "error");
+            });
+
             // ── Initialize Lucide Icons ──────────────────────────────────────────
             function initLucideIcons() {
                 if (window.lucide) {
