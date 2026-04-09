@@ -1,8 +1,8 @@
 use crate::app_state::AppState;
+use crate::resend_mailer::mailer::send_reset_email;
 use crate::{
     auth::hashing::hash_password,
     error::{AppError, AppResult},
-    mailer::send_reset_email,
 };
 use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
 use chrono::{DateTime, Utc};

@@ -2,12 +2,11 @@ mod app_state;
 mod auth;
 mod config;
 mod db;
-mod email_templates;
 mod error;
 mod handlers;
-mod mailer;
 mod middleware;
 mod models;
+mod resend_mailer;
 mod routes;
 mod startup;
 
