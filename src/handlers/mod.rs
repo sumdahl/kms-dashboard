@@ -1,6 +1,9 @@
+pub mod actions;
 pub mod admin;
 pub mod api;
 pub mod auth;
 pub mod dashboard;
 pub mod logout_partial;
+pub mod pages;
+pub mod partials;
 pub mod password_reset;

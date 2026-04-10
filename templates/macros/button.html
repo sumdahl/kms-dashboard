@@ -1,0 +1,63 @@
+{# templates/macros/button.html #}
+
+{# ── button ──────────────────────────────────────────────────────────────────
+   Variants: "primary" | "secondary" | "danger" | "ghost" | "outline"
+   Usage: {{ btn::button(label="Sign in") }}
+   Usage: {{ btn::button(label="Ask AI", icon_svg="<svg>...</svg>", variant="ghost") }}
+   Usage: {{ btn::button(label="Menu", id="mobile-sidebar-toggle", variant="ghost") }}
+   Usage: {{ btn::button(label="Toggle", hx_on="htmx:afterRequest: document.documentElement.classList.toggle('dark')") }}
+────────────────────────────────────────────────────────────────────────────── #}
+{% macro button(
+    label,
+    id="",
+    icon_svg="",
+    btn_type="submit",
+    variant="primary",
+    full_width=false,
+    disabled=false,
+    hx_get="",
+    hx_post="",
+    hx_target="",
+    hx_swap="",
+    hx_confirm="",
+    hx_push_url="",
+    hx_on=""
+) %}
+<button
+    {% if !id.is_empty() %}id="{{ id }}"{% endif %}
+    type="{{ btn_type }}"
+    {% if disabled %}disabled{% endif %}
+    {% if !hx_get.is_empty() %}hx-get="{{ hx_get }}"{% endif %}
+    {% if !hx_post.is_empty() %}hx-post="{{ hx_post }}"{% endif %}
+    {% if !hx_target.is_empty() %}hx-target="{{ hx_target }}"{% endif %}
+    {% if !hx_swap.is_empty() %}hx-swap="{{ hx_swap }}"{% endif %}
+    {% if !hx_confirm.is_empty() %}hx-confirm="{{ hx_confirm }}"{% endif %}
+    {% if !hx_push_url.is_empty() %}hx-push-url="{{ hx_push_url }}"{% endif %}
+    {% if !hx_on.is_empty() %}hx-on="{{ hx_on }}"{% endif %}
+    class="
+        {% if full_width %}w-full{% endif %}
+        inline-flex items-center justify-center gap-1.5
+        h-9 px-4 rounded-sm
+        text-[13px] font-medium
+        transition-colors
+        focus:outline-none
+        disabled:opacity-50 disabled:cursor-not-allowed
+        {% if variant == "primary" %}
+            bg-btn-primary text-white hover:bg-btn-primary-hover
+        {% elif variant == "secondary" %}
+            bg-surface-02 text-text-primary border border-border-strong hover:bg-surface-active
+        {% elif variant == "danger" %}
+            bg-red-600 text-white hover:bg-red-700
+        {% elif variant == "ghost" %}
+            bg-transparent text-text-secondary hover:bg-surface-hover hover:text-text-primary
+        {% elif variant == "outline" %}
+            bg-transparent text-text-primary border border-border-strong hover:bg-surface-hover
+        {% endif %}
+    "
+>
+    {% if !icon_svg.is_empty() %}
+        <span class="text-icon-muted">{{ icon_svg|safe }}</span>
+    {% endif %}
+    {{ label }}
+</button>
+{% endmacro %}

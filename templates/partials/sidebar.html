@@ -1,248 +1,747 @@
-<aside id="sidebar"
+{# templates/partials/sidebar.html #}
+
+<aside
+    id="sidebar"
     class="sidebar [grid-area:sidebar] h-full overflow-hidden bg-surface-01 border-r border-border-subtle flex flex-col"
-    data-pinned="{{ sidebar_pinned }}">
-    <!-- Zone A: hover triggers expand/collapse -->
-    <div id="sidebar-hover-zone" class="sidebar-scroll flex-1 flex flex-col overflow-hidden overflow-y-auto">
-        <!-- Account header -->
+    data-pinned="{{ sidebar_pinned }}"
+>
+    <div
+        id="sidebar-hover-zone"
+        class="sidebar-scroll flex-1 flex flex-col overflow-hidden overflow-y-auto"
+    >
+        {# Account header #}
         <div
-            class="flex items-center gap-3 px-3 h-12 min-h-12 border-b border-border-subtle overflow-hidden cursor-pointer hover:bg-surface-hover transition-colors">
-            <!-- Logo placeholder -->
-            <a href="/" class="sidebar-logo-wrapper h-6 shrink-0 overflow-hidden relative flex items-center justify-start">
-                <img src="/static/logo/citytech_logo.webp" alt="Citytech Global Logo"
-                    class="h-full w-auto object-left object-cover max-w-none origin-left scale-110" loading="lazy" />
+            class="flex items-center gap-3 px-3 h-12 min-h-12 border-b border-border-subtle overflow-hidden cursor-pointer hover:bg-surface-hover transition-colors"
+        >
+            <a
+                href="/"
+                class="sidebar-logo-wrapper h-6 shrink-0 overflow-hidden relative flex items-center justify-start"
+            >
+                <img
+                    src="/static/logo/citytech_logo.webp"
+                    alt="Citytech Global Logo"
+                    class="h-full w-auto object-left object-cover max-w-none origin-left scale-110"
+                    loading="lazy"
+                />
             </a>
-            <!-- Account info fades in when expanded -->
             <div class="sidebar-label flex items-center gap-2 min-w-0 flex-1">
                 <span
-                    class="text-[13px] font-medium text-text-primary overflow-hidden text-ellipsis whitespace-nowrap flex-1 min-w-0">{{
-                    user_email }}
+                    class="text-[13px] font-medium text-text-primary overflow-hidden text-ellipsis whitespace-nowrap flex-1 min-w-0"
+                >
+                    {{ user_email }}
                 </span>
-                <!-- Lucide icon: chevrons-up-down -->
-                <i data-lucide="chevrons-up-down" class="text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                {# chevrons-up-down #}
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="text-icon-muted shrink-0"
+                >
+                    <path d="m7 15 5 5 5-5" />
+                    <path d="m7 9 5-5 5 5" />
+                </svg>
             </div>
         </div>
-        <!-- Search -->
-        <div class="px-3 py-3 border-b border-border-subtle overflow-hidden shrink-0">
-            <button
-                onclick="openSearch()"
-                class="sidebar-search-btn w-full flex items-center gap-2 h-8 px-2 border rounded-md hover:bg-surface-hover hover:border-text-primary transition-colors overflow-hidden group text-left">
-                <i data-lucide="search" class="text-icon-secondary shrink-0 w-3.5 h-3.5"></i>
-                <span class="sidebar-label text-[13px] font-medium text-text-secondary flex-1 truncate">Search...</span>
+
+        {# Search #}
+        <div
+            class="px-3 py-3 border-b border-border-subtle overflow-hidden shrink-0"
+        >
+            <a
+                href="/search"
+                class="sidebar-search-btn w-full flex items-center gap-2 h-8 px-2 border rounded-md hover:bg-surface-hover hover:border-text-primary transition-colors overflow-hidden text-left no-underline"
+            >
+                {# search icon #}
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="text-icon-secondary shrink-0"
+                >
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="m21 21-4.3-4.3" />
+                </svg>
                 <span
-                    class="sidebar-label text-[10px] text-text-helper bg-surface-01 px-1.5 py-0.5 rounded border border-border-strong shrink-0 font-medium">⌘K</span>
-            </button>
-        </div>
-        <!-- Nav -->
-        <nav class="p-1 flex flex-col gap-0.5 flex-1 pb-8" aria-label="Main navigation">
-            <!-- Account home (active) -->
-            <a href="/?skip_onboarding=true"
-                class="flex items-center gap-3 h-10 px-3 rounded-md text-text-primary font-semibold overflow-hidden"
-                aria-current="page">
-                <!-- Lucide icon: home -->
-                <i data-lucide="home" class="w-[18px] h-[18px] min-w-[18px] text-icon-secondary shrink-0"></i>
-                <span class="sidebar-label text-[14px] flex-1">Account home</span>
+                    class="sidebar-label text-[13px] font-medium text-text-secondary flex-1 truncate"
+                    >Search...</span
+                >
+                <span
+                    class="sidebar-label text-[10px] text-text-helper bg-surface-01 px-1.5 py-0.5 rounded border border-border-strong shrink-0 font-medium"
+                    >⌘K</span
+                >
             </a>
-            <!-- Recents -->
+        </div>
+
+        {# Nav #}
+        <nav
+            class="p-1 flex flex-col gap-0.5 flex-1 pb-8"
+            aria-label="Main navigation"
+        >
+            {# Account home #}
+            <a
+                href="/?skip_onboarding=true"
+                class="flex items-center gap-3 h-10 px-3 rounded-md text-text-primary font-semibold overflow-hidden"
+                aria-current="page"
+            >
+                {# home #}
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="text-icon-secondary shrink-0 min-w-[18px]"
+                >
+                    <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                    <polyline points="9 22 9 12 15 12 15 22" />
+                </svg>
+                <span class="sidebar-label text-[14px] flex-1"
+                    >Account home</span
+                >
+            </a>
+
+            {# Recents #}
             <details class="flex flex-col">
                 <summary
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
-                    <!-- Lucide icon: clock -->
-                    <i data-lucide="clock" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
-                    <span class="sidebar-label text-[14px] flex-1">Recents</span>
-                    <!-- Lucide icon: chevron-right -->
-                    <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+                >
+                    {# clock #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-icon-muted shrink-0 min-w-[18px]"
+                    >
+                        <circle cx="12" cy="12" r="10" />
+                        <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    <span class="sidebar-label text-[14px] flex-1"
+                        >Recents</span
+                    >
+                    {# chevron-right #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="sidebar-label chevron text-icon-muted shrink-0"
+                    >
+                        <path d="m9 18 6-6-6-6" />
+                    </svg>
                 </summary>
                 <div class="sidebar-label flex flex-col pb-1">
-                    <!-- sub-items have no icons -->
-                    <a href="#"
-                        class="flex flex-col justify-center min-h-[44px] px-3 pl-9 rounded-sm hover:bg-surface-hover transition-colors">
-                        <span class="text-[13px] font-medium text-text-primary leading-tight">Workers &amp; Pages</span>
-                        <span class="text-[11px] text-text-helper leading-tight">Compute</span>
+                    <a
+                        href="#"
+                        class="flex flex-col justify-center min-h-[44px] px-3 pl-9 rounded-sm hover:bg-surface-hover transition-colors"
+                    >
+                        <span
+                            class="text-[13px] font-medium text-text-primary leading-tight"
+                            >Workers &amp; Pages</span
+                        >
+                        <span class="text-[11px] text-text-helper leading-tight"
+                            >Compute</span
+                        >
                     </a>
                 </div>
             </details>
 
-            <!-- Analytics & logs -->
+            {# Analytics & logs #}
             <details class="flex flex-col">
                 <summary
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
-                    <!-- Lucide icon: bar-chart-3 -->
-                    <i data-lucide="bar-chart-3" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
-                    <span class="sidebar-label text-[14px] flex-1">Analytics &amp; logs</span>
-                    <!-- Lucide icon: chevron-right -->
-                    <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+                >
+                    {# bar-chart-3 #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-icon-muted shrink-0 min-w-[18px]"
+                    >
+                        <path d="M3 3v18h18" />
+                        <path d="M18 17V9" />
+                        <path d="M13 17V5" />
+                        <path d="M8 17v-3" />
+                    </svg>
+                    <span class="sidebar-label text-[14px] flex-1"
+                        >Analytics &amp; logs</span
+                    >
+                    {# chevron-right #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="sidebar-label chevron text-icon-muted shrink-0"
+                    >
+                        <path d="m9 18 6-6-6-6" />
+                    </svg>
                 </summary>
             </details>
 
-            <!-- Domains -->
+            {# Domains #}
             <details class="flex flex-col">
                 <summary
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
-                    <!-- Lucide icon: globe -->
-                    <i data-lucide="globe" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
-                    <span class="sidebar-label text-[14px] flex-1">Domains</span>
-                    <!-- Lucide icon: chevron-right -->
-                    <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+                >
+                    {# globe #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-icon-muted shrink-0 min-w-[18px]"
+                    >
+                        <circle cx="12" cy="12" r="10" />
+                        <path d="M2 12h20" />
+                        <path
+                            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                        />
+                    </svg>
+                    <span class="sidebar-label text-[14px] flex-1"
+                        >Domains</span
+                    >
+                    {# chevron-right #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="sidebar-label chevron text-icon-muted shrink-0"
+                    >
+                        <path d="m9 18 6-6-6-6" />
+                    </svg>
                 </summary>
             </details>
 
-            <!-- ── Build section ──────────────────────────────────────────── -->
+            {# Build section #}
             <div class="mt-2">
                 <div class="section-divider bg-border-subtle my-1"></div>
                 <span
-                    class="section-label flex items-end px-3 pb-1 text-[11px] text-text-helper whitespace-nowrap overflow-hidden">Build</span>
+                    class="section-label flex items-end px-3 pb-1 text-[11px] text-text-helper whitespace-nowrap overflow-hidden"
+                    >Build</span
+                >
             </div>
 
-            <!-- Compute -->
+            {# Compute #}
             <details class="flex flex-col">
                 <summary
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
-                    <!-- Lucide icon: package -->
-                    <i data-lucide="package" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
-                    <span class="sidebar-label text-[14px] flex-1">Compute</span>
-                    <!-- Lucide icon: chevron-right -->
-                    <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+                >
+                    {# package #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-icon-muted shrink-0 min-w-[18px]"
+                    >
+                        <path d="M16.5 9.4 7.55 4.24" />
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                        />
+                        <polyline points="3.29 7 12 12 20.71 7" />
+                        <line x1="12" x2="12" y1="22" y2="12" />
+                    </svg>
+                    <span class="sidebar-label text-[14px] flex-1"
+                        >Compute</span
+                    >
+                    {# chevron-right #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="sidebar-label chevron text-icon-muted shrink-0"
+                    >
+                        <path d="m9 18 6-6-6-6" />
+                    </svg>
                 </summary>
             </details>
 
-            <!-- AI -->
+            {# AI #}
             <details class="flex flex-col">
                 <summary
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
-                    <!-- Lucide icon: sparkles -->
-                    <i data-lucide="sparkles" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+                >
+                    {# sparkles #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-icon-muted shrink-0 min-w-[18px]"
+                    >
+                        <path
+                            d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"
+                        />
+                        <path d="M5 3v4" />
+                        <path d="M19 17v4" />
+                        <path d="M3 5h4" />
+                        <path d="M17 19h4" />
+                    </svg>
                     <span class="sidebar-label text-[14px] flex-1">AI</span>
-                    <!-- Lucide icon: chevron-right -->
-                    <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                    {# chevron-right #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="sidebar-label chevron text-icon-muted shrink-0"
+                    >
+                        <path d="m9 18 6-6-6-6" />
+                    </svg>
                 </summary>
             </details>
 
-            <!-- Storage & databases -->
+            {# Storage & databases #}
             <details class="flex flex-col">
                 <summary
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
-                    <!-- Lucide icon: database -->
-                    <i data-lucide="database" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
-                    <span class="sidebar-label text-[14px] flex-1">Storage &amp; databases</span>
-                    <!-- Lucide icon: chevron-right -->
-                    <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+                >
+                    {# database #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-icon-muted shrink-0 min-w-[18px]"
+                    >
+                        <ellipse cx="12" cy="5" rx="9" ry="3" />
+                        <path d="M3 5V19A9 3 0 0 0 21 19V5" />
+                        <path d="M3 12A9 3 0 0 0 21 12" />
+                    </svg>
+                    <span class="sidebar-label text-[14px] flex-1"
+                        >Storage &amp; databases</span
+                    >
+                    {# chevron-right #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="sidebar-label chevron text-icon-muted shrink-0"
+                    >
+                        <path d="m9 18 6-6-6-6" />
+                    </svg>
                 </summary>
             </details>
 
-            <!-- Media -->
+            {# Media #}
             <details class="flex flex-col">
                 <summary
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
-                    <!-- Lucide icon: play-circle -->
-                    <i data-lucide="play-circle" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+                >
+                    {# play-circle #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-icon-muted shrink-0 min-w-[18px]"
+                    >
+                        <circle cx="12" cy="12" r="10" />
+                        <polygon points="10 8 16 12 10 16 10 8" />
+                    </svg>
                     <span class="sidebar-label text-[14px] flex-1">Media</span>
-                    <!-- Lucide icon: chevron-right -->
-                    <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                    {# chevron-right #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="sidebar-label chevron text-icon-muted shrink-0"
+                    >
+                        <path d="m9 18 6-6-6-6" />
+                    </svg>
                 </summary>
             </details>
 
-            <!-- ── Protect & Connect section ──────────────────────────────── -->
+            {# Protect & Connect section #}
             <div class="mt-2">
                 <div class="section-divider bg-border-subtle my-1"></div>
                 <span
-                    class="section-label flex items-end px-3 pb-1 text-[11px] text-text-helper whitespace-nowrap overflow-hidden">Protect
-                    &amp; Connect</span>
+                    class="section-label flex items-end px-3 pb-1 text-[11px] text-text-helper whitespace-nowrap overflow-hidden"
+                    >Protect &amp; Connect</span
+                >
             </div>
 
-            <!-- Application security -->
+            {# Application security #}
             <details class="flex flex-col">
                 <summary
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
-                    <!-- Lucide icon: shield -->
-                    <i data-lucide="shield" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
-                    <span class="sidebar-label text-[14px] flex-1">Application security</span>
-                    <!-- Lucide icon: chevron-right -->
-                    <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+                >
+                    {# shield #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-icon-muted shrink-0 min-w-[18px]"
+                    >
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    </svg>
+                    <span class="sidebar-label text-[14px] flex-1"
+                        >Application security</span
+                    >
+                    {# chevron-right #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="sidebar-label chevron text-icon-muted shrink-0"
+                    >
+                        <path d="m9 18 6-6-6-6" />
+                    </svg>
                 </summary>
             </details>
 
-            <!-- Zero Trust (direct link) -->
-            <a href="#"
-                class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors overflow-hidden">
-                <!-- Lucide icon: shield-check -->
-                <i data-lucide="shield-check" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+            {# Zero Trust #}
+            <a
+                href="#"
+                class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors overflow-hidden"
+            >
+                {# shield-check #}
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="text-icon-muted shrink-0 min-w-[18px]"
+                >
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <path d="m9 12 2 2 4-4" />
+                </svg>
                 <span class="sidebar-label text-[14px]">Zero Trust</span>
             </a>
 
-            <!-- Networking -->
+            {# Networking #}
             <details class="flex flex-col">
                 <summary
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
-                    <!-- Lucide icon: share-2 -->
-                    <i data-lucide="share-2" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
-                    <span class="sidebar-label text-[14px] flex-1">Networking</span>
-                    <!-- Lucide icon: chevron-right -->
-                    <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+                >
+                    {# share-2 #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-icon-muted shrink-0 min-w-[18px]"
+                    >
+                        <circle cx="18" cy="5" r="3" />
+                        <circle cx="6" cy="12" r="3" />
+                        <circle cx="18" cy="19" r="3" />
+                        <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
+                        <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+                    </svg>
+                    <span class="sidebar-label text-[14px] flex-1"
+                        >Networking</span
+                    >
+                    {# chevron-right #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="sidebar-label chevron text-icon-muted shrink-0"
+                    >
+                        <path d="m9 18 6-6-6-6" />
+                    </svg>
                 </summary>
             </details>
 
-            <!-- Delivery & performance -->
+            {# Delivery & performance #}
             <details class="flex flex-col">
                 <summary
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
-                    <!-- Lucide icon: zap -->
-                    <i data-lucide="zap" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
-                    <span class="sidebar-label text-[14px] flex-1">Delivery &amp; performance</span>
-                    <!-- Lucide icon: chevron-right -->
-                    <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+                >
+                    {# zap #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-icon-muted shrink-0 min-w-[18px]"
+                    >
+                        <polygon
+                            points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"
+                        />
+                    </svg>
+                    <span class="sidebar-label text-[14px] flex-1"
+                        >Delivery &amp; performance</span
+                    >
+                    {# chevron-right #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="sidebar-label chevron text-icon-muted shrink-0"
+                    >
+                        <path d="m9 18 6-6-6-6" />
+                    </svg>
                 </summary>
             </details>
 
-            <!-- Divider + Manage account -->
+            {# Divider #}
             <div class="h-px bg-border-subtle my-2 shrink-0"></div>
+
+            {# Manage account #}
             <details class="flex flex-col">
                 <summary
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
-                    <!-- Lucide icon: settings -->
-                    <i data-lucide="settings" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
-                    <span class="sidebar-label text-[14px] flex-1">Manage account</span>
-                    <!-- Lucide icon: chevron-right -->
-                    <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden"
+                >
+                    {# settings #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-icon-muted shrink-0 min-w-[18px]"
+                    >
+                        <path
+                            d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"
+                        />
+                        <circle cx="12" cy="12" r="3" />
+                    </svg>
+                    <span class="sidebar-label text-[14px] flex-1"
+                        >Manage account</span
+                    >
+                    {# chevron-right #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="sidebar-label chevron text-icon-muted shrink-0"
+                    >
+                        <path d="m9 18 6-6-6-6" />
+                    </svg>
                 </summary>
             </details>
 
-            {% if is_admin %}
-            <!-- ── Admin section ── -->
+            {# Admin section #} {% if is_admin %}
             <div>
                 <div class="mt-2">
                     <div class="section-divider bg-border-subtle my-1"></div>
                     <span
-                        class="section-label flex items-end px-3 pb-1 text-[11px] text-text-helper whitespace-nowrap overflow-hidden">Admin</span>
+                        class="section-label flex items-end px-3 pb-1 text-[11px] text-text-helper whitespace-nowrap overflow-hidden"
+                        >Admin</span
+                    >
                 </div>
-                <a href="/roles"
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors overflow-hidden">
-                    <i data-lucide="shield-alert" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+
+                {# Roles #}
+                <a
+                    href="/roles"
+                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors overflow-hidden"
+                >
+                    {# shield-alert #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-icon-muted shrink-0 min-w-[18px]"
+                    >
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <line x1="12" x2="12" y1="8" y2="12" />
+                        <line x1="12" x2="12.01" y1="16" y2="16" />
+                    </svg>
                     <span class="sidebar-label text-[14px] flex-1">Roles</span>
                 </a>
-                <a href="/users"
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors overflow-hidden">
-                    <i data-lucide="users" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+
+                {# Users #}
+                <a
+                    href="/users"
+                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors overflow-hidden"
+                >
+                    {# users #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-icon-muted shrink-0 min-w-[18px]"
+                    >
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
                     <span class="sidebar-label text-[14px] flex-1">Users</span>
                 </a>
-                <a href="/assign"
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors overflow-hidden">
-                    <i data-lucide="user-check" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
-                    <span class="sidebar-label text-[14px] flex-1">Assign Role</span>
+
+                {# Assign Role #}
+                <a
+                    href="/assign"
+                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors overflow-hidden"
+                >
+                    {# user-check #}
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-icon-muted shrink-0 min-w-[18px]"
+                    >
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <polyline points="16 11 18 13 22 9" />
+                    </svg>
+                    <span class="sidebar-label text-[14px] flex-1"
+                        >Assign Role</span
+                    >
                 </a>
             </div>
             {% endif %}
         </nav>
     </div>
-    <!-- /sidebar-hover-zone -->
 </aside>

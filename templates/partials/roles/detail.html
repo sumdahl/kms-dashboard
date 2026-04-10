@@ -1,0 +1,80 @@
+{# templates/partials/roles/detail.html #} {% import "macros/badge.html" as bdg
+%} {% import "macros/button.html" as btn %}
+
+<div class="flex flex-col gap-3.5">
+    {# Role header #}
+    <div class="flex items-center gap-3">
+        <div
+            class="w-10 h-10 rounded shrink-0 flex items-center justify-center text-[15px] font-bold select-none bg-surface-active text-text-secondary border border-border-subtle"
+        >
+            {{ role.initials }}
+        </div>
+        <div class="flex flex-col min-w-0">
+            <span class="text-[14px] font-semibold text-text-primary truncate">
+                {{ role.name }}
+            </span>
+            <span class="body-sm truncate">
+                {% if role.description.is_empty() %} No description {% else %}
+                {{ role.description }} {% endif %}
+            </span>
+        </div>
+    </div>
+
+    <div class="h-px bg-border-subtle"></div>
+
+    {# Details #}
+    <div class="flex flex-col gap-2.5">
+        <div class="flex items-center justify-between">
+            <span class="body-sm">Role ID</span>
+            <span class="text-[12px] font-mono text-text-primary">
+                {{ role.role_id|truncate(8) }}…
+            </span>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <span class="body-sm">Created</span>
+            <span class="text-[12px] text-text-primary"
+                >{{ role.created_at }}</span
+            >
+        </div>
+
+        <div class="flex items-center justify-between">
+            <span class="body-sm">Permissions</span>
+            <span class="text-[12px] text-text-primary"
+                >{{ role.permissions_count }}</span
+            >
+        </div>
+    </div>
+
+    {# Permissions list #} {% if !role.permissions.is_empty() %}
+    <div class="h-px bg-border-subtle"></div>
+    <div class="flex flex-col gap-1.5">
+        <span class="label-uppercase">Granted permissions</span>
+        {% for perm in role.permissions %}
+        <div class="flex items-center justify-between py-1">
+            <span
+                class="flex items-center gap-1.5 text-[12px] text-text-primary"
+            >
+                <span
+                    class="w-1.5 h-1.5 rounded-full bg-status-blue shrink-0"
+                ></span>
+                {{ perm.resource }}
+            </span>
+            {{ bdg::badge(label=perm.access, variant="info") }}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="h-px bg-border-subtle"></div>
+
+    {# Actions #}
+    <div class="flex flex-col gap-2">
+        {{ btn::button( label="Assign Users", btn_type="button",
+        variant="primary", full_width=true, hx_get="/assign?role={{ role.name
+        }}", hx_target="body", hx_push_url="true", hx_swap="none" ) }} {{
+        btn::button( label="Delete Role", btn_type="button", variant="danger",
+        full_width=true, hx_get="/roles/{{ role.role_id }}/delete-modal",
+        hx_target="#modal-container", hx_swap="innerHTML" ) }}
+    </div>
+</div>

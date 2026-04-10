@@ -1,0 +1,100 @@
+{# templates/partials/roles/list.html #}
+{% import "macros/empty_state.html" as es %}
+
+<div id="roles-list">
+    {% if roles.is_empty() %}
+        {% if !query.is_empty() %}
+            {{ es::empty_state(
+                title="No roles match your search",
+                subtitle="Try a different search term.",
+                icon_svg="<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>"
+            ) }}
+        {% else %}
+            {{ es::empty_state(
+                title="No roles yet",
+                subtitle="Click 'Create Application' to create the first role and start managing access control.",
+                icon_svg="<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z'/></svg>"
+            ) }}
+        {% endif %}
+    {% else %}
+        <div class="flex flex-col gap-3">
+            {% for role in roles %}
+                {% include "partials/roles/row.html" %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    {# Pagination #}
+    {% if total > 0 %}
+    <div class="flex items-center justify-between mt-4">
+        <span class="body-xs">
+            {% if total == roles|length %}
+                {{ total }} role{% if total != 1 %}s{% endif %}
+            {% else %}
+                Showing {{ (page - 1) * size + 1 }}–{{ (page - 1) * size + roles|length }} of {{ total }}
+            {% endif %}
+        </span>
+
+        {% if pages > 1 %}
+        <div class="flex items-center shadow-sm">
+            {# First #}
+            {% if page > 1 %}
+
+                href="?page=1&size={{ size }}&search={{ query }}&filter={{ filter }}"
+                hx-get="/roles?page=1&size={{ size }}&search={{ query }}&filter={{ filter }}"
+                hx-target="#roles-list"
+                hx-swap="outerHTML"
+                class="w-8 h-[30px] flex items-center justify-center border border-border-strong rounded-l-md bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover transition-colors"
+            >«</a>
+            {% else %}
+            <span class="w-8 h-[30px] flex items-center justify-center border border-border-strong rounded-l-md bg-surface-02 text-text-placeholder text-[12px] cursor-not-allowed">«</span>
+            {% endif %}
+
+            {# Prev #}
+            {% if page > 1 %}
+
+                href="?page={{ page - 1 }}&size={{ size }}&search={{ query }}&filter={{ filter }}"
+                hx-get="/roles?page={{ page - 1 }}&size={{ size }}&search={{ query }}&filter={{ filter }}"
+                hx-target="#roles-list"
+                hx-swap="outerHTML"
+                class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover transition-colors"
+            >‹</a>
+            {% else %}
+            <span class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-02 text-text-placeholder text-[12px] cursor-not-allowed">‹</span>
+            {% endif %}
+
+            {# Current page #}
+            <span class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-text-primary text-[13px] font-medium">
+                {{ page }}
+            </span>
+
+            {# Next #}
+            {% if page < pages %}
+
+                href="?page={{ page + 1 }}&size={{ size }}&search={{ query }}&filter={{ filter }}"
+                hx-get="/roles?page={{ page + 1 }}&size={{ size }}&search={{ query }}&filter={{ filter }}"
+                hx-target="#roles-list"
+                hx-swap="outerHTML"
+                class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover transition-colors"
+            >›</a>
+            {% else %}
+            <span class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-02 text-text-placeholder text-[12px] cursor-not-allowed">›</span>
+            {% endif %}
+
+            {# Last #}
+            {% if page < pages %}
+
+                href="?page={{ pages }}&size={{ size }}&search={{ query }}&filter={{ filter }}"
+                hx-get="/roles?page={{ pages }}&size={{ size }}&search={{ query }}&filter={{ filter }}"
+                hx-target="#roles-list"
+                hx-swap="outerHTML"
+                class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong rounded-r-md bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover transition-colors"
+            >»</a>
+            {% else %}
+            <span class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong rounded-r-md bg-surface-02 text-text-placeholder text-[12px] cursor-not-allowed">»</span>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>

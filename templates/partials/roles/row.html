@@ -1,0 +1,125 @@
+{# templates/partials/roles/row.html #}
+
+<div
+    id="role-row-{{ role.role_id }}"
+    class="bg-surface-01 border border-border-subtle rounded-card overflow-visible hover:border-border-strong transition-colors cursor-pointer"
+    hx-get="/roles/{{ role.role_id }}/detail"
+    hx-target="#role-detail-panel"
+    hx-swap="innerHTML"
+>
+    {# Top section #}
+    <div class="p-4 flex items-center justify-between">
+        <div class="flex items-center gap-4 flex-1 min-w-0 pr-4">
+
+            {# Role avatar #}
+            <div class="w-10 h-10 rounded shrink-0 flex items-center justify-center text-[15px] font-bold select-none bg-surface-active text-text-secondary border border-border-subtle">
+                {{ role.initials }}
+            </div>
+
+            {# Role info #}
+            <div class="flex flex-col flex-1 min-w-0">
+                <span class="text-[14px] font-semibold text-text-primary truncate">
+                    {{ role.name }}
+                </span>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                    <span class="body-sm truncate">
+                        {% if role.description.is_empty() %}
+                            No description
+                        {% else %}
+                            {{ role.description }}
+                        {% endif %}
+                    </span>
+                    <span class="text-text-placeholder">•</span>
+                    <span class="flex items-center gap-1 body-sm shrink-0">
+                        <span class="w-1.5 h-1.5 rounded-full shrink-0
+                            {% if role.permissions_count > 0 %}bg-status-green{% else %}bg-status-red{% endif %}">
+                        </span>
+                        {{ role.permissions_count }} perms
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        {# Actions #}
+        <div class="flex items-center gap-3 shrink-0">
+            <span class="body-xs">{{ role.created_at }}</span>
+
+            {# Three dot menu — details/summary, no JS #}
+            <details class="relative" onclick="event.stopPropagation()">
+                <summary class="flex items-center justify-center w-8 h-8 rounded-sm text-icon-muted hover:text-text-primary hover:bg-surface-hover transition-colors list-none cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="5" cy="12" r="1.5"/>
+                        <circle cx="12" cy="12" r="1.5"/>
+                        <circle cx="19" cy="12" r="1.5"/>
+                    </svg>
+                </summary>
+                <div class="absolute right-0 top-9 z-50 w-44 bg-surface-01 border border-border-subtle rounded-md shadow-lg py-1 overflow-hidden">
+
+                        href="/roles/{{ role.role_id }}"
+                        class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        View details
+                    </a>
+
+                        href="/assign?role={{ role.name }}"
+                        class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <line x1="19" y1="8" x2="19" y2="14"/>
+                            <line x1="22" y1="11" x2="16" y2="11"/>
+                        </svg>
+                        Assign role
+                    </a>
+                    <div class="border-t border-border-subtle my-1"></div>
+                    <button
+                        type="button"
+                        class="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] text-status-red hover:bg-red-500/8 transition-colors text-left"
+                        hx-get="/roles/{{ role.role_id }}/delete-modal"
+                        hx-target="#modal-container"
+                        hx-swap="innerHTML"
+                    >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"/>
+                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            <line x1="10" y1="11" x2="10" y2="17"/>
+                            <line x1="14" y1="11" x2="14" y2="17"/>
+                        </svg>
+                        Delete role
+                    </button>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    {# Footer strip #}
+    <div class="bg-surface-02 border-t border-border-subtle px-4 py-2.5 flex items-center justify-between gap-4 rounded-b-card">
+        <div class="flex items-center gap-2 min-w-0 flex-1">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-icon-muted shrink-0">
+                <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+            </svg>
+            <span class="body-sm truncate">
+                <span class="font-medium text-text-primary">grants access to:</span>
+                <span class="text-text-helper ml-1">
+                    {% if role.resources.is_empty() %}
+                        No permissions assigned
+                    {% else %}
+                        {{ role.resources }}
+                    {% endif %}
+                </span>
+            </span>
+        </div>
+        <span class="body-xs flex items-center gap-1 shrink-0">
+            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-icon-muted">
+                <path d="M12 20h9"/>
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+            </svg>
+            KMS Panel Admin
+        </span>
+    </div>
+</div>

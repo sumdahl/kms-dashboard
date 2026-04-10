@@ -1,0 +1,134 @@
+{# templates/partials/wizard/step3.html #} {% import "macros/button.html" as btn
+%} {% import "macros/badge.html" as bdg %} {% import "macros/feedback.html" as
+fb %}
+
+<div id="wizard-step">
+    <div
+        class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden"
+    >
+        <div class="p-8">
+            {# Card header #}
+            <div class="flex items-center gap-4 mb-8">
+                <div
+                    class="w-12 h-12 rounded-lg bg-surface-02 border border-border-subtle flex items-center justify-center text-icon-secondary shrink-0"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M9 11l3 3L22 4" />
+                        <path
+                            d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"
+                        />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="section-title">Review Role</h3>
+                    <p class="body-sm">Confirm your new role configuration.</p>
+                </div>
+            </div>
+
+            {# Global error #} {% if let Some(msg) = error %} {{
+            fb::alert(message=msg, variant="error") }} {% endif %} {# Summary #}
+            <div
+                class="bg-surface-02 border border-border-subtle rounded-card p-6 space-y-4 mb-6"
+            >
+                <div>
+                    <span class="label-uppercase block mb-1">Role Name</span>
+                    <p
+                        class="text-[16px] font-bold text-text-primary font-mono"
+                    >
+                        {{ form.name }}
+                    </p>
+                </div>
+
+                <div>
+                    <span class="label-uppercase block mb-1">Description</span>
+                    <p class="body-sm italic">
+                        {% if form.description.is_empty() %} No description
+                        provided. {% else %} {{ form.description }} {% endif %}
+                    </p>
+                </div>
+
+                <div>
+                    <span class="label-uppercase block mb-2"
+                        >Granted Permissions</span
+                    >
+                    <div class="flex flex-wrap gap-2">
+                        {% for perm in form.permissions %}
+                        <span
+                            class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-surface-01 border border-border-subtle rounded-sm text-[12px] font-medium text-text-secondary"
+                        >
+                            <span
+                                class="w-1.5 h-1.5 rounded-full bg-btn-primary shrink-0"
+                            ></span>
+                            {{ perm.resource }}
+                            <span class="text-text-placeholder">•</span>
+                            <span
+                                class="text-text-primary font-bold uppercase text-[10px]"
+                                >{{ perm.access }}</span
+                            >
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            {# Final submit form — carries all state #}
+            <form
+                hx-post="/roles"
+                hx-target="#wizard-step"
+                hx-swap="outerHTML"
+                novalidate
+            >
+                {# Hidden fields — all state from previous steps #}
+                <input type="hidden" name="name" value="{{ form.name }}" />
+                <input
+                    type="hidden"
+                    name="description"
+                    value="{{ form.description }}"
+                />
+                {% for perm in form.permissions %}
+                <input
+                    type="hidden"
+                    name="resource[]"
+                    value="{{ perm.resource }}"
+                />
+                <input
+                    type="hidden"
+                    name="access[]"
+                    value="{{ perm.access }}"
+                />
+                {% endfor %} {# Actions #}
+                <div class="flex items-center justify-between">
+                    {{ btn::button( label="Back to Permissions",
+                    btn_type="button", variant="ghost", full_width=false,
+                    icon_svg="<svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M19 12H5" />
+                        <path d="m12 19-7-7 7-7" /></svg
+                    >", hx_get="/roles/new/step2", hx_target="#wizard-step",
+                    hx_swap="outerHTML" ) }} {{ btn::button( label="Create Role
+                    Now", btn_type="submit", variant="primary", full_width=false
+                    ) }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,48 @@
+{# templates/partials/roles/stats.html #}
+
+<div id="roles-stats">
+    <div class="flex items-center justify-between mb-2">
+        <h2 class="section-title">Summary</h2>
+        <span class="body-xs uppercase">{{ summary_date }}</span>
+    </div>
+    <div
+        class="bg-surface-01 border border-border-subtle rounded-card shadow-sm overflow-hidden"
+    >
+        <div class="grid grid-cols-2 border-b border-border-subtle">
+            <div class="p-3 border-r border-border-subtle">
+                <span class="label-uppercase">Total Roles</span>
+                <div
+                    class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight"
+                >
+                    {{ total_roles }}
+                </div>
+            </div>
+            <div class="p-3">
+                <span class="label-uppercase">Permissions</span>
+                <div
+                    class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight"
+                >
+                    {{ total_permissions }}
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-2">
+            <div class="p-3 border-r border-border-subtle">
+                <span class="label-uppercase">Resources</span>
+                <div
+                    class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight"
+                >
+                    {{ unique_resources }}
+                </div>
+            </div>
+            <div class="p-3">
+                <span class="label-uppercase">Admin perms</span>
+                <div
+                    class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight"
+                >
+                    {{ admin_count }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

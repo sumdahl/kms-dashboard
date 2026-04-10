@@ -1,0 +1,114 @@
+{# templates/partials/wizard/step1.html #} {% import "macros/input.html" as inp
+%} {% import "macros/button.html" as btn %} {% import "macros/feedback.html" as
+fb %}
+
+<div id="wizard-step">
+    {# Step 1 card #}
+    <div
+        class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden"
+    >
+        <div class="p-8">
+            {# Card header #}
+            <div class="flex items-center gap-4 mb-8">
+                <div
+                    class="w-12 h-12 rounded-lg bg-surface-02 border border-border-subtle flex items-center justify-center text-icon-secondary shrink-0"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path
+                            d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
+                        />
+                        <line x1="7" y1="7" x2="7.01" y2="7" />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="section-title">Role Identity</h3>
+                    <p class="body-sm">
+                        Give your role a name and a clear description.
+                    </p>
+                </div>
+            </div>
+
+            {# Form — posts to step 2 #}
+            <form
+                hx-post="/roles/new/step2"
+                hx-target="#wizard-step"
+                hx-swap="outerHTML"
+                novalidate
+                class="space-y-6"
+            >
+                {# Global error #} {% if let Some(msg) = error %} {{
+                fb::alert(message=msg, variant="error") }} {% endif %} {# Role
+                name #}
+                <div class="flex flex-col">
+                    {{ inp::label(text="Role Name", for_id="name") }}
+                    <p class="body-xs mb-2">
+                        Each role must have a unique, descriptive name.
+                    </p>
+                    {{ inp::input( name="name", input_type="text",
+                    value=form.name, placeholder="e.g. Security Auditor",
+                    error=name_error ) }} {{ fb::field_error(error=name_error)
+                    }}
+                </div>
+
+                {# Description #}
+                <div class="flex flex-col">
+                    {{ inp::label(text="Description", for_id="description") }}
+                    <p class="body-xs mb-2">
+                        Provide a brief overview of this role's
+                        responsibilities.
+                    </p>
+                    {{ inp::input( name="description", input_type="text",
+                    value=form.description, placeholder="What is this role for?"
+                    ) }}
+                </div>
+
+                {# Actions #}
+                <div class="flex justify-end pt-4">
+                    {{ btn::button( label="Next: Configure Permissions",
+                    btn_type="submit", variant="primary", full_width=false ) }}
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {# Need it faster? #}
+    <div
+        class="bg-surface-01 border border-border-subtle rounded-card p-5 mt-6"
+    >
+        <h3 class="section-title mb-2">Need it faster?</h3>
+        <p class="body-sm mb-4">
+            If you don't need a multi-step review, try our simplified
+            single-form setup.
+        </p>
+        <a
+            href="/roles/quick"
+            class="text-[12px] font-bold text-btn-primary hover:underline flex items-center gap-1"
+        >
+            Switch to Quick Setup
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path d="M5 12h14" />
+                <path d="m12 5 7 7-7 7" />
+            </svg>
+        </a>
+    </div>
+</div>

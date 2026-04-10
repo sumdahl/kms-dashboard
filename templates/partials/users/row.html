@@ -1,0 +1,70 @@
+{# templates/partials/users/row.html #} {% import "macros/badge.html" as bdg %}
+{% import "macros/avatar.html" as av %} {% import "macros/button.html" as btn %}
+
+<div
+    id="user-row-{{ user.user_id }}"
+    class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden hover:border-border-strong transition-colors cursor-pointer {% if !user.is_active %}opacity-60{% endif %}"
+    hx-get="/users/{{ user.user_id }}/detail"
+    hx-target="#user-detail-panel"
+    hx-swap="innerHTML"
+>
+    <div
+        class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+    >
+        <div class="flex items-center gap-3 flex-1 min-w-0">
+            {# Avatar #} {{ av::avatar(initials=user.initials, size="md") }} {#
+            Info #}
+            <div class="flex flex-col min-w-0 flex-1">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span
+                        class="text-[14px] font-semibold text-text-primary truncate"
+                    >
+                        {{ user.full_name }}
+                    </span>
+                    {% if user.is_admin %} {{ bdg::badge(label="Admin",
+                    variant="admin") }} {% endif %}
+                </div>
+                <span class="body-sm truncate mt-0.5">{{ user.email }}</span>
+            </div>
+        </div>
+
+        {# Status + Action #}
+        <div class="flex items-center sm:justify-end gap-3 shrink-0">
+            {% if user.is_active %} {{ bdg::badge(label="Active",
+            variant="success") }} {% else %} {{ bdg::badge(label="Disabled",
+            variant="danger") }} {% endif %} {% if user.is_active %} {{
+            btn::button( label="Disable", btn_type="button", variant="outline",
+            full_width=false, hx_get="/users/{{ user.user_id }}/disable-modal",
+            hx_target="#modal-container", hx_swap="innerHTML" ) }} {% else %} {{
+            btn::button( label="Enable", btn_type="button", variant="ghost",
+            full_width=false, hx_post="/users/enable/{{ user.user_id }}",
+            hx_target="#user-row-{{ user.user_id }}", hx_swap="outerHTML" ) }}
+            {% endif %}
+        </div>
+    </div>
+
+    {# Disabled reason bar #} {% if !user.is_active %} {% if let Some(reason) =
+    user.disabled_reason %}
+    <div
+        class="bg-red-500/5 border-t border-red-500/15 px-4 py-2 flex items-center gap-2"
+    >
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="11"
+            height="11"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="text-status-red shrink-0"
+        >
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <span class="body-xs truncate">Reason: {{ reason }}</span>
+    </div>
+    {% endif %} {% endif %}
+</div>

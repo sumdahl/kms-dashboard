@@ -1,0 +1,59 @@
+{# templates/macros/card.html #} {% macro card() %}
+<div
+    class="bg-surface-01 border border-border-subtle rounded-card shadow-sm overflow-hidden"
+>
+    <div
+        class="h-px bg-gradient-to-r from-transparent via-indigo-500/40 to-transparent"
+    ></div>
+    {{ caller() }}
+</div>
+{% endmacro %} {% macro card_header(title, subtitle="", icon_svg="") %}
+<div class="flex flex-col items-center mb-8">
+    {% if !icon_svg.is_empty() %}
+    <div
+        class="w-11 h-11 bg-surface-02 border border-border-subtle rounded-md flex items-center justify-center mb-5 text-icon-secondary"
+    >
+        {{ icon_svg|safe }}
+    </div>
+    {% endif %}
+    <h1 class="text-xl font-semibold text-text-primary tracking-tight">
+        {{ title }}
+    </h1>
+    {% if !subtitle.is_empty() %}
+    <p class="text-[13px] text-text-helper mt-1.5 text-center">
+        {{ subtitle }}
+    </p>
+    {% endif %}
+</div>
+{% endmacro %} {% macro card_footer() %}
+<div
+    class="px-8 py-4 bg-surface-02 border-t border-border-subtle flex items-center justify-center gap-1.5"
+>
+    <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="11"
+        height="11"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="text-text-helper"
+    >
+        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+    </svg>
+    <span class="text-[11px] text-text-helper tracking-wide"
+        >End-to-end encrypted</span
+    >
+</div>
+{% endmacro %} {% macro card_brand() %}
+<div class="flex items-center justify-center gap-2 mb-6">
+    <div class="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+    <span
+        class="text-[11px] text-text-helper tracking-widest uppercase font-medium"
+        >KMS Dashboard</span
+    >
+</div>
+{% endmacro %}

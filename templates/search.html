@@ -1,0 +1,288 @@
+{# templates/search.html #} {% extends "layout.html" %} {% import
+"macros/input.html" as inp %} {% block title %}Search - KMS Dashboard{% endblock
+%} {% block content %}
+<div
+    class="fixed inset-0 z-[100] overflow-y-auto"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Search"
+>
+    {# Backdrop — click goes back #}
+
+    <a
+        href="javascript:history.back()"
+        class="fixed inset-0 bg-zinc-900/40"
+        tabindex="-1"
+        aria-hidden="true"
+    ></a>
+
+    {# Modal box #}
+    <div
+        class="relative z-10 flex min-h-full items-start justify-center p-4 sm:p-6 md:p-20"
+    >
+        <div
+            class="w-full max-w-2xl overflow-hidden rounded-lg bg-surface-01 shadow-2xl ring-1 ring-border-subtle"
+        >
+            {# Search header #}
+            <div
+                class="relative flex items-center border-b border-border-subtle bg-surface-01"
+            >
+                {# Search icon #}
+                <div
+                    class="pointer-events-none pl-4 pr-3 flex items-center justify-center"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        class="text-icon-secondary"
+                    >
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                    </svg>
+                </div>
+
+                {# Search input #} {{ inp::input( name="q", id="search-input",
+                input_type="text", value=query, placeholder="Search products,
+                pages, and features...", autocomplete="off", autofocus=true,
+                height="h-12", hx_get="/search", hx_trigger="keyup changed
+                delay:300ms", hx_target="#search-results", hx_push_url="true",
+                hx_on="keydown: if(event.key==='Escape') history.back()" ) }} {#
+                Spinner + Esc hint #}
+                <div class="absolute right-4 flex items-center gap-2">
+                    <div id="search-spinner" class="htmx-indicator">
+                        <div
+                            class="animate-spin h-4 w-4 border-2 border-btn-primary border-t-transparent rounded-full"
+                        ></div>
+                    </div>
+                    <kbd
+                        class="hidden sm:block rounded border border-border-strong px-1.5 py-0.5 bg-surface-02 text-[10px] text-text-helper font-sans shadow-sm"
+                        >Esc</kbd
+                    >
+                </div>
+            </div>
+
+            {# Results area #}
+            <div
+                id="search-results"
+                class="max-h-[60vh] overflow-y-auto bg-surface-01"
+            >
+                {% if query.is_empty() %} {# Initial state — search tips #}
+                <div class="p-4">
+                    <h2
+                        class="text-[11px] font-bold text-text-secondary mb-3 px-2"
+                    >
+                        Search tips
+                    </h2>
+                    <div class="flex flex-col gap-1">
+                        <div
+                            class="flex items-center gap-3 px-3 py-2 rounded-md text-[13px] text-text-secondary hover:bg-surface-02 transition-colors"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="text-icon-muted shrink-0"
+                            >
+                                <path
+                                    d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"
+                                />
+                                <path d="M5 3v4" />
+                                <path d="M19 17v4" />
+                                <path d="M3 5h4" />
+                                <path d="M17 19h4" />
+                            </svg>
+                            <div class="flex-1">
+                                <span class="font-bold text-text-primary"
+                                    >ask:</span
+                                >
+                                <span class="text-text-helper mx-1">—</span>
+                                <span>Ask AI</span>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center gap-3 px-3 py-2 rounded-md text-[13px] text-text-secondary hover:bg-surface-02 transition-colors"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="text-icon-muted shrink-0"
+                            >
+                                <path
+                                    d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
+                                />
+                                <path d="m9 12 2 2 4-4" />
+                            </svg>
+                            <div class="flex-1">
+                                <span class="font-bold text-text-primary"
+                                    >access:</span
+                                >
+                                <span class="text-text-helper mx-1">—</span>
+                                <span>Search Access applications</span>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center gap-3 px-3 py-2 rounded-md text-[13px] text-text-secondary hover:bg-surface-02 transition-colors"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="text-icon-muted shrink-0"
+                            >
+                                <rect
+                                    width="18"
+                                    height="18"
+                                    x="3"
+                                    y="3"
+                                    rx="2"
+                                />
+                                <path d="M3 9h18" />
+                                <path d="M3 15h18" />
+                                <path d="M9 3v18" />
+                                <path d="M15 3v18" />
+                            </svg>
+                            <div class="flex-1">
+                                <span class="font-bold text-text-primary"
+                                    >aig:</span
+                                >
+                                <span class="text-text-helper mx-1">—</span>
+                                <span>Search AI Gateways</span>
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex items-center gap-3 px-3 py-2 rounded-md text-[13px] text-text-secondary hover:bg-surface-02 transition-colors"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                class="text-icon-muted shrink-0"
+                            >
+                                <circle cx="11" cy="11" r="8" />
+                                <path d="m21 21-4.3-4.3" />
+                            </svg>
+                            <div class="flex-1">
+                                <span class="font-bold text-text-primary"
+                                    >ais:</span
+                                >
+                                <span class="text-text-helper mx-1">—</span>
+                                <span>Search AI Search instances</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %} {# Results rendered by server #} {% include
+                "partials/search_results.html" %} {% endif %}
+            </div>
+
+            {# Footer shortcuts #}
+            <div
+                class="flex items-center gap-6 border-t border-border-subtle bg-surface-01 px-4 py-3 text-[12px] text-text-secondary"
+            >
+                <div class="flex items-center gap-1.5">
+                    <div class="flex gap-1">
+                        <kbd
+                            class="flex items-center justify-center w-5 h-5 rounded border border-border-strong bg-surface-01 shadow-sm text-icon-secondary"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="m18 15-6-6-6 6" />
+                            </svg>
+                        </kbd>
+                        <kbd
+                            class="flex items-center justify-center w-5 h-5 rounded border border-border-strong bg-surface-01 shadow-sm text-icon-secondary"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="12"
+                                height="12"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+                                <path d="m6 9 6 6 6-6" />
+                            </svg>
+                        </kbd>
+                    </div>
+                    <span class="text-text-helper">to navigate</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <kbd
+                        class="flex items-center justify-center w-5 h-5 rounded border border-border-strong bg-surface-01 shadow-sm text-icon-secondary"
+                    >
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="m9 10 2 2 4-4" />
+                            <rect width="20" height="20" x="2" y="2" rx="2" />
+                        </svg>
+                    </kbd>
+                    <span class="text-text-helper">to select</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                    <kbd
+                        class="rounded border border-border-strong px-1.5 py-0.5 bg-surface-02 text-[10px] text-text-helper shadow-sm"
+                        >Esc</kbd
+                    >
+                    <span class="text-text-helper">to close</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

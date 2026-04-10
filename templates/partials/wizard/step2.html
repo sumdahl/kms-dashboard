@@ -1,0 +1,112 @@
+{# templates/partials/wizard/step2.html #} {% import "macros/button.html" as btn
+%} {% import "macros/feedback.html" as fb %} {% import "macros/input.html" as
+inp %}
+
+<div id="wizard-step">
+    <div
+        class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden"
+    >
+        <div class="p-8">
+            {# Card header #}
+            <div class="flex items-center gap-4 mb-8">
+                <div
+                    class="w-12 h-12 rounded-lg bg-surface-02 border border-border-subtle flex items-center justify-center text-icon-secondary shrink-0"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="22"
+                        height="22"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path
+                            d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"
+                        />
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="section-title">Permissions</h3>
+                    <p class="body-sm">
+                        Define which resources this role can access.
+                    </p>
+                </div>
+            </div>
+
+            <form
+                hx-post="/roles/new/step3"
+                hx-target="#wizard-step"
+                hx-swap="outerHTML"
+                novalidate
+                class="space-y-6"
+            >
+                {# Pass step 1 state via hidden fields #}
+                <input type="hidden" name="name" value="{{ form.name }}" />
+                <input
+                    type="hidden"
+                    name="description"
+                    value="{{ form.description }}"
+                />
+
+                {# Permissions error #} {% if let Some(msg) = permissions_error
+                %} {{ fb::alert(message=msg, variant="error") }} {% endif %} {#
+                Permissions #}
+                <div class="flex flex-col gap-2">
+                    <div class="flex items-center justify-between">
+                        <span class="label-uppercase">Active Permissions</span>
+                        {{ btn::button( label="Add permission",
+                        btn_type="button", variant="ghost", full_width=false,
+                        icon_svg="<svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="11"
+                            height="11"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                        >
+                            <path d="M5 12h14" />
+                            <path d="M12 5v14" /></svg
+                        >", hx_post="/roles/permission-row",
+                        hx_target="#permissions-list", hx_swap="beforeend" ) }}
+                    </div>
+
+                    <div
+                        id="permissions-list"
+                        class="flex flex-col gap-2.5 min-h-[100px]"
+                    >
+                        {# Initial row #} {% include
+                        "partials/roles/permission_row.html" %}
+                    </div>
+                </div>
+
+                {# Actions #}
+                <div class="flex items-center justify-between pt-4">
+                    {{ btn::button( label="Back to Identity", btn_type="button",
+                    variant="ghost", full_width=false, icon_svg="<svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M19 12H5" />
+                        <path d="m12 19-7-7 7-7" /></svg
+                    >", hx_get="/roles/new/step1", hx_target="#wizard-step",
+                    hx_swap="outerHTML" ) }} {{ btn::button( label="Next:
+                    Review", btn_type="submit", variant="primary",
+                    full_width=false ) }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

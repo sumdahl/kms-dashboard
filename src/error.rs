@@ -1,9 +1,8 @@
+use askama::Template;
 use axum::{
     http::{HeaderMap, HeaderValue, StatusCode},
-    response::{IntoResponse, Response},
-    Json,
+    response::{Html, IntoResponse, Response},
 };
-use serde_json::json;
 use thiserror::Error;
 
 #[derive(Debug, Error)]
@@ -48,43 +47,95 @@ impl From<serde_json::Error> for AppError {
     }
 }
 
+// ── Error page template ──────────────────────────────────────────────────────
+
+#[derive(Template)]
+#[template(path = "error.html")]
+struct ErrorPageTemplate {
+    pub dark_mode: bool,
+    pub status: u16,
+    pub title: String,
+    pub message: String,
+}
+
+fn render_error_page(status: StatusCode, title: &str, message: &str) -> Response {
+    let html = ErrorPageTemplate {
+        dark_mode: false,
+        status: status.as_u16(),
+        title: title.to_string(),
+        message: message.to_string(),
+    };
+    let body = html.render().unwrap_or_else(|_| {
+        format!(
+            "<html><body><h1>{}</h1><p>{}</p></body></html>",
+            title, message
+        )
+    });
+    (status, Html(body)).into_response()
+}
+
+// ── Auth redirect (Option A: both headers) ───────────────────────────────────
+
+fn login_redirect(path: &'static str) -> Response {
+    let mut headers = HeaderMap::new();
+    // Browser redirect
+    headers.insert(axum::http::header::LOCATION, HeaderValue::from_static(path));
+    // HTMX full-page navigation
+    headers.insert("HX-Redirect", HeaderValue::from_static(path));
+    (StatusCode::FOUND, headers).into_response()
+}
+
+// ── IntoResponse ─────────────────────────────────────────────────────────────
+
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
-        if let AppError::AccountDisabled(ref reason) = self {
-            return disabled_response(reason.clone());
+        match self {
+            // Auth errors → redirect to login (both browser and HTMX)
+            AppError::Unauthorized | AppError::TokenExpired | AppError::TokenRevoked => {
+                login_redirect("/login")
+            }
+
+            AppError::AccountDisabled(_) => login_redirect("/login?reason=account_disabled"),
+
+            // Forbidden → 403 page
+            AppError::NoPermission | AppError::InsufficientAccess => render_error_page(
+                StatusCode::FORBIDDEN,
+                "Access Denied",
+                "You don't have permission to access this resource.",
+            ),
+
+            // Not found → 404 page
+            AppError::RoleNotFound | AppError::UserNotFound => render_error_page(
+                StatusCode::NOT_FOUND,
+                "Not Found",
+                "The resource you're looking for doesn't exist.",
+            ),
+
+            AppError::EmailTaken => render_error_page(
+                StatusCode::CONFLICT,
+                "Email Already Registered",
+                "An account with this email already exists.",
+            ),
+
+            AppError::Conflict(ref msg) => render_error_page(StatusCode::CONFLICT, "Conflict", msg),
+
+            AppError::BadCredentials => render_error_page(
+                StatusCode::UNAUTHORIZED,
+                "Invalid Credentials",
+                "The email or password you entered is incorrect.",
+            ),
+
+            AppError::BadRequest(ref msg) => {
+                render_error_page(StatusCode::BAD_REQUEST, "Bad Request", msg)
+            }
+
+            AppError::Internal(ref msg) => render_error_page(
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "Internal Server Error",
+                msg,
+            ),
         }
-
-        let status = match &self {
-            AppError::EmailTaken => StatusCode::CONFLICT,
-            AppError::BadCredentials => StatusCode::UNAUTHORIZED,
-            AppError::Unauthorized => StatusCode::UNAUTHORIZED,
-            AppError::TokenExpired => StatusCode::UNAUTHORIZED,
-            AppError::TokenRevoked => StatusCode::UNAUTHORIZED,
-            AppError::NoPermission => StatusCode::FORBIDDEN,
-            AppError::InsufficientAccess => StatusCode::FORBIDDEN,
-            AppError::RoleNotFound => StatusCode::NOT_FOUND,
-            AppError::UserNotFound => StatusCode::NOT_FOUND,
-            AppError::Conflict(_) => StatusCode::CONFLICT,
-            AppError::Internal(_) => StatusCode::INTERNAL_SERVER_ERROR,
-            AppError::BadRequest(_) => StatusCode::BAD_REQUEST,
-            AppError::AccountDisabled(_) => unreachable!("handled by early return above"),
-        };
-
-        (status, Json(json!({ "error": self.to_string() }))).into_response()
     }
 }
 
-fn disabled_response(reason: Option<String>) -> Response {
-    let mut headers = HeaderMap::new();
-    headers.insert(
-        "HX-Redirect",
-        HeaderValue::from_static("/login?reason=account_disabled"),
-    );
-    let message = match &reason {
-        Some(r) => format!("Your account has been disabled. Reason: {}", r),
-        None => "Your account has been disabled. Contact an administrator.".to_string(),
-    };
-    let body = Json(json!({ "error": message }));
-    (StatusCode::FORBIDDEN, headers, body).into_response()
-}
 pub type AppResult<T> = Result<T, AppError>;

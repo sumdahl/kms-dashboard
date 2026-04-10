@@ -1,0 +1,27 @@
+{# templates/partials/roles/delete_modal.html #} {% import "macros/modal.html"
+as m %} {% import "macros/button.html" as btn %} {% import
+"macros/feedback.html" as fb %} {% call m::modal(title="Delete Role") %} {#
+Description #}
+<p class="body-sm mb-4">
+    Are you sure you want to delete
+    <span class="font-medium text-text-primary">{{ role.name }}</span>? This
+    will remove all associated permissions and assignments.
+</p>
+
+{# Global error #} {% if let Some(msg) = error %} {{ fb::alert(message=msg,
+variant="error") }} {% endif %}
+
+<form
+    hx-delete="/roles/{{ role.role_id }}"
+    hx-target="#role-row-{{ role.role_id }}"
+    hx-swap="outerHTML"
+    hx-on::after-request="this.closest('[role=dialog]').remove()"
+    novalidate
+>
+    {% call m::modal_footer() %} {{ btn::button( label="Cancel",
+    btn_type="button", variant="outline", full_width=false, hx_on="click:
+    this.closest('[role=dialog]').remove()" ) }} {{ btn::button( label="Delete
+    Role", btn_type="submit", variant="danger", full_width=false ) }} {% endcall
+    %}
+</form>
+{% endcall %}

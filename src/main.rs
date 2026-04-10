@@ -6,6 +6,7 @@ mod error;
 mod handlers;
 mod middleware;
 mod models;
+mod page_context;
 mod resend_mailer;
 mod routes;
 mod startup;

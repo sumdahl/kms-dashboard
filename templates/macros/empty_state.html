@@ -1,0 +1,35 @@
+{# templates/macros/empty_state.html #} {# ── empty_state
+───────────────────────────────────────────────────────────── Usage: {{
+es::empty_state(title="No users found", subtitle="Try adjusting your search or
+filter.") }}
+──────────────────────────────────────────────────────────────────────────────
+#} {% macro empty_state(title, subtitle="", icon_svg="") %}
+<div class="flex flex-col items-center justify-center py-16 gap-3 text-center">
+    <div
+        class="flex items-center justify-center w-12 h-12 rounded-full bg-surface-02 text-icon-muted"
+    >
+        {% if !icon_svg.is_empty() %} {{ icon_svg|safe }} {% else %} {# Default:
+        box icon #}
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="22"
+            height="22"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <path
+                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+            />
+        </svg>
+        {% endif %}
+    </div>
+    <p class="text-[13px] font-medium text-text-primary">{{ title }}</p>
+    {% if !subtitle.is_empty() %}
+    <p class="text-xs text-text-helper max-w-xs">{{ subtitle }}</p>
+    {% endif %}
+</div>
+{% endmacro %}

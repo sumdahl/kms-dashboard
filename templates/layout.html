@@ -1,42 +1,27 @@
+{# templates/layout.html #}
 <!doctype html>
-<html lang="en">
+<html lang="en" {% if dark_mode %}class="dark" {% endif %}>
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{% block title %}Dashboard{% endblock %}</title>
-        <!-- Prevent Flash of Unstyled Theme -->
-        <script>
-            (function () {
-                const theme = localStorage.getItem("theme");
-                if (
-                    theme === "dark" ||
-                    (!theme &&
-                        window.matchMedia("(prefers-color-scheme: dark)")
-                            .matches)
-                ) {
-                    document.documentElement.classList.add("dark");
-                }
-            })();
-        </script>
-        <link rel="stylesheet" href="/static/css/output.css?v={{ css_version }}" />
-        <!-- Lucide Icons (Local for Offline Support) -->
-        <script src="/static/js/lucide.min.js"></script>
-        <!-- HTMX -->
+        <link
+            rel="stylesheet"
+            href="/static/css/output.css?v={{ css_version }}"
+        />
         <script src="/static/js/htmx.min.js" defer></script>
         {% block head_scripts %}{% endblock %}
     </head>
     <body class="app-shell {% if sidebar_pinned %}sidebar-expanded{% endif %}">
         {% include "partials/sidebar.html" %}
-        
-        <!-- Mobile Overlay -->
+
         <div id="sidebar-overlay" class="sidebar-overlay md:hidden"></div>
 
         <div class="flex flex-col min-w-0 [grid-area:main] overflow-hidden">
             {% include "partials/header.html" %}
-
             <main class="flex-1 flex flex-col bg-bg-page overflow-y-auto">
-                {% if show_banner %}{% include "partials/announcement.html" %}{% endif %}
-                {% include "partials/banner.html" %}
+                {% if show_banner %}{% include "partials/announcement.html" %}{%
+                endif %} {% include "partials/banner.html" %}
                 <div class="px-4 md:px-8 py-4 md:py-6 flex-1">
                     {% block content %}{% endblock %}
                 </div>
@@ -78,116 +63,40 @@
                     </svg>
                 </button>
             </div>
-
             <div
                 class="flex-1 flex items-center justify-center flex-wrap gap-2 px-4"
             >
-                <!-- footer links -->
                 <a
                     href="#"
                     class="text-xs text-text-helper hover:text-text-primary transition-colors whitespace-nowrap"
                     >Support</a
                 >
                 <span class="text-xs text-border-subtle select-none">|</span>
-
                 <a
                     href="#"
                     class="text-xs text-text-helper hover:text-text-primary transition-colors whitespace-nowrap"
                     >System Status</a
                 >
                 <span class="text-xs text-border-subtle select-none">|</span>
-
                 <a
                     href="#"
                     class="text-xs text-text-helper hover:text-text-primary transition-colors whitespace-nowrap"
                     >Report Security Issues</a
                 >
                 <span class="text-xs text-border-subtle select-none">|</span>
-
                 <a
                     href="#"
                     class="text-xs text-text-helper hover:text-text-primary transition-colors whitespace-nowrap"
                     >Privacy Policy</a
                 >
                 <span class="text-xs text-border-subtle select-none">|</span>
-
                 <span class="text-xs text-text-helper whitespace-nowrap"
                     >© 2026 Dashboard, Inc.</span
                 >
             </div>
         </footer>
 
-        {% include "partials/search_modal.html" %}
-
-        <!-- Scripts -->
         <script src="/static/js/sidebar.js"></script>
-
-        <script>
-            // ── Global HTMX Network Error Handler ───────────────────────────────
-            document.addEventListener("htmx:sendError", function () {
-                window.showBanner("Network error. The server may be unreachable.", "error");
-            });
-
-            // ── Initialize Lucide Icons ──────────────────────────────────────────
-            function initLucideIcons() {
-                if (window.lucide) {
-                    console.log("Lucide: Initializing icons...");
-                    window.lucide.createIcons();
-                } else {
-                    console.warn("Lucide: Library not found during init.");
-                }
-            }
-
-            // Run on initial load
-            if (document.readyState === "loading") {
-                document.addEventListener("DOMContentLoaded", initLucideIcons);
-            } else {
-                initLucideIcons();
-            }
-
-            // Run after any HTMX swap
-            document.addEventListener("htmx:afterSwap", initLucideIcons);
-
-            // ── Theme Management ────────────────────────────────────────────────
-            (function () {
-                const html = document.documentElement;
-
-                function syncThemeUI() {
-                    const isDark = html.classList.contains("dark");
-                    const sun = document.getElementById("icon-sun");
-                    const moon = document.getElementById("icon-moon");
-                    const textEl = document.getElementById("theme-text");
-                    if (sun) sun.classList.toggle("hidden", !isDark);
-                    if (moon) moon.classList.toggle("hidden", isDark);
-                    if (textEl) textEl.textContent = isDark ? "Light mode" : "Dark mode";
-                }
-
-                // Initial sync
-                syncThemeUI();
-
-                // Listen for clicks on the toggle button
-                document.addEventListener("click", function(e) {
-                    const toggle = e.target.closest("#theme-toggle");
-                    if (!toggle) return;
-
-                    html.classList.add("no-transition");
-                    const isDark = html.classList.toggle("dark");
-                    localStorage.setItem("theme", isDark ? "dark" : "light");
-                    syncThemeUI();
-                    
-                    // Force reflow
-                    window.getComputedStyle(html).opacity;
-                    html.classList.remove("no-transition");
-                });
-
-                // Re-sync after HTMX swaps
-                document.addEventListener("htmx:afterSwap", function(e) {
-                    if (e.detail.target.id === "account-dropdown") {
-                        syncThemeUI();
-                    }
-                });
-            })();
-        </script>
         {% block body_scripts %}{% endblock %}
     </body>
 </html>

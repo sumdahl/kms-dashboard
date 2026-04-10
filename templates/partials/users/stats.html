@@ -1,0 +1,49 @@
+{# templates/partials/users/stats.html #} {% import "macros/badge.html" as bdg
+%}
+
+<div id="users-stats">
+    <div class="flex items-center justify-between mb-2">
+        <h2 class="section-title">Summary</h2>
+        <span class="body-xs uppercase">{{ summary_date }}</span>
+    </div>
+    <div
+        class="bg-surface-01 border border-border-subtle rounded-card shadow-sm overflow-hidden"
+    >
+        <div class="grid grid-cols-2 border-b border-border-subtle">
+            <div class="p-3 border-r border-border-subtle">
+                <span class="label-uppercase">Total Users</span>
+                <div
+                    class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight"
+                >
+                    {{ total }}
+                </div>
+            </div>
+            <div class="p-3">
+                <span class="label-uppercase">Active</span>
+                <div
+                    class="text-[20px] font-bold text-status-green mt-1 leading-none tracking-tight"
+                >
+                    {{ active }}
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-2">
+            <div class="p-3 border-r border-border-subtle">
+                <span class="label-uppercase">Disabled</span>
+                <div
+                    class="text-[20px] font-bold text-status-red mt-1 leading-none tracking-tight"
+                >
+                    {{ disabled }}
+                </div>
+            </div>
+            <div class="p-3">
+                <span class="label-uppercase">Admins</span>
+                <div
+                    class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight"
+                >
+                    {{ admins }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

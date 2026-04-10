@@ -1,0 +1,44 @@
+{# templates/partials/roles/permission_row.html #}
+
+<div class="permission-row flex items-center gap-2">
+    <div class="flex-1">
+        <select
+            name="resource[]"
+            class="permission-resource w-full px-3 h-9 border border-border-subtle rounded-sm bg-surface-02 text-[13px] text-text-primary focus:border-border-strong focus:outline-none transition-colors appearance-none cursor-pointer"
+        >
+            {% for resource in resources %}
+            <option value="{{ resource }}">{{ resource }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="flex-1">
+        <select
+            name="access[]"
+            class="permission-access w-full px-3 h-9 border border-border-subtle rounded-sm bg-surface-02 text-[13px] text-text-primary focus:border-border-strong focus:outline-none transition-colors appearance-none cursor-pointer"
+        >
+            {% for access in access_levels %}
+            <option value="{{ access }}">{{ access }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button
+        type="button"
+        class="flex items-center justify-center w-8 h-8 rounded-sm text-icon-muted hover:text-status-red hover:bg-red-500/10 transition-colors shrink-0"
+        hx-on:click="this.closest('.permission-row').remove()"
+    >
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+        </svg>
+    </button>
+</div>

@@ -1,0 +1,81 @@
+{# templates/partials/users/detail.html #} {% import "macros/badge.html" as bdg
+%} {% import "macros/avatar.html" as av %} {% import "macros/button.html" as btn
+%}
+
+<div class="flex flex-col gap-3.5">
+    {# User header #}
+    <div class="flex items-center gap-3">
+        {{ av::avatar(initials=user.initials, size="lg") }}
+        <div class="flex flex-col min-w-0">
+            <span class="text-[14px] font-semibold text-text-primary truncate">
+                {{ user.full_name }}
+            </span>
+            <span class="body-sm truncate">{{ user.email }}</span>
+        </div>
+    </div>
+
+    <div class="h-px bg-border-subtle"></div>
+
+    {# Details #}
+    <div class="flex flex-col gap-2.5">
+        <div class="flex items-center justify-between">
+            <span class="body-sm">User ID</span>
+            <span class="text-[12px] font-mono text-text-primary">
+                {{ user.user_id|truncate(8) }}…
+            </span>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <span class="body-sm">Role</span>
+            <span class="text-[12px] text-text-primary">
+                {% if user.is_admin %}Administrator{% else %}Member{% endif %}
+            </span>
+        </div>
+
+        <div class="flex items-center justify-between">
+            <span class="body-sm">Status</span>
+            {% if user.is_active %} {{ bdg::badge(label="Active",
+            variant="success") }} {% else %} {{ bdg::badge(label="Disabled",
+            variant="danger") }} {% endif %}
+        </div>
+
+        {% if !user.is_active %} {% if let Some(reason) = user.disabled_reason
+        %}
+        <div class="flex flex-col gap-1 pt-2 border-t border-border-subtle">
+            <span class="body-xs">Disabled reason</span>
+            <span class="text-[12px] text-text-primary">{{ reason }}</span>
+        </div>
+        {% endif %} {% endif %}
+    </div>
+
+    <div class="h-px bg-border-subtle"></div>
+
+    {# Action #}
+    <div>
+        {% if user.is_admin %}
+        <div class="flex items-center justify-center gap-1.5 py-1.5">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="text-icon-muted shrink-0"
+            >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            <span class="body-xs">Admin accounts cannot be disabled</span>
+        </div>
+        {% elif user.is_active %} {{ btn::button( label="Disable Account",
+        btn_type="button", variant="danger", full_width=true, hx_get="/users/{{
+        user.user_id }}/disable-modal", hx_target="#modal-container",
+        hx_swap="innerHTML" ) }} {% else %} {{ btn::button( label="Re-enable
+        Account", btn_type="button", variant="secondary", full_width=true,
+        hx_post="/users/enable/{{ user.user_id }}", hx_target="#user-row-{{
+        user.user_id }}", hx_swap="outerHTML" ) }} {% endif %}
+    </div>
+</div>

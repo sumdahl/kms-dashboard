@@ -1,0 +1,130 @@
+{# templates/macros/input.html #} {# ── label
+────────────────────────────────────────────────────────────────── Usage: {{
+inp::label(text="Email address", for_id="email") }} Usage: {{
+inp::label(text="Full Name", for_id="full_name", required=true) }}
+──────────────────────────────────────────────────────────────────────────────
+#} {% macro label(text, for_id, required=false) %}
+<label
+    for="{{ for_id }}"
+    class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase"
+>
+    {{ text }} {% if required %}
+    <span class="text-status-red ml-0.5">*</span>
+    {% endif %}
+</label>
+{% endmacro %} {# ── input
+────────────────────────────────────────────────────────────────── Usage: {{
+inp::input(name="email", input_type="email", placeholder="you@example.com") }}
+Usage: {{ inp::input(name="email", value=form.email, error=errors.email) }}
+Usage: {{ inp::input(name="q", autofocus=true, hx_push_url="true",
+height="h-12") }}
+──────────────────────────────────────────────────────────────────────────────
+#} {% macro input( name, input_type="text", value="", placeholder="", id="",
+error="", height="h-10", disabled=false, readonly=false, required=false,
+autofocus=false, autocomplete="", hx_get="", hx_post="", hx_target="",
+hx_swap="", hx_trigger="", hx_push_url="", hx_on="" ) %}
+<input
+    type="{{ input_type }}"
+    name="{{ name }}"
+    id="{% if !id.is_empty() %}{{ id }}{% else %}{{ name }}{% endif %}"
+    value="{{ value }}"
+    {%
+    if
+    !placeholder.is_empty()
+    %}placeholder="{{ placeholder }}"
+    {%
+    endif
+    %}
+    {%
+    if
+    !autocomplete.is_empty()
+    %}autocomplete="{{ autocomplete }}"
+    {%
+    endif
+    %}
+    {%
+    if
+    required
+    %}required{%
+    endif
+    %}
+    {%
+    if
+    disabled
+    %}disabled{%
+    endif
+    %}
+    {%
+    if
+    readonly
+    %}readonly{%
+    endif
+    %}
+    {%
+    if
+    autofocus
+    %}autofocus{%
+    endif
+    %}
+    {%
+    if
+    !hx_get.is_empty()
+    %}hx-get="{{ hx_get }}"
+    {%
+    endif
+    %}
+    {%
+    if
+    !hx_post.is_empty()
+    %}hx-post="{{ hx_post }}"
+    {%
+    endif
+    %}
+    {%
+    if
+    !hx_target.is_empty()
+    %}hx-target="{{ hx_target }}"
+    {%
+    endif
+    %}
+    {%
+    if
+    !hx_swap.is_empty()
+    %}hx-swap="{{ hx_swap }}"
+    {%
+    endif
+    %}
+    {%
+    if
+    !hx_trigger.is_empty()
+    %}hx-trigger="{{ hx_trigger }}"
+    {%
+    endif
+    %}
+    {%
+    if
+    !hx_push_url.is_empty()
+    %}hx-push-url="{{ hx_push_url }}"
+    {%
+    endif
+    %}
+    {%
+    if
+    !hx_on.is_empty()
+    %}hx-on="{{ hx_on }}"
+    {%
+    endif
+    %}
+    class="w-full px-3 {{ height }} rounded-sm text-sm text-text-primary
+           placeholder:text-text-placeholder focus:outline-none transition-colors
+           {% if !error.is_empty() %}
+               bg-surface-02 border border-status-red focus:border-status-red
+           {% elif disabled %}
+               bg-surface-02 border border-border-subtle opacity-50 cursor-not-allowed
+           {% elif readonly %}
+               bg-surface-02 border border-border-subtle cursor-default
+           {% else %}
+               bg-surface-02 border border-border-subtle focus:border-border-strong
+           {% endif %}"
+/>
+{% endmacro %}

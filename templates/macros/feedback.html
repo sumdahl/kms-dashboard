@@ -1,0 +1,84 @@
+{# templates/macros/feedback.html #}
+
+{# ── alert ──────────────────────────────────────────────────────────────────
+   Variants: "success" | "error" | "info"
+   Usage: {{ fb::alert(message="Invalid credentials.", variant="error") }}
+────────────────────────────────────────────────────────────────────────────── #}
+{% macro alert(message, variant="info") %}
+<div
+    role="alert"
+    aria-live="polite"
+    class="flex items-center justify-between gap-3 min-h-[40px] px-4 py-2 rounded-sm border-l-[3px]
+    {% if variant == "success" %}
+        bg-banner-success-bg border-status-green
+    {% elif variant == "error" %}
+        bg-banner-danger-bg border-status-red
+    {% else %}
+        bg-banner-bg border-status-blue
+    {% endif %}
+    "
+>
+    <div class="flex items-center gap-2.5 flex-1 min-w-0">
+        {# Icon #}
+        <span class="shrink-0
+            {% if variant == "success" %}text-status-green
+            {% elif variant == "error" %}text-status-red
+            {% else %}text-status-blue{% endif %}
+        ">
+            {% if variant == "success" %}
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 6 9 17l-5-5"/>
+            </svg>
+            {% elif variant == "error" %}
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            {% else %}
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4"/>
+                <path d="M12 8h.01"/>
+            </svg>
+            {% endif %}
+        </span>
+
+        {# Message #}
+        <p class="text-[13px] font-medium text-text-primary leading-snug overflow-wrap-anywhere flex-1">
+            {{ message }}
+        </p>
+    </div>
+
+    {# Dismiss — HTMX removes the element, no JS needed #}
+    <button
+        type="button"
+        aria-label="Dismiss"
+        class="shrink-0 flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+        hx-on:click="this.closest('[role=alert]').remove()"
+    >
+        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 6 6 18"/>
+            <path d="m6 6 12 12"/>
+        </svg>
+    </button>
+</div>
+{% endmacro %}
+
+
+{# ── field_error ─────────────────────────────────────────────────────────────
+   Renders nothing if error is empty.
+   Usage: {{ fb::field_error(error=errors.email) }}
+────────────────────────────────────────────────────────────────────────────── #}
+{% macro field_error(error="") %}
+{% if !error.is_empty() %}
+<p class="flex items-center gap-1 mt-1.5 text-[11px] text-status-red">
+    <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+    </svg>
+    <span>{{ error }}</span>
+</p>
+{% endif %}
+{% endmacro %}

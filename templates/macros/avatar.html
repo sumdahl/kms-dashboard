@@ -1,0 +1,24 @@
+{# templates/macros/avatar.html #}
+
+{# ── avatar ──────────────────────────────────────────────────────────────────
+   Renders a user initials avatar.
+   Sizes: "sm" (28px) | "md" (40px) | "lg" (48px)
+   Usage: {{ av::avatar(initials="JD", size="md") }}
+   Usage: {{ av::avatar(initials=user.initials, color_seed=user.email, size="md") }}
+────────────────────────────────────────────────────────────────────────────── #}
+{% macro avatar(initials, size="md") %}
+<div
+    class="rounded shrink-0 flex items-center justify-center font-bold select-none
+        bg-surface-active text-text-secondary border border-border-subtle
+        {% if size == "sm" %}
+            w-7 h-7 text-[11px]
+        {% elif size == "lg" %}
+            w-12 h-12 text-[16px]
+        {% else %}
+            w-10 h-10 text-[14px]
+        {% endif %}
+    "
+>
+    {{ initials }}
+</div>
+{% endmacro %}

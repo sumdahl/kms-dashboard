@@ -1,0 +1,41 @@
+{# templates/partials/users/disable_modal.html #} {% import "macros/modal.html"
+as m %} {% import "macros/input.html" as inp %} {% import "macros/button.html"
+as btn %} {% import "macros/feedback.html" as fb %} {% call
+m::modal(title="Disable Account") %} {# Description #}
+<p class="body-sm mb-4">
+    Disabling
+    <span class="font-medium text-text-primary">{{ user.email }}</span>
+    will immediately terminate all active sessions.
+</p>
+
+{# Reason input #}
+<form
+    hx-post="/users/disable/{{ user.user_id }}"
+    hx-target="#user-row-{{ user.user_id }}"
+    hx-swap="outerHTML"
+    hx-on::after-request="this.closest('[role=dialog]').remove()"
+    novalidate
+    class="space-y-4"
+>
+    {# Global error #} {% if let Some(msg) = error %} {{ fb::alert(message=msg,
+    variant="error") }} {% endif %}
+
+    <div class="flex flex-col">
+        <div class="flex items-center gap-1 mb-1.5">
+            {{ inp::label(text="Reason", for_id="disable_reason") }}
+            <span class="body-xs normal-case tracking-normal font-normal"
+                >(optional)</span
+            >
+        </div>
+        {{ inp::input( name="reason", id="disable_reason", input_type="text",
+        placeholder="e.g. Suspicious activity, policy violation…",
+        error=reason_error ) }} {{ fb::field_error(error=reason_error) }}
+    </div>
+
+    {% call m::modal_footer() %} {{ btn::button( label="Cancel",
+    btn_type="button", variant="outline", full_width=false, hx_on="click:
+    this.closest('[role=dialog]').remove()" ) }} {{ btn::button( label="Disable
+    Account", btn_type="submit", variant="danger", full_width=false ) }} {%
+    endcall %}
+</form>
+{% endcall %}

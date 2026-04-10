@@ -1,0 +1,100 @@
+{# templates/partials/my_roles.html #} {% import "macros/badge.html" as bdg %}
+{% import "macros/empty_state.html" as es %} {% if user_roles.is_empty() %} {{
+es::empty_state( title="No roles assigned yet", subtitle="You haven't been
+granted any roles. Contact your administrator to request access.",
+icon_svg="<svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="22"
+    height="22"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" /></svg
+>" ) }} {% else %} {% for role in user_roles %}
+<details class="border-b border-border-subtle last:border-b-0">
+    <summary
+        class="flex items-center gap-3 px-4 py-3 hover:bg-surface-hover transition-colors cursor-pointer list-none"
+    >
+        <div
+            class="w-8 h-8 rounded-md bg-surface-02 border border-border-subtle flex items-center justify-center shrink-0"
+        >
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="15"
+                height="15"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="text-icon-secondary"
+            >
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+        </div>
+        <div class="flex-1 min-w-0">
+            <p class="text-[13px] font-semibold text-text-primary">
+                {{ role.name }}
+            </p>
+            <p class="body-xs truncate">{{ role.description }}</p>
+        </div>
+        {% if let Some(expires) = role.expires_at %} {{
+        bdg::badge(label=expires, variant="warning") }} {% else %} {{
+        bdg::badge(label="Permanent", variant="success") }} {% endif %}
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="chevron text-icon-muted shrink-0 ml-1"
+        >
+            <path d="m9 18 6-6-6-6" />
+        </svg>
+    </summary>
+    <div
+        class="mx-4 mb-4 rounded-card border border-border-subtle overflow-hidden"
+    >
+        <div class="px-4 py-3 bg-surface-02 border-b border-border-subtle">
+            <p class="label-uppercase mb-0.5">Access granted</p>
+            <p class="text-[15px] font-semibold text-text-primary">
+                You have been assigned to
+                <span class="text-btn-primary">{{ role.name }}</span>
+            </p>
+        </div>
+        <div class="px-4 py-3">
+            <p class="label-uppercase mb-2">Permissions included</p>
+            {% if role.permissions.is_empty() %}
+            <p class="body-sm">No specific permissions configured.</p>
+            {% else %}
+            <div class="flex flex-col gap-0.5">
+                {% for perm in role.permissions %}
+                <div class="flex items-center gap-2 py-1">
+                    <span
+                        class="w-1.5 h-1.5 rounded-full bg-btn-primary shrink-0"
+                    ></span>
+                    <span
+                        class="text-[13px] text-text-primary font-medium capitalize"
+                        >{{ perm.resource }}</span
+                    >
+                    <span class="text-text-helper text-[13px]">—</span>
+                    <span class="text-[13px] text-text-secondary capitalize"
+                        >{{ perm.access }} access</span
+                    >
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</details>
+{% endfor %} {% endif %}

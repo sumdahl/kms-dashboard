@@ -1,1303 +1,223 @@
-{% extends "layout.html" %} {% block title %}Roles — KMS Dashboard{% endblock %}
-{% block head_scripts %}
-<style>
-    #permissions-list::-webkit-scrollbar {
-        width: 4px;
-    }
-    #permissions-list::-webkit-scrollbar-track {
-        background: transparent;
-    }
-    #permissions-list::-webkit-scrollbar-thumb {
-        background: var(--color-border-subtle);
-        border-radius: 2px;
-    }
-</style>
-{% endblock %} {% block content %}
-
-<!-- ── LIGHT THEME OVERRIDE WRAPPER ────────────────────────────────────────── -->
+{# templates/dashboard/roles.html #} {% extends "layout.html" %} {% import
+"macros/button.html" as btn %} {% import "macros/input.html" as inp %} {% block
+title %}Roles — KMS Dashboard{% endblock %} {% block content %}
 <div class="w-full py-4">
-    <!-- ── Header ── -->
-    <div class="flex flex-col gap-6 mb-8 w-full">
-        <div
-            class="flex flex-col md:flex-row md:items-start justify-between gap-4"
-        >
-            <div class="flex items-start gap-3">
-                <div class="text-icon-secondary mt-1 shrink-0">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="22"
-                        height="22"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2.5"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <polyline points="16 18 22 12 16 6" />
-                        <polyline points="8 6 2 12 8 18" />
-                    </svg>
-                </div>
-                <div>
-                    <h1 class="text-[22px] font-bold text-text-primary">
-                        Roles & Access
-                    </h1>
-                    <p class="text-[13px] text-text-secondary mt-0.5">
-                        Manage permissions, user assignment, and access control.
-                    </p>
-                </div>
-            </div>
-            <div class="flex flex-wrap items-center gap-3 shrink-0">
-                <a
-                    href="/docs"
-                    target="_blank"
-                    class="inline-flex items-center justify-center h-8 px-4 rounded-md text-[13px] font-medium bg-(--color-doc-btn-bg) hover:bg-(--color-doc-btn-hover) border border-(--color-doc-btn-border) text-(--color-doc-btn-text) transition-colors shadow-sm"
-                >
-                    Documentation
-                </a>
-                <button
-                    onclick="openCreationSelectionModal()"
-                    class="inline-flex items-center justify-center w-full sm:w-[145px] h-8 border border-transparent bg-[var(--color-btn-primary)] hover:bg-[var(--color-btn-primary-hover)] text-white rounded-md text-[13px] font-medium transition-colors shadow-sm box-border leading-none"
-                >
-                    Create Application
-                </button>
+    {# ── Header ── #}
+    <div
+        class="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-8"
+    >
+        <div class="flex items-start gap-3">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="22"
+                height="22"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="text-icon-secondary mt-1 shrink-0"
+            >
+                <polyline points="16 18 22 12 16 6" />
+                <polyline points="8 6 2 12 8 18" />
+            </svg>
+            <div>
+                <h1 class="page-title">Roles & Access</h1>
+                <p class="page-subtitle mt-0.5">
+                    Manage permissions, user assignment, and access control.
+                </p>
             </div>
         </div>
-
-        <div class="flex flex-col lg:flex-row items-start gap-8">
-            <!-- ── Left Column: Cards List ── -->
-            <div class="flex-1 min-w-0 flex flex-col w-full">
-                <!-- Toolbar -->
-                <div class="flex flex-wrap items-center gap-2 mb-4">
-                    <div class="relative flex-1 min-w-[200px]">
-                        <svg
-                            class="absolute left-3 top-1/2 -translate-y-1/2 text-icon-muted"
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <circle cx="11" cy="11" r="8" />
-                            <path d="m21 21-4.35-4.35" />
-                        </svg>
-                        <input
-                            id="role-search"
-                            oninput="filterRoles()"
-                            type="text"
-                            placeholder="Search applications"
-                            class="w-full pl-9 pr-3 h-[34px] border border-border-strong rounded-md bg-surface-01 text-[13px] placeholder:text-text-placeholder focus:outline-none focus:border-btn-primary transition-colors"
-                        />
-                    </div>
-                    <!-- Mock dropdowns -->
-                    <button
-                        class="h-[34px] px-3 flex items-center gap-2.5 border border-border-strong rounded-md bg-surface-01 text-[13px] text-text-primary hover:bg-surface-hover transition-colors shadow-sm"
-                    >
-                        <span>Show all</span>
-                        <svg
-                            class="text-icon-muted"
-                            width="12"
-                            height="12"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path d="m6 9 6 6 6-6" />
-                        </svg>
-                    </button>
-                    <button
-                        class="h-[34px] px-3 flex items-center gap-2.5 border border-border-strong rounded-md bg-surface-01 text-[13px] text-text-primary hover:bg-surface-hover transition-colors shadow-sm"
-                    >
-                        <span>Last modified</span>
-                        <svg
-                            class="text-icon-muted"
-                            width="12"
-                            height="12"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path d="m6 9 6 6 6-6" />
-                        </svg>
-                    </button>
-                    <!-- Refresh tool -->
-                    <button
-                        onclick="loadRoles()"
-                        class="h-[34px] w-[34px] shrink-0 flex items-center justify-center border border-border-strong rounded-md bg-surface-01 text-icon-secondary hover:bg-surface-hover transition-colors shadow-sm"
-                    >
-                        <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                        >
-                            <path
-                                d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
-                            />
-                            <path d="M21 3v5h-5" />
-                            <path
-                                d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
-                            />
-                            <path d="M8 16H3v5" />
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- Cards Container -->
-                <div id="roles-list" class="flex flex-col gap-3">
-                    <!-- Skeletons... -->
-                </div>
-
-                <!-- Pagination -->
-                <div class="flex items-center justify-between mt-4">
-                    <span
-                        id="showing-text"
-                        class="text-[12px] text-text-secondary"
-                    ></span>
-                    <div
-                        id="pagination-controls"
-                        class="hidden flex items-center shadow-sm"
-                    >
-                        <button
-                            id="pg-first"
-                            onclick="goPage(1)"
-                            class="w-8 h-[30px] flex items-center justify-center border border-border-strong rounded-l-md bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-50"
-                        >
-                            «
-                        </button>
-                        <button
-                            id="pg-prev"
-                            onclick="goPage(_page - 1)"
-                            class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-50"
-                        >
-                            ‹
-                        </button>
-                        <span
-                            id="pg-num"
-                            class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-text-primary text-[13px] font-medium"
-                            >1</span
-                        >
-                        <button
-                            id="pg-next"
-                            onclick="goPage(_page + 1)"
-                            class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-50"
-                        >
-                            ›
-                        </button>
-                        <button
-                            id="pg-last"
-                            class="w-8 h-[30px] flex items-center justify-center border-y border-r border-border-strong rounded-r-md bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-50"
-                        >
-                            »
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ── Right Column: Summary & Account Details ── -->
-            <div class="w-full lg:w-[300px] lg:shrink-0 flex flex-col gap-6">
-                <!-- Usage / Summary Card -->
-                <div>
-                    <div class="flex items-center justify-between mb-2">
-                        <h2 class="text-[16px] font-bold text-text-primary">
-                            Summary
-                        </h2>
-                        <span
-                            id="summary-date"
-                            class="text-[11px] text-text-secondary uppercase"
-                        ></span>
-                    </div>
-                    <div
-                        class="bg-surface-01 border border-border-strong rounded-[8px] shadow-sm overflow-hidden flex flex-col"
-                    >
-                        <div
-                            class="grid grid-cols-2 border-b border-border-subtle"
-                        >
-                            <div class="p-3 border-r border-border-subtle">
-                                <span
-                                    class="flex items-center gap-1 text-[11px] text-text-secondary"
-                                    >Requests today
-                                    <svg
-                                        class="text-icon-muted"
-                                        width="10"
-                                        height="10"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                    >
-                                        <circle cx="12" cy="12" r="10" />
-                                        <path d="M12 16v-4" />
-                                        <path d="M12 8h.01" /></svg
-                                ></span>
-                                <div
-                                    id="sum-total"
-                                    class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight"
-                                >
-                                    —
-                                </div>
-                            </div>
-                            <div class="p-3">
-                                <span
-                                    class="flex items-center gap-1 text-[11px] text-text-secondary"
-                                    >Permissions
-                                    <svg
-                                        class="text-icon-muted"
-                                        width="10"
-                                        height="10"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                    >
-                                        <circle cx="12" cy="12" r="10" />
-                                        <path d="M12 16v-4" />
-                                        <path d="M12 8h.01" /></svg
-                                ></span>
-                                <div
-                                    id="sum-perms"
-                                    class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight"
-                                >
-                                    —
-                                </div>
-                            </div>
-                        </div>
-                        <div class="grid grid-cols-2">
-                            <div class="p-3 border-r border-border-subtle">
-                                <span
-                                    class="flex items-center gap-1 text-[11px] text-text-secondary"
-                                    >Resources
-                                    <svg
-                                        class="text-icon-muted"
-                                        width="10"
-                                        height="10"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                    >
-                                        <circle cx="12" cy="12" r="10" />
-                                        <path d="M12 16v-4" />
-                                        <path d="M12 8h.01" /></svg
-                                ></span>
-                                <div
-                                    id="sum-res"
-                                    class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight"
-                                >
-                                    —
-                                </div>
-                            </div>
-                            <div class="p-3">
-                                <span
-                                    class="flex items-center gap-1 text-[11px] text-text-secondary"
-                                    >Admins
-                                    <svg
-                                        class="text-icon-muted"
-                                        width="10"
-                                        height="10"
-                                        viewBox="0 0 24 24"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        stroke-width="2"
-                                    >
-                                        <circle cx="12" cy="12" r="10" />
-                                        <path d="M12 16v-4" />
-                                        <path d="M12 8h.01" /></svg
-                                ></span>
-                                <div
-                                    id="sum-admin"
-                                    class="text-[20px] font-bold text-text-primary mt-1 leading-none tracking-tight"
-                                >
-                                    —
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Account Details Panel -->
-                <div id="role-detail-panel">
-                    <h2 class="text-[16px] font-bold text-text-primary mb-2">
-                        Account Details
-                    </h2>
-                    <div
-                        class="bg-surface-01 border border-border-strong rounded-[8px] shadow-sm p-4 flex flex-col gap-3.5"
-                    >
-                        <div class="flex items-center justify-center py-6">
-                            <span
-                                class="text-[12px] text-text-secondary text-center"
-                                >Click an application to view account mapping
-                                details.</span
-                            >
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="flex flex-wrap items-center gap-3 shrink-0">
+            {{ btn::button( label="Documentation", btn_type="button",
+            variant="outline", full_width=false ) }} {{ btn::button(
+            label="Create Role", btn_type="button", variant="primary",
+            full_width=false, hx_get="/roles/new/method",
+            hx_target="#modal-container", hx_swap="innerHTML" ) }}
         </div>
     </div>
-</div>
-<!-- /two-column -->
 
-<!-- ── Shared role action menu (portal — positioned by JS, never clipped) ── -->
-<div
-    id="role-action-menu"
-    class="hidden fixed z-50 w-44 bg-surface-01 border border-border-subtle rounded-sm shadow-lg py-1 overflow-hidden"
-></div>
-
-<!-- ── Creation Method Selection Modal ────────────────────────────────────── -->
-<div
-    id="creation-selection-modal"
-    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]"
->
-    <div
-        class="w-full max-w-lg mx-4 bg-surface-01 border border-border-subtle rounded-card shadow-xl overflow-hidden"
-    >
-        <!-- Header -->
-        <div
-            class="flex items-center justify-between px-5 h-12 border-b border-border-subtle bg-surface-02"
-        >
-            <span class="text-[13px] font-semibold text-text-primary"
-                >Choose Creation Method</span
-            >
-            <button
-                onclick="closeCreationSelectionModal()"
-                class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-text-primary hover:bg-surface-hover transition-colors"
-            >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-            </button>
-        </div>
-
-        <!-- Body -->
-        <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <!-- Option 1: Wizard (feat/logo_issue style) -->
-            <button
-                onclick="goToWizard()"
-                class="group flex flex-col text-left p-5 border border-border-strong rounded-md bg-surface-01 hover:border-btn-primary hover:bg-surface-hover transition-all"
-            >
-                <div
-                    class="w-10 h-10 rounded-lg bg-btn-primary/10 text-btn-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <path
-                            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"
-                        />
-                    </svg>
-                </div>
-                <h3 class="text-[15px] font-bold text-text-primary mb-1">
-                    Professional Way
-                </h3>
-                <p class="text-[12px] text-text-secondary leading-normal">
-                    Step-by-step setup process. Ideal for complex roles.
-                </p>
-            </button>
-
-            <!-- Option 2: Current Modal -->
-            <button
-                onclick="openQuickCreate()"
-                class="group flex flex-col text-left p-5 border border-border-strong rounded-md bg-surface-01 hover:border-btn-primary hover:bg-surface-hover transition-all"
-            >
-                <div
-                    class="w-10 h-10 rounded-lg bg-icon-secondary/10 text-icon-secondary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform"
-                >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="20"
-                        height="20"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                    >
-                        <path d="M12 5v14" />
-                        <path d="M5 12h14" />
-                    </svg>
-                </div>
-                <h3 class="text-[15px] font-bold text-text-primary mb-1">
-                    Quick Setup
-                </h3>
-                <p class="text-[12px] text-text-secondary leading-normal">
-                    Create a role instantly using a single form.
-                </p>
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- ── Delete Confirmation Dialog ────────────────────────────────────────── -->
-<div
-    id="delete-confirm-modal"
-    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]"
->
-    <div
-        class="w-full max-w-sm mx-4 bg-surface-01 border border-border-subtle rounded-card shadow-xl overflow-hidden"
-    >
-        <!-- Header -->
-        <div class="flex items-center gap-3 px-5 py-4">
-            <div
-                class="flex items-center justify-center w-10 h-10 rounded-full bg-red-500/10 text-red-500 shrink-0"
-            >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <polyline points="3 6 5 6 21 6" />
-                    <path
-                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-                    />
-                    <line x1="10" y1="11" x2="10" y2="17" />
-                    <line x1="14" y1="11" x2="14" y2="17" />
-                </svg>
-            </div>
-            <div>
-                <p class="text-[14px] font-semibold text-text-primary">
-                    Delete Role
-                </p>
-                <p class="text-[12px] text-text-secondary mt-0.5">
-                    Are you sure you want to delete
-                    <span
-                        id="delete-role-name"
-                        class="font-medium text-text-primary"
-                    ></span
-                    >? This will remove all associated permissions and
-                    assignments.
-                </p>
-            </div>
-        </div>
-        <!-- Footer -->
-        <div
-            class="flex items-center justify-end gap-2 px-5 py-3.5 bg-surface-02 border-t border-border-subtle"
-        >
-            <button
-                onclick="closeDeleteConfirm()"
-                class="px-4 h-8 border border-border-subtle rounded-sm text-[13px] text-text-secondary bg-surface-01 hover:bg-surface-hover transition-colors"
-            >
-                Cancel
-            </button>
-            <button
-                id="delete-confirm-btn"
-                onclick="confirmDeleteRole()"
-                class="px-4 h-8 bg-red-600 text-white rounded-sm text-[13px] font-medium hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-                Delete
-            </button>
-        </div>
-    </div>
-</div>
-
-<!-- ── Create Role Modal ────────────────────────────────────────────────── -->
-<div
-    id="create-role-modal"
-    class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-[2px]"
->
-    <div
-        class="w-full max-w-md mx-4 bg-surface-01 border border-border-subtle rounded-card shadow-xl overflow-hidden"
-    >
-        <!-- Header -->
-        <div
-            class="flex items-center justify-between px-5 h-12 border-b border-border-subtle"
-        >
-            <span class="text-[13px] font-semibold text-text-primary"
-                >Create New Role</span
-            >
-            <button
-                onclick="closeCreateModal()"
-                class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-text-primary hover:bg-surface-hover transition-colors"
-            >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="15"
-                    height="15"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                >
-                    <line x1="18" y1="6" x2="6" y2="18" />
-                    <line x1="6" y1="6" x2="18" y2="18" />
-                </svg>
-            </button>
-        </div>
-
-        <!-- Body -->
-        <div class="px-5 py-4 space-y-4">
-            <p
-                id="create-role-error"
-                class="hidden text-[11px] text-red-500 bg-red-500/5 border border-red-500/20 rounded-sm px-3 py-2"
-            ></p>
-
-            <div>
-                <label
-                    class="block text-[11px] font-medium text-text-secondary uppercase tracking-wider mb-1.5"
-                >
-                    Role Name
-                </label>
-                <input
-                    id="role-name"
-                    type="text"
-                    placeholder="e.g. Inventory Manager"
-                    class="w-full px-3 h-9 border border-border-subtle rounded-sm bg-surface-02 text-[13px] text-text-primary placeholder:text-text-placeholder focus:border-border-strong focus:bg-surface-01 focus:outline-none transition-colors"
-                />
-            </div>
-
-            <div>
-                <label
-                    class="block text-[11px] font-medium text-text-secondary uppercase tracking-wider mb-1.5"
-                >
-                    Description
-                </label>
-                <input
-                    id="role-desc"
-                    type="text"
-                    placeholder="Short description of this role"
-                    class="w-full px-3 h-9 border border-border-subtle rounded-sm bg-surface-02 text-[13px] text-text-primary placeholder:text-text-placeholder focus:border-border-strong focus:bg-surface-01 focus:outline-none transition-colors"
-                />
-            </div>
-
-            <div>
-                <div class="flex items-center justify-between mb-2">
-                    <label
-                        class="text-[11px] font-medium text-text-secondary uppercase tracking-wider"
-                    >
-                        Permissions
-                    </label>
-                    <button
-                        type="button"
-                        onclick="addPermissionRow()"
-                        class="inline-flex items-center gap-1 text-[11px] text-text-link hover:underline transition-colors"
+    {# ── Main Layout ── #}
+    <div class="flex flex-col lg:flex-row items-start gap-8">
+        {# ── Left: Role List ── #}
+        <div class="flex-1 min-w-0 flex flex-col w-full">
+            {# Toolbar #}
+            <div class="flex flex-wrap items-center gap-2 mb-4">
+                {# Search #}
+                <div class="relative flex-1 min-w-[200px]">
+                    <div
+                        class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
-                            width="11"
-                            height="11"
+                            width="14"
+                            height="14"
                             viewBox="0 0 24 24"
                             fill="none"
                             stroke="currentColor"
-                            stroke-width="2.5"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            class="text-icon-muted"
                         >
-                            <path d="M5 12h14" />
-                            <path d="M12 5v14" />
+                            <circle cx="11" cy="11" r="8" />
+                            <path d="m21 21-4.3-4.3" />
                         </svg>
-                        Add permission
-                    </button>
+                    </div>
+                    {{ inp::input( name="search", id="role-search",
+                    input_type="text", value=query, placeholder="Search roles",
+                    hx_get="/roles", hx_trigger="keyup changed delay:300ms",
+                    hx_target="#roles-list", hx_swap="outerHTML",
+                    hx_include="[name='filter']" ) }}
                 </div>
-                <div
-                    id="permissions-list"
-                    class="flex flex-col gap-1.5 max-h-40 overflow-y-auto"
-                ></div>
+
+                {# Filter #}
+                <select
+                    name="filter"
+                    hx-get="/roles"
+                    hx-trigger="change"
+                    hx-target="#roles-list"
+                    hx-swap="outerHTML"
+                    hx-include="[name='search']"
+                    class="h-10 px-3 border border-border-subtle rounded-sm bg-surface-01 text-[13px] text-text-primary focus:outline-none focus:border-border-strong transition-colors"
+                >
+                    <option
+                        value="all"
+                        {%
+                        if
+                        filter=""
+                        ="all"
+                        %}selected{%
+                        endif
+                        %}
+                    >
+                        Show all
+                    </option>
+                    <option
+                        value="with_permissions"
+                        {%
+                        if
+                        filter=""
+                        ="with_permissions"
+                        %}selected{%
+                        endif
+                        %}
+                    >
+                        Has permissions
+                    </option>
+                    <option
+                        value="empty"
+                        {%
+                        if
+                        filter=""
+                        ="empty"
+                        %}selected{%
+                        endif
+                        %}
+                    >
+                        No permissions
+                    </option>
+                </select>
+
+                {# Sort #}
+                <select
+                    name="sort"
+                    hx-get="/roles"
+                    hx-trigger="change"
+                    hx-target="#roles-list"
+                    hx-swap="outerHTML"
+                    hx-include="[name='search'],[name='filter']"
+                    class="h-10 px-3 border border-border-subtle rounded-sm bg-surface-01 text-[13px] text-text-primary focus:outline-none focus:border-border-strong transition-colors"
+                >
+                    <option
+                        value="newest"
+                        {%
+                        if
+                        sort=""
+                        ="newest"
+                        %}selected{%
+                        endif
+                        %}
+                    >
+                        Last modified
+                    </option>
+                    <option
+                        value="oldest"
+                        {%
+                        if
+                        sort=""
+                        ="oldest"
+                        %}selected{%
+                        endif
+                        %}
+                    >
+                        Oldest first
+                    </option>
+                    <option
+                        value="name"
+                        {%
+                        if
+                        sort=""
+                        ="name"
+                        %}selected{%
+                        endif
+                        %}
+                    >
+                        Name A–Z
+                    </option>
+                </select>
+
+                {# Refresh #} {{ btn::button( label="", btn_type="button",
+                variant="outline", full_width=false, icon_svg="<svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="14"
+                    height="14"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path
+                        d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"
+                    />
+                    <path d="M21 3v5h-5" />
+                    <path
+                        d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"
+                    />
+                    <path d="M8 16H3v5" /></svg
+                >", hx_get="/roles", hx_target="#roles-list",
+                hx_swap="outerHTML" ) }}
             </div>
+
+            {# Role list — server rendered #} {% include
+            "partials/roles/list.html" %}
         </div>
 
-        <!-- Footer -->
-        <div
-            class="flex items-center justify-end gap-2 px-5 py-3.5 bg-surface-02 border-t border-border-subtle"
-        >
-            <button
-                onclick="closeCreateModal()"
-                class="px-4 h-8 border border-border-subtle rounded-sm text-[13px] text-text-secondary bg-surface-01 hover:bg-surface-hover transition-colors"
-            >
-                Cancel
-            </button>
-            <button
-                id="create-role-btn"
-                onclick="submitCreateRole()"
-                class="px-4 h-8 bg-btn-primary text-text-on-primary rounded-sm text-[13px] font-medium hover:bg-btn-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-                Create Role
-            </button>
+        {# ── Right: Stats + Detail Panel ── #}
+        <div class="w-full lg:w-[300px] lg:shrink-0 flex flex-col gap-6">
+            {# Stats #} {% include "partials/roles/stats.html" %} {# Detail
+            panel #}
+            <div>
+                <h2 class="section-title mb-2">Role Details</h2>
+                <div
+                    id="role-detail-panel"
+                    class="bg-surface-01 border border-border-subtle rounded-card shadow-sm p-4"
+                >
+                    <div class="flex items-center justify-center py-6">
+                        <span class="body-sm text-center">
+                            Click a role to view details and actions.
+                        </span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-{% endblock %} {% block body_scripts %}
-<script>
-    // ── Constants ─────────────────────────────────────────────────────────
-    const RESOURCES = [
-        "orders",
-        "customers",
-        "reports",
-        "inventory",
-        "admin_panel",
-    ];
-    const ACCESS_LEVELS = ["read", "write", "admin"];
-    const PAGE_SIZE = 8;
+{# Modal container #}
+<div id="modal-container"></div>
 
-    // ── State ─────────────────────────────────────────────────────────────
-    let _page = 1;
-    let _search = "";
-    let _debounceTimer = null;
-    let _totalRoles = 0;
-
-    // ── Permission-row helpers (used by modal) ────────────────────────────
-    function makeSelectHTML(id) {
-        const arrow =
-            "url('data:image/svg+xml;utf8,<svg xmlns=\\'http://www.w3.org/2000/svg\\' width=\\'12\\' height=\\'12\\' viewBox=\\'0 0 24 24\\' fill=\\'none\\' stroke=\\'%238d8d8d\\' stroke-width=\\'2\\'><path d=\\'m6 9 6 6 6-6\\'/></svg>')";
-        return `<div class="flex-1">
-            <select id="${id}"
-                class="w-full px-3 h-9 border border-border-subtle rounded-sm bg-surface-02 text-[13px] text-text-primary focus:border-border-strong focus:outline-none transition-colors appearance-none cursor-pointer"
-                style="background-image:${arrow};background-repeat:no-repeat;background-position:right 8px center;background-size:12px">
-            </select>
-        </div>`;
-    }
-
-    function addPermissionRow(resource = "inventory", access = "read") {
-        const list = document.getElementById("permissions-list");
-        const row = document.createElement("div");
-        row.className = "flex items-center gap-2";
-        const rid = "ps-res-" + Date.now();
-        const aid = "ps-acc-" + (Date.now() + 1);
-        row.innerHTML =
-            makeSelectHTML(rid) +
-            makeSelectHTML(aid) +
-            `
-            <button type="button" onclick="this.parentElement.remove()"
-                class="flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-red-500 hover:bg-red-500/8 transition-colors shrink-0">
-                <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13"
-                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
-            </button>`;
-        list.appendChild(row);
-        row.querySelector(`#${rid}`).innerHTML = RESOURCES.map(
-            (r) =>
-                `<option value="${r}" ${r === resource ? "selected" : ""}>${r}</option>`,
-        ).join("");
-        row.querySelector(`#${aid}`).innerHTML = ACCESS_LEVELS.map(
-            (a) =>
-                `<option value="${a}" ${a === access ? "selected" : ""}>${a}</option>`,
-        ).join("");
-    }
-
-    // Seed one default row when page loads
-    addPermissionRow("inventory", "read");
-
-    // ── Creation Selection Modal ──────────────────────────────────────────
-    function openCreationSelectionModal() {
-        document
-            .getElementById("creation-selection-modal")
-            .classList.remove("hidden");
-        document.body.classList.add("overflow-hidden");
-    }
-
-    function closeCreationSelectionModal() {
-        document
-            .getElementById("creation-selection-modal")
-            .classList.add("hidden");
-        document.body.classList.remove("overflow-hidden");
-    }
-
-    function goToWizard() {
-        window.location.href = "/roles/new";
-    }
-
-    function openQuickCreate() {
-        window.location.href = "/roles/quick";
-    }
-
-    // ── Modal open / close ────────────────────────────────────────────────
-    function openCreateModal() {
-        document.getElementById("create-role-modal").classList.remove("hidden");
-        document.body.classList.add("overflow-hidden");
-    }
-
-    function closeCreateModal() {
-        document.getElementById("create-role-modal").classList.add("hidden");
-        document.body.classList.remove("overflow-hidden");
-        document.getElementById("permissions-list").innerHTML = "";
-        document.getElementById("role-name").value = "";
-        document.getElementById("role-desc").value = "";
-        document.getElementById("create-role-error").classList.add("hidden");
-        addPermissionRow("inventory", "read");
-    }
-
-    // ── Submit create role ────────────────────────────────────────────────
-    async function submitCreateRole() {
-        const name = document.getElementById("role-name").value.trim();
-        const desc = document.getElementById("role-desc").value.trim();
-        const errEl = document.getElementById("create-role-error");
-        const btn = document.getElementById("create-role-btn");
-
-        errEl.classList.add("hidden");
-        if (!name) {
-            errEl.textContent = "Role name is required.";
-            errEl.classList.remove("hidden");
-            return;
-        }
-
-        const permissions = [
-            ...document.querySelectorAll("#permissions-list > div"),
-        ]
-            .map((row) => {
-                const s = row.querySelectorAll("select");
-                return {
-                    resource: s[0]?.value || "",
-                    access: s[1]?.value || "",
-                };
-            })
-            .filter((p) => p.resource && p.access);
-
-        // Check for duplicates
-        const seen = new Set();
-        for (const p of permissions) {
-            const key = `${p.resource}:${p.access}`;
-            if (seen.has(key)) {
-                errEl.textContent = `Duplicate permission detected: "${p.resource}:${p.access}". Please remove redundant entries.`;
-                errEl.classList.remove("hidden");
-                return;
-            }
-            seen.add(key);
-        }
-
-        btn.disabled = true;
-        btn.textContent = "Creating…";
-
-        try {
-            const res = await fetch("/admin/roles", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, description: desc, permissions }),
-            });
-            const data = await res.json();
-            if (!res.ok) {
-                errEl.textContent =
-                    data.error || data.message || "Failed to create role.";
-                errEl.classList.remove("hidden");
-            } else {
-                closeCreateModal();
-                window.showBanner(`Role "${name}" created successfully.`, "success");
-                await loadRoles();
-            }
-        } catch {
-            errEl.textContent = "Network error. Please try again.";
-            errEl.classList.remove("hidden");
-        } finally {
-            btn.disabled = false;
-            btn.textContent = "Create Role";
-        }
-    }
-    // ── Utility: Generate deterministic color from name ──────────
-    function roleColor(name) {
-        let hash = 0;
-        for (let i = 0; i < name.length; i++)
-            hash = name.charCodeAt(i) + ((hash << 5) - hash);
-        const hue = Math.abs(hash) % 360;
-        return [`hsl(${hue}, 70%, 30%)`, `hsl(${hue}, 80%, 90%)`];
-    }
-
-    // ── Utility: Get leading icon initials ───────────────────────
-    function roleInitial(name) {
-        if (!name) return "?";
-        const parts = name.trim().split(/\s+/);
-        if (parts.length === 1) return parts[0].substring(0, 2).toUpperCase();
-        return (parts[0][0] + parts[1][0]).toUpperCase();
-    }
-
-    // ── Render a single role row (CF-style card row) ──────────────────────
-    function renderRoleRow(role, isLast) {
-        const menuId = "role-" + role.name.replace(/\W+/g, "-");
-        const date = new Date(role.created_at).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric",
-        });
-        const [fg, bg] = roleColor(role.name);
-
-        const permBadges = role.permissions.length
-            ? role.permissions.map((p) => p.resource).join(", ")
-            : "No permissions assigned";
-
-        let commitIco = `<svg class="text-icon-muted" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>`;
-
-        return `
-        <div class="bg-surface-01 border border-border-strong rounded-[8px] overflow-hidden hover:border-[#0051c3] transition-colors cursor-pointer"
-             data-role-id="${role.role_id}"
-             onclick="showRoleDetail('${role.role_id}')">
-            <!-- Top Half -->
-            <div class="p-4 flex items-center justify-between">
-                <div class="flex items-center gap-4 flex-1 min-w-0 pr-4">
-                    <!-- Icon -->
-                    <div style="background:${bg};color:${fg};box-shadow:inset 0 0 0 1px rgba(0,0,0,0.1)"
-                         class="w-10 h-10 rounded shrink-0 flex items-center justify-center text-[15px] font-bold select-none">
-                        ${roleInitial(role.name)}
-                    </div>
-                    <!-- Text -->
-                    <div class="flex flex-col flex-1 min-w-0">
-                        <span class="text-[14px] font-semibold text-text-primary truncate">${escHtml(role.name)}</span>
-                        <div class="flex items-center gap-1.5 mt-0.5 text-[12px] text-text-secondary truncate">
-                            <span class="truncate">${escHtml(role.description) || "No description"}</span>
-                            <span class="text-text-placeholder">•</span>
-                            <span class="flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full ${role.permissions.length ? "bg-green-500" : "bg-red-500"}"></span> ${role.permissions.length} perms</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4 shrink-0">
-                    <span class="text-[12px] text-text-secondary">${date} relative</span>
-                    <button class="text-icon-muted hover:text-text-primary transition-colors p-1"
-                            data-role-name="${escHtml(role.name)}" data-role-id="${escHtml(role.role_id)}"
-                            onclick="event.stopPropagation();toggleRoleMenu(this.dataset.roleName,this.dataset.roleId,event)"
-                            title="More actions">
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
-                    </button>
-                </div>
-            </div>
-            <!-- Bottom Half (Footer) -->
-            <div class="bg-surface-02 border-t border-border-subtle px-4 py-2.5 flex items-center justify-between gap-4">
-                <div class="flex items-center gap-2 min-w-0 flex-1">
-                    ${commitIco}
-                    <span class="text-[12px] text-text-secondary truncate"><span class="font-medium text-text-primary">grants access to:</span> <span class="text-text-helper">${escHtml(permBadges)}</span></span>
-                </div>
-                <span class="text-[12px] text-text-helper flex items-center gap-1"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg> KMS Panel Admin</span>
-            </div>
-        </div>`;
-    }
-
-    // ── Render the current page of roles ─────────────────────────────────
-    function renderPage(roles, total, page, pages) {
-        const list = document.getElementById("roles-list");
-        _totalRoles = total;
-
-        // ── Empty states ──
-        if (total === 0 && _search) {
-            list.innerHTML = `
-                <div class="py-12 text-center text-[13px] text-text-helper">
-                    No roles match your search.
-                </div>`;
-        } else if (total === 0) {
-            list.innerHTML = `
-                <div class="flex flex-col items-center justify-center py-16 gap-3 text-center">
-                    <div class="flex items-center justify-center w-12 h-12 rounded-full bg-surface-02 text-icon-muted">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
-                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-                        </svg>
-                    </div>
-                    <p class="text-[13px] font-medium text-text-primary">No roles yet</p>
-                    <p class="text-xs text-text-helper max-w-xs">
-                        Click "+ New Role" to create the first role and start managing access control.
-                    </p>
-                </div>`;
-        } else {
-            list.innerHTML = roles
-                .map((role, i) => renderRoleRow(role, i === roles.length - 1))
-                .join("");
-        }
-
-        // ── Pagination ──
-        const showEl = document.getElementById("showing-text");
-        const pgCtrl = document.getElementById("pagination-controls");
-
-        if (total > 0) {
-            const start = (page - 1) * PAGE_SIZE;
-            const end = Math.min(start + roles.length, total);
-            showEl.textContent = `Showing ${start + 1}–${end} of ${total}`;
-        } else {
-            showEl.textContent = "";
-        }
-
-        if (pages > 1) {
-            pgCtrl.classList.remove("hidden");
-            document.getElementById("pg-num").textContent = page;
-            document.getElementById("pg-first").disabled = page === 1;
-            document.getElementById("pg-prev").disabled = page === 1;
-            document.getElementById("pg-next").disabled = page === pages;
-            document.getElementById("pg-last").disabled = page === pages;
-            document.getElementById("pg-last").onclick = () => goPage(pages);
-        } else if (total > 0) {
-            pgCtrl.classList.remove("hidden");
-            document.getElementById("pg-num").textContent = page;
-            document.getElementById("pg-first").disabled = true;
-            document.getElementById("pg-prev").disabled = true;
-            document.getElementById("pg-next").disabled = true;
-            document.getElementById("pg-last").disabled = true;
-        } else {
-            pgCtrl.classList.add("hidden");
-        }
-    }
-
-    // ── Role row ⋯ menu helpers (portal pattern — immune to overflow:hidden) ──
-    function toggleRoleMenu(roleName, roleId, e) {
-        e.stopPropagation();
-        const menu = document.getElementById("role-action-menu");
-        const btn = e.currentTarget;
-
-        // Clicking the same button while open → close
-        if (menu._activeRole === roleId && !menu.classList.contains("hidden")) {
-            menu.classList.add("hidden");
-            menu._activeRole = null;
-            return;
-        }
-
-        // Build menu content using data attributes to avoid inline quoting issues
-        const encoded = encodeURIComponent(roleName);
-        const safe = escHtml(roleName);
-        menu.innerHTML = `
-            <a href="/roles/${encoded}"
-               class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                </svg>
-                View details
-            </a>
-            <a href="/assign?role=${encoded}"
-               class="flex items-center gap-2.5 px-3 py-2 text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-                    <circle cx="9" cy="7" r="4"/>
-                    <line x1="19" y1="8" x2="19" y2="14"/>
-                    <line x1="22" y1="11" x2="16" y2="11"/>
-                </svg>
-                Assign role
-            </a>
-            <button data-name="${safe}" onclick="copyRoleName(this.dataset.name)"
-                    class="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors text-left">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                </svg>
-                Copy name
-            </button>
-            <div class="border-t border-border-subtle my-1"></div>
-            <button data-name="${encodeURIComponent(roleName)}" data-role-id="${escHtml(roleId)}" onclick="openDeleteConfirm(this.dataset.roleId, decodeURIComponent(this.dataset.name))"
-                    class="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] text-red-500 hover:bg-red-500/8 transition-colors text-left">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                     viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="3 6 5 6 21 6"/>
-                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                    <line x1="10" y1="11" x2="10" y2="17"/>
-                    <line x1="14" y1="11" x2="14" y2="17"/>
-                </svg>
-                Delete role
-            </button>`;
-
-        menu._activeRole = roleId;
-
-        // ── Position: right-align under the button, flip up if near viewport bottom ──
-        const rect = btn.getBoundingClientRect();
-        const menuW = 176; // w-44 = 11rem
-        const menuH = menu.scrollHeight || 84;
-
-        let top = rect.bottom + 4;
-        let left = rect.right - menuW;
-
-        // Flip upward when overflowing viewport bottom
-        if (top + menuH > window.innerHeight - 8) {
-            top = rect.top - menuH - 4;
-        }
-        // Clamp horizontally within viewport
-        if (left < 8) left = 8;
-        if (left + menuW > window.innerWidth - 8)
-            left = window.innerWidth - menuW - 8;
-
-        menu.style.top = top + "px";
-        menu.style.left = left + "px";
-        menu.classList.remove("hidden");
-    }
-
-    function copyRoleName(name) {
-        navigator.clipboard.writeText(name).then(() => {
-            const menu = document.getElementById("role-action-menu");
-            menu.classList.add("hidden");
-            menu._activeRole = null;
-            window.showBanner(`Copied "${name}" to clipboard.`, "info");
-        });
-    }
-
-    // ── Delete role confirmation ───────────────────────────────────────────
-    let _pendingDeleteRole = null;
-    let _pendingDeleteRoleId = null;
-
-    function openDeleteConfirm(roleId, roleName) {
-        const menu = document.getElementById("role-action-menu");
-        menu.classList.add("hidden");
-        menu._activeRole = null;
-
-        _pendingDeleteRoleId = roleId;
-        _pendingDeleteRole = roleName;
-        document.getElementById("delete-role-name").textContent =
-            `"${roleName}"`;
-        document
-            .getElementById("delete-confirm-modal")
-            .classList.remove("hidden");
-        document.body.classList.add("overflow-hidden");
-    }
-
-    function closeDeleteConfirm() {
-        _pendingDeleteRole = null;
-        _pendingDeleteRoleId = null;
-        document.getElementById("delete-confirm-modal").classList.add("hidden");
-        document.body.classList.remove("overflow-hidden");
-        const btn = document.getElementById("delete-confirm-btn");
-        btn.disabled = false;
-        btn.textContent = "Delete";
-    }
-
-    async function confirmDeleteRole() {
-        if (!_pendingDeleteRoleId) return;
-        const btn = document.getElementById("delete-confirm-btn");
-        btn.disabled = true;
-        btn.textContent = "Deleting…";
-
-        const roleName = _pendingDeleteRole;
-        const roleId = _pendingDeleteRoleId;
-
-        let deleteOk = false;
-        let errMsg = "";
-        try {
-            const res = await fetch(
-                `/admin/roles/${encodeURIComponent(roleId)}`,
-                {
-                    method: "DELETE",
-                    headers: { "Content-Type": "application/json" },
-                },
-            );
-            const text = await res.text();
-            if (res.ok) {
-                deleteOk = true;
-            } else {
-                try {
-                    errMsg = JSON.parse(text).error;
-                } catch {}
-                if (!errMsg) errMsg = `Server returned ${res.status}`;
-            }
-        } catch (err) {
-            errMsg = "Network error";
-            console.error("[delete] Fetch failed:", err);
-        }
-
-        closeDeleteConfirm();
-
-        if (deleteOk) {
-            window.showBanner(`Role "${roleName}" deleted successfully.`, "error");
-            _page = 1;
-            await loadRoles();
-        } else if (errMsg) {
-            window.showBanner(errMsg, "error");
-        }
-    }
-
-    // Close delete modal on Escape
-    document.addEventListener("keydown", (e) => {
-        if (
-            e.key === "Escape" &&
-            !document
-                .getElementById("delete-confirm-modal")
-                .classList.contains("hidden")
-        ) {
-            closeDeleteConfirm();
-        }
-    });
-
-    // Close portal menu on outside click or Escape
-    document.addEventListener("click", () => {
-        const menu = document.getElementById("role-action-menu");
-        if (menu) {
-            menu.classList.add("hidden");
-            menu._activeRole = null;
-        }
-    });
-    document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape") {
-            const menu = document.getElementById("role-action-menu");
-            if (menu) {
-                menu.classList.add("hidden");
-                menu._activeRole = null;
-            }
-        }
-    });
-
-    // ── Pagination helper ─────────────────────────────────────────────────
-    function goPage(n) {
-        _page = n;
-        loadRoles();
-        document
-            .getElementById("roles-list")
-            .scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-
-    // ── Debounced server-side search ──────────────────────────────────────
-    function filterRoles() {
-        clearTimeout(_debounceTimer);
-        _debounceTimer = setTimeout(() => {
-            _search = document.getElementById("role-search").value.trim();
-            _page = 1;
-            loadRoles();
-        }, 300);
-    }
-
-    // ── Summary sidebar (server-side) ────────────────────────────────────
-    async function updateSummary() {
-        try {
-            const res = await fetch("/admin/roles/summary");
-            const data = await res.json();
-
-            document.getElementById("summary-date").textContent =
-                new Date().toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                });
-
-            document.getElementById("sum-total").textContent = data.total_roles;
-            document.getElementById("sum-perms").textContent =
-                data.total_permissions;
-            document.getElementById("sum-res").textContent =
-                data.unique_resources;
-            document.getElementById("sum-admin").textContent = data.admin_count;
-        } catch {
-            // Silently ignore summary fetch errors
-        }
-    }
-
-    // ── Load roles from API (server-side pagination) ─────────────────────
-    async function loadRoles() {
-        const list = document.getElementById("roles-list");
-
-        // Skeleton
-        const skeletonRow = (w1, w2, w3) => `
-            <div class="border-b border-border-subtle last:border-0 animate-pulse">
-                <div class="flex items-center gap-3 px-4 py-3">
-                    <div class="w-8 h-8 rounded-sm bg-surface-02 shrink-0"></div>
-                    <div class="flex-1 space-y-1.5">
-                        <div class="h-3.5 bg-surface-02 rounded ${w1}"></div>
-                        <div class="h-3 bg-surface-02 rounded ${w2}"></div>
-                    </div>
-                    <div class="h-3 bg-surface-02 rounded w-20"></div>
-                </div>
-                <div class="flex gap-2 px-4 pb-3 pl-[52px]">
-                    <div class="h-5 bg-surface-02 rounded ${w3}"></div>
-                </div>
-            </div>`;
-        list.innerHTML =
-            skeletonRow("w-32", "w-48", "w-24") +
-            skeletonRow("w-40", "w-56", "w-20 mr-1") +
-            skeletonRow("w-28", "w-40", "w-28");
-
-        try {
-            const params = new URLSearchParams({
-                page: _page,
-                size: PAGE_SIZE,
-            });
-            if (_search) params.set("search", _search);
-
-            const res = await fetch(`/admin/roles?${params}`);
-            const data = await res.json();
-            renderPage(data.roles, data.total, data.page, data.pages);
-            updateSummary();
-        } catch {
-            list.innerHTML = `
-                <div class="flex items-center justify-center gap-2 px-4 py-10 text-[13px] text-red-500">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
-                         viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                         stroke-width="2" class="shrink-0">
-                        <circle cx="12" cy="12" r="10"/>
-                        <line x1="12" y1="8" x2="12" y2="12"/>
-                        <line x1="12" y1="16" x2="12.01" y2="16"/>
-                    </svg>
-                    Failed to load roles. Please try again.
-                </div>`;
-        }
-    }
-
-    // ── XSS escape ────────────────────────────────────────────────────────
-    function escHtml(str) {
-        if (!str) return "";
-        return String(str)
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;");
-    }
-
-    // ── In-memory roles store (populated on loadRoles) ──────────
-    let _allRoles = [];
-
-    // ── Update role details panel (Account Details) ─────────────
-    function showRoleDetail(roleId) {
-        const role = _allRoles.find((r) => r.role_id === roleId);
-        if (!role) return;
-
-        const panel = document.getElementById("role-detail-panel");
-        const createdDate = new Date(role.created_at).toLocaleDateString(
-            "en-US",
-            { month: "short", day: "numeric", year: "numeric" },
-        );
-
-        panel.innerHTML = `
-            <h2 class="text-[16px] font-bold text-text-primary mb-2">Account Details</h2>
-            <div class="bg-surface-01 border border-border-strong rounded-[8px] shadow-sm p-4 flex flex-col gap-3">
-                <div class="flex items-center justify-between">
-                    <span class="text-[12px] text-text-secondary">Account ID</span>
-                    <span class="text-[12px] text-text-primary text-right font-mono flex items-center gap-1" title="${escHtml(role.role_id)}">
-                        ${escHtml(role.role_id.substring(0, 8))}...
-                        <svg class="text-icon-muted cursor-pointer hover:text-text-primary" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-                    </span>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="text-[12px] text-text-secondary">Created</span>
-                    <span class="text-[12px] text-text-primary text-right flex items-center gap-1">${createdDate}</span>
-                </div>
-                <div class="pt-3 border-t border-border-subtle mt-1 flex flex-col gap-2">
-                    <a href="/assign?role=${encodeURIComponent(role.name)}" class="w-full h-8 flex items-center justify-center bg-[var(--color-btn-primary)] hover:bg-[var(--color-btn-primary-hover)] active:bg-[var(--color-btn-primary-press)] text-white text-[13px] font-medium rounded-md transition-colors shadow-sm">Assign Users</a>
-                </div>
-            </div>
-        `;
-    }
-
-    // ── Store all roles in memory on fetch ─────────────────────
-    const _origRenderPage = renderPage;
-    renderPage = function (roles, total, page, pages) {
-        // If we are given total==total, it's the full array (mocked inside loadRoles). We just store it.
-        // Actually the original loadRoles fetch directly passes data.roles.
-        _allRoles = roles;
-        _origRenderPage(roles, total, page, pages);
-    };
-
-    document.addEventListener("DOMContentLoaded", loadRoles);
-</script>
 {% endblock %}

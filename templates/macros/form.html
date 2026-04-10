@@ -1,0 +1,43 @@
+{# templates/macros/form.html #}
+
+{# ── form ────────────────────────────────────────────────────────────────────
+   Usage: {{ f::form(action="/auth/login") }}
+   Usage: {{ f::form(action="/auth/login", hx_post="/auth/login", hx_target="#login-form", hx_swap="outerHTML") }}
+   Note:  Always close with </form>
+────────────────────────────────────────────────────────────────────────────── #}
+{% macro form(
+    action,
+    method="post",
+    hx_post="",
+    hx_get="",
+    hx_target="",
+    hx_swap="outerHTML"
+) %}
+<form
+    action="{{ action }}"
+    method="{{ method }}"
+    enctype="application/x-www-form-urlencoded"
+    {% if !hx_post.is_empty() %}hx-post="{{ hx_post }}"{% endif %}
+    {% if !hx_get.is_empty() %}hx-get="{{ hx_get }}"{% endif %}
+    {% if !hx_target.is_empty() %}hx-target="{{ hx_target }}"{% endif %}
+    hx-swap="{{ hx_swap }}"
+    novalidate
+    class="space-y-4"
+>
+{% endmacro %}
+
+
+{# ── formgroup ────────────────────────────────────────────────────────────────
+   Wraps label + input + error into a consistent vertical group.
+   Usage:
+       {% call f::formgroup() %}
+           {{ inp::label(text="Email", for_id="email") }}
+           {{ inp::input(name="email", input_type="email", value=form.email, error=errors.email) }}
+           {{ fb::field_error(error=errors.email) }}
+       {% endcall %}
+────────────────────────────────────────────────────────────────────────────── #}
+{% macro formgroup() %}
+<div class="flex flex-col">
+    {{ caller() }}
+</div>
+{% endmacro %}
