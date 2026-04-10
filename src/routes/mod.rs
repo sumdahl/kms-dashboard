@@ -4,30 +4,25 @@ pub mod auth;
 pub mod logout_partial;
 
 use crate::app_state::AppState;
-use crate::db::Db;
+use crate::handlers::dashboard::{
+    assign_page, banner_dismiss, create_role_wizard_page, home, quick_create_role_page,
+    role_detail_page, roles_page, sidebar_pin, users_page,
+};
+use crate::handlers::auth::{login, login_page, signup, signup_page};
 use crate::handlers::logout_partial::account_menu;
+use crate::handlers::password_reset::{forgot_password_page, reset_password_page};
 use crate::middleware::auth::require_admin_mw;
-use crate::models::types::{AccessLevel, Resource};
-use crate::models::{Claims, Role, RolePermission};
 use axum::middleware;
 use axum::{
-    extract::{Form, Path, Query, State},
-    http::StatusCode,
-    response::{Html, IntoResponse, Redirect, Response},
     routing::{delete, get, post},
     Router,
 };
-use chrono::Utc;
-use std::collections::HashMap;
-use uuid::Uuid;
-
-use serde::Deserialize;
 
 pub fn create_router(state: AppState) -> Router {
     Router::new()
         .route("/", get(home))
-        .route("/login", get(login_page))
-        .route("/signup", get(signup_page))
+        .route("/login", get(login_page).post(login))
+        .route("/signup", get(signup_page).post(signup))
         .route("/roles", get(roles_page))
         .route("/users", get(users_page))
         .route("/roles/new", get(create_role_wizard_page))
@@ -38,7 +33,6 @@ pub fn create_router(state: AppState) -> Router {
         .route("/ui/banner", delete(banner_dismiss))
         .route("/forgot-password", get(forgot_password_page))
         .route("/reset-password", get(reset_password_page))
-        //to simulate 500 server error.
         .route(
             "/test-panic",
             get(|| async {
@@ -59,399 +53,6 @@ pub fn create_router(state: AppState) -> Router {
         .nest("/api", api::router())
         .fallback(not_found_handler)
         .with_state(state)
-}
-
-#[derive(askama::Template)]
-#[template(path = "dashboard/users.html")]
-struct UsersTemplate {
-    pub sidebar_pinned: bool,
-    pub user_email: String,
-    pub show_banner: bool,
-    pub css_version: &'static str,
-    pub is_admin: bool,
-}
-
-async fn users_page(claims: Option<Claims>) -> Response {
-    match claims {
-        None => Redirect::to("/login").into_response(),
-        Some(c) => UsersTemplate {
-            sidebar_pinned: true,
-            user_email: c.email,
-            show_banner: false,
-            css_version: env!("CSS_VERSION"),
-            is_admin: c.is_admin,
-        }
-        .into_response(),
-    }
-}
-
-#[derive(askama::Template)]
-#[template(path = "login.html")]
-struct LoginTemplate {
-    pub account_disabled: bool,
-}
-
-async fn login_page(Query(params): Query<HashMap<String, String>>) -> impl IntoResponse {
-    LoginTemplate {
-        account_disabled: params
-            .get("reason")
-            .map(|r| r == "account_disabled")
-            .unwrap_or(false),
-    }
-}
-#[derive(askama::Template)]
-#[template(path = "signup.html")]
-struct SignupTemplate {}
-
-async fn signup_page() -> impl IntoResponse {
-    SignupTemplate {}
-}
-
-#[derive(askama::Template)]
-#[template(path = "forgot_password.html")]
-struct ForgotPasswordTemplate {}
-
-async fn forgot_password_page() -> impl IntoResponse {
-    ForgotPasswordTemplate {}
-}
-
-#[derive(Deserialize)]
-struct ResetTokenQuery {
-    token: Option<String>,
-}
-
-#[derive(askama::Template)]
-#[template(path = "reset_password.html")]
-struct ResetPasswordTemplate {
-    token_valid: bool,
-    token: String,
-}
-
-async fn reset_password_page(
-    State(state): State<AppState>,
-    Query(query): Query<ResetTokenQuery>,
-) -> impl IntoResponse {
-    let (token_valid, token) = match query.token {
-        None => (false, String::new()),
-        Some(ref t) => match Uuid::parse_str(t) {
-            Err(_) => (false, String::new()),
-            Ok(token_uuid) => {
-                let result = sqlx::query!(
-                    "SELECT expires_at, used_at FROM password_reset_tokens WHERE token = $1",
-                    token_uuid
-                )
-                .fetch_optional(&state.db)
-                .await;
-
-                match result {
-                    Ok(Some(record)) => {
-                        let valid = record.used_at.is_none() && Utc::now() < record.expires_at;
-                        (valid, if valid { t.clone() } else { String::new() })
-                    }
-                    _ => (false, String::new()),
-                }
-            }
-        },
-    };
-
-    ResetPasswordTemplate { token_valid, token }
-}
-#[derive(askama::Template)]
-#[template(path = "dashboard/create_role_wizard.html")]
-struct CreateRoleWizardTemplate {
-    sidebar_pinned: bool,
-    user_email: String,
-    show_banner: bool,
-    css_version: &'static str,
-    is_admin: bool,
-}
-
-async fn create_role_wizard_page(claims: Option<Claims>) -> Response {
-    match claims {
-        None => Redirect::to("/login").into_response(),
-        Some(c) => CreateRoleWizardTemplate {
-            sidebar_pinned: true,
-            user_email: c.email,
-            show_banner: false,
-            css_version: env!("CSS_VERSION"),
-            is_admin: c.is_admin,
-        }
-        .into_response(),
-    }
-}
-
-#[derive(askama::Template)]
-#[template(path = "dashboard/quick_create_role.html")]
-struct QuickCreateRoleTemplate {
-    sidebar_pinned: bool,
-    user_email: String,
-    show_banner: bool,
-    css_version: &'static str,
-    is_admin: bool,
-}
-
-async fn quick_create_role_page(claims: Option<Claims>) -> Response {
-    match claims {
-        None => Redirect::to("/login").into_response(),
-        Some(c) => QuickCreateRoleTemplate {
-            sidebar_pinned: true,
-            user_email: c.email,
-            show_banner: false,
-            css_version: env!("CSS_VERSION"),
-            is_admin: c.is_admin,
-        }
-        .into_response(),
-    }
-}
-
-#[derive(askama::Template)]
-#[template(path = "dashboard/home.html")]
-struct HomeTemplate {
-    sidebar_pinned: bool,
-    user_email: String,
-    show_banner: bool,
-    css_version: &'static str,
-    is_admin: bool,
-}
-
-#[derive(askama::Template)]
-#[template(path = "dashboard/onboarding.html")]
-struct OnboardingTemplate {
-    sidebar_pinned: bool,
-    user_email: String,
-    show_banner: bool,
-    css_version: &'static str,
-    is_admin: bool,
-    current_step: u8,
-}
-
-#[derive(serde::Deserialize)]
-pub struct HomeParams {
-    pub skip_onboarding: Option<bool>,
-}
-
-async fn home(
-    claims: Option<Claims>,
-    axum::extract::Query(_params): axum::extract::Query<HomeParams>,
-) -> Response {
-    match claims {
-        None => Redirect::to("/login").into_response(),
-        Some(c) => {
-            // Default to the full dashboard (HomeTemplate) now
-            HomeTemplate {
-                sidebar_pinned: true,
-                user_email: c.email,
-                show_banner: true,
-                css_version: env!("CSS_VERSION"),
-                is_admin: c.is_admin,
-            }
-            .into_response()
-        }
-    }
-}
-
-#[derive(askama::Template)]
-#[template(path = "dashboard/roles.html")]
-struct RolesTemplate {
-    sidebar_pinned: bool,
-    user_email: String,
-    show_banner: bool,
-    css_version: &'static str,
-    is_admin: bool,
-}
-
-async fn roles_page(
-    claims: Option<Claims>,
-    axum::extract::Query(_params): axum::extract::Query<HomeParams>,
-) -> Response {
-    match claims {
-        None => Redirect::to("/login").into_response(),
-        Some(c) => RolesTemplate {
-            sidebar_pinned: true,
-            user_email: c.email,
-            show_banner: false,
-            css_version: env!("CSS_VERSION"),
-            is_admin: c.is_admin,
-        }
-        .into_response(),
-    }
-}
-
-#[derive(askama::Template)]
-#[template(path = "dashboard/assign.html")]
-struct AssignTemplate {
-    sidebar_pinned: bool,
-    user_email: String,
-    show_banner: bool,
-    css_version: &'static str,
-    is_admin: bool,
-}
-
-async fn assign_page(
-    claims: Option<Claims>,
-    axum::extract::Query(params): axum::extract::Query<HomeParams>,
-) -> Response {
-    match claims {
-        None => Redirect::to("/login").into_response(),
-        Some(c) => {
-            let skip = params.skip_onboarding.unwrap_or(false);
-
-            if skip {
-                AssignTemplate {
-                    sidebar_pinned: true,
-                    user_email: c.email,
-                    show_banner: false,
-                    css_version: env!("CSS_VERSION"),
-                    is_admin: c.is_admin,
-                }
-                .into_response()
-            } else {
-                OnboardingTemplate {
-                    sidebar_pinned: true,
-                    user_email: c.email,
-                    show_banner: false,
-                    css_version: env!("CSS_VERSION"),
-                    is_admin: c.is_admin,
-                    current_step: 2,
-                }
-                .into_response()
-            }
-        }
-    }
-}
-
-// ── Role Detail Page ─────────────────────────────────────────────────────
-
-#[derive(askama::Template)]
-#[template(path = "dashboard/role_detail.html")]
-struct RoleDetailTemplate {
-    sidebar_pinned: bool,
-    user_email: String,
-    show_banner: bool,
-    css_version: &'static str,
-    is_admin: bool,
-    role_name: String,
-    role_description: String,
-    role_id_short: String,
-    created_at_display: String,
-    permissions_len: usize,
-    permissions: Vec<(String, String)>,
-    assignments_len: usize,
-    assignments: Vec<(String, String, String, bool)>, // (email, assigned_display, expires_display, is_active)
-}
-
-async fn role_detail_page(
-    claims: Option<Claims>,
-    State(pool): State<Db>,
-    Path(role_name): Path<String>,
-) -> Response {
-    let c = match claims {
-        None => return Redirect::to("/login").into_response(),
-        Some(c) => c,
-    };
-
-    // Fetch role
-    let mut role = match sqlx::query_as::<_, Role>(
-        "SELECT role_id, name, description, created_at FROM roles WHERE name = $1",
-    )
-    .bind(&role_name)
-    .fetch_optional(&pool)
-    .await
-    {
-        Ok(Some(r)) => r,
-        _ => {
-            return error_page(
-                404,
-                "Not Found",
-                "The role you are looking for does not exist.",
-            )
-            .into_response()
-        }
-    };
-
-    // Load permissions
-    let perms =
-        match sqlx::query("SELECT resource, access_level FROM role_permissions WHERE role_id = $1")
-            .bind(role.role_id)
-            .fetch_all(&pool)
-            .await
-        {
-            Ok(rows) => rows,
-            Err(_) => vec![],
-        };
-
-    use sqlx::Row;
-    role.permissions = perms
-        .into_iter()
-        .map(|p| {
-            let res_str: String = p.get("resource");
-            let acc_str: String = p.get("access_level");
-            RolePermission {
-                resource: res_str.parse().unwrap_or(Resource::Orders),
-                access: acc_str.parse().unwrap_or(AccessLevel::Read),
-            }
-        })
-        .collect();
-
-    let permissions: Vec<(String, String)> = role
-        .permissions
-        .iter()
-        .map(|p| (p.resource.to_string(), p.access.to_string()))
-        .collect();
-
-    // Load assignments
-    let assignment_rows = match sqlx::query(
-        "SELECT u.email, ra.assigned_at, ra.expires_at,
-                CASE WHEN ra.expires_at IS NULL OR ra.expires_at > NOW() THEN true ELSE false END AS is_active
-         FROM role_assignments ra
-         JOIN users u ON u.user_id = ra.user_id
-         WHERE ra.role_id = $1
-         ORDER BY ra.assigned_at DESC",
-    )
-    .bind(role.role_id)
-    .fetch_all(&pool)
-    .await
-    {
-        Ok(rows) => rows,
-        Err(_) => vec![],
-    };
-
-    let assignments: Vec<(String, String, String, bool)> = assignment_rows
-        .into_iter()
-        .map(|r| {
-            let email: String = r.get("email");
-            let assigned_at: chrono::DateTime<chrono::Utc> = r.get("assigned_at");
-            let expires_at: Option<chrono::DateTime<chrono::Utc>> = r.get("expires_at");
-            let is_active: bool = r.get("is_active");
-            (
-                email,
-                assigned_at.format("%b %d, %Y").to_string(),
-                expires_at
-                    .map(|e| e.format("%b %d, %Y %H:%M").to_string())
-                    .unwrap_or_default(),
-                is_active,
-            )
-        })
-        .collect();
-
-    let assignments_len = assignments.len();
-
-    RoleDetailTemplate {
-        sidebar_pinned: true,
-        user_email: c.email,
-        show_banner: false,
-        css_version: env!("CSS_VERSION"),
-        is_admin: c.is_admin,
-        role_name: role.name,
-        role_description: role.description,
-        role_id_short: role.role_id.to_string().chars().take(8).collect(),
-        created_at_display: role.created_at.format("%b %d, %Y").to_string(),
-        permissions_len: permissions.len(),
-        permissions,
-        assignments_len,
-        assignments,
-    }
-    .into_response()
 }
 
 // ── Error pages ──────────────────────────────────────────────────────────
@@ -492,34 +93,14 @@ pub fn error_page_response(
         .unwrap()
 }
 
-fn error_page(code: u16, title: &str, message: &str) -> impl IntoResponse {
-    (
-        StatusCode::from_u16(code).unwrap_or(StatusCode::INTERNAL_SERVER_ERROR),
-        ErrorTemplate {
-            code,
-            title: title.to_string(),
-            message: message.to_string(),
-        },
-    )
+fn error_page(code: u16, title: &str, message: &str) -> axum::http::Response<axum::body::Body> {
+    error_page_response(code, title, message)
 }
 
-async fn not_found_handler() -> impl IntoResponse {
+async fn not_found_handler() -> axum::http::Response<axum::body::Body> {
     error_page(
         404,
         "Page Not Found",
         "The page you are looking for does not exist or has been moved.",
     )
-}
-
-#[derive(Deserialize)]
-pub struct SidebarPinForm {
-    pub pinned: String,
-}
-
-async fn sidebar_pin(Form(_form): Form<SidebarPinForm>) -> Html<&'static str> {
-    Html("")
-}
-
-async fn banner_dismiss() -> Html<&'static str> {
-    Html("")
 }

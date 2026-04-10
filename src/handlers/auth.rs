@@ -4,11 +4,40 @@ use crate::auth::jwt::create_jwt;
 use crate::db::Db;
 use crate::error::{AppError, AppResult};
 use crate::models::{Claims, User};
-use axum::response::Response;
-use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
+use askama::Template;
+use askama_axum::IntoResponse;
+use axum::extract::{Form, Query, State};
+use axum::http::StatusCode;
+use axum::response::{Html, Response};
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
+use std::collections::HashMap;
 use uuid::Uuid;
+
+// --- Templates ---
+
+#[derive(Template)]
+#[template(path = "login.html")]
+pub struct LoginTemplate {
+    pub email: String,
+    pub email_error: Option<String>,
+    pub password_error: Option<String>,
+    pub global_error: Option<String>,
+    pub account_disabled: bool,
+}
+
+#[derive(Template)]
+#[template(path = "signup.html")]
+pub struct SignupTemplate {
+    pub email: String,
+    pub full_name: String,
+    pub email_error: Option<String>,
+    pub full_name_error: Option<String>,
+    pub password_error: Option<String>,
+    pub global_error: Option<String>,
+}
+
+// --- Requests ---
 
 #[derive(Deserialize)]
 pub struct LoginRequest {
@@ -23,105 +52,189 @@ pub struct SignupRequest {
     pub password: String,
 }
 
-#[derive(Serialize)]
-pub struct SigninResponse {
-    pub token: String,
-    pub user_id: String,
-    pub message: String,
-    pub is_admin: bool,
+// --- Handlers ---
+
+pub async fn login_page(Query(params): Query<HashMap<String, String>>) -> Response {
+    let template = LoginTemplate {
+        email: String::new(),
+        email_error: None,
+        password_error: None,
+        global_error: None,
+        account_disabled: params
+            .get("reason")
+            .map(|r| r == "account_disabled")
+            .unwrap_or(false),
+    };
+    template.into_response()
 }
 
-#[derive(Serialize)]
-pub struct SignupResponse {
-    pub user_id: String,
-    pub message: String,
-}
-
-#[derive(Serialize)]
-pub struct LogoutResponse {
-    pub message: String,
+pub async fn signup_page() -> Response {
+    let template = SignupTemplate {
+        email: String::new(),
+        full_name: String::new(),
+        email_error: None,
+        full_name_error: None,
+        password_error: None,
+        global_error: None,
+    };
+    template.into_response()
 }
 
 pub async fn login(
     State(pool): State<Db>,
-    Json(payload): Json<LoginRequest>,
-) -> AppResult<Response> {
-    let user = sqlx::query_as::<_, User>("SELECT * FROM users WHERE email = $1")
+    jar: CookieJar,
+    Form(payload): Form<LoginRequest>,
+) -> Response {
+    let mut template = LoginTemplate {
+        email: payload.email.clone(),
+        email_error: None,
+        password_error: None,
+        global_error: None,
+        account_disabled: false,
+    };
+
+    let mut has_error = false;
+    if payload.email.is_empty() {
+        template.email_error = Some("Email is required".into());
+        has_error = true;
+    }
+    if payload.password.is_empty() {
+        template.password_error = Some("Password is required".into());
+        has_error = true;
+    }
+
+    if has_error {
+        return (StatusCode::UNPROCESSABLE_ENTITY, template).into_response();
+    }
+
+    let user = match sqlx::query_as::<_, User>("SELECT * FROM users WHERE email = $1")
         .bind(&payload.email)
         .fetch_optional(&pool)
-        .await?
-        .ok_or(AppError::BadCredentials)?;
+        .await
+    {
+        Ok(Some(u)) => u,
+        Ok(None) => {
+            template.global_error = Some("Invalid email or password".into());
+            return (StatusCode::UNAUTHORIZED, template).into_response();
+        }
+        Err(_) => {
+            template.global_error = Some("An internal error occurred".into());
+            return (StatusCode::INTERNAL_SERVER_ERROR, template).into_response();
+        }
+    };
 
     if !verify_password(&payload.password, &user.password_hash) {
-        return Err(AppError::BadCredentials);
+        template.global_error = Some("Invalid email or password".into());
+        return (StatusCode::UNAUTHORIZED, template).into_response();
     }
 
     if !user.is_active {
-        return Err(AppError::AccountDisabled(user.disabled_reason));
+        template.account_disabled = true;
+        return (StatusCode::FORBIDDEN, template).into_response();
     }
 
-    let token = create_jwt(
+    let token = match create_jwt(
         &user.user_id.to_string(),
         &user.email,
         user.is_admin,
         user.session_version,
-    )?;
+    ) {
+        Ok(t) => t,
+        Err(_) => {
+            template.global_error = Some("Failed to create session".into());
+            return (StatusCode::INTERNAL_SERVER_ERROR, template).into_response();
+        }
+    };
 
-    let cookie = Cookie::build(("token", token.clone()))
+    let cookie = Cookie::build(("token", token))
         .http_only(true)
         .same_site(SameSite::Lax)
         .path("/")
         .build();
-    let jar = CookieJar::new().add(cookie);
-
-    let body = Json(SigninResponse {
-        token,
-        user_id: user.user_id.to_string(),
-        message: "Login successful".into(),
-        is_admin: user.is_admin,
-    });
-
-    let mut res = (jar, body).into_response();
-    res.headers_mut()
-        .insert("HX-Redirect", "/".parse().unwrap());
-    Ok(res)
+    
+    let mut res = (jar.add(cookie), Html("")).into_response();
+    res.headers_mut().insert("HX-Redirect", "/".parse().unwrap());
+    res
 }
 
 pub async fn signup(
     State(pool): State<Db>,
-    Json(payload): Json<SignupRequest>,
-) -> AppResult<Response> {
-    let exists = sqlx::query("SELECT user_id FROM users WHERE email = $1")
-        .bind(&payload.email)
-        .fetch_optional(&pool)
-        .await?;
+    Form(payload): Form<SignupRequest>,
+) -> Response {
+    let mut template = SignupTemplate {
+        email: payload.email.clone(),
+        full_name: payload.full_name.clone(),
+        email_error: None,
+        full_name_error: None,
+        password_error: None,
+        global_error: None,
+    };
 
-    if exists.is_some() {
-        return Err(AppError::EmailTaken);
+    let mut has_error = false;
+    if payload.email.is_empty() {
+        template.email_error = Some("Email is required".into());
+        has_error = true;
+    } else if !payload.email.contains('@') {
+        template.email_error = Some("Invalid email address".into());
+        has_error = true;
     }
 
-    let hashed = hash_password(&payload.password)?;
-    let user_id = Uuid::new_v4();
+    if payload.full_name.is_empty() {
+        template.full_name_error = Some("Full name is required".into());
+        has_error = true;
+    }
 
-    sqlx::query(
+    if payload.password.len() < 6 {
+        template.password_error = Some("Password must be at least 6 characters".into());
+        has_error = true;
+    }
+
+    if has_error {
+        return (StatusCode::UNPROCESSABLE_ENTITY, template).into_response();
+    }
+
+    let exists = match sqlx::query("SELECT user_id FROM users WHERE email = $1")
+        .bind(&payload.email)
+        .fetch_optional(&pool)
+        .await
+    {
+        Ok(e) => e,
+        Err(_) => {
+            template.global_error = Some("An internal error occurred".into());
+            return (StatusCode::INTERNAL_SERVER_ERROR, template).into_response();
+        }
+    };
+
+    if exists.is_some() {
+        template.email_error = Some("Email already registered".into());
+        return (StatusCode::CONFLICT, template).into_response();
+    }
+
+    let hashed = match hash_password(&payload.password) {
+        Ok(h) => h,
+        Err(_) => {
+            template.global_error = Some("Failed to secure password".into());
+            return (StatusCode::INTERNAL_SERVER_ERROR, template).into_response();
+        }
+    };
+
+    if let Err(_) = sqlx::query(
         "INSERT INTO users (user_id, email, full_name, password_hash) VALUES ($1, $2, $3, $4)",
     )
-    .bind(user_id)
+    .bind(Uuid::new_v4())
     .bind(&payload.email)
     .bind(&payload.full_name)
     .bind(hashed)
     .execute(&pool)
-    .await?;
+    .await
+    {
+        template.global_error = Some("Failed to save user".into());
+        return (StatusCode::INTERNAL_SERVER_ERROR, template).into_response();
+    }
 
-    let body = Json(SignupResponse {
-        user_id: user_id.to_string(),
-        message: "Account created".into(),
-    });
-
-    let mut res = (StatusCode::CREATED, body).into_response();
-    res.headers_mut()
-        .insert("HX-Redirect", "/login".parse().unwrap());
-    Ok(res)
+    let mut res = (StatusCode::CREATED, Html("")).into_response();
+    res.headers_mut().insert("HX-Redirect", "/login".parse().unwrap());
+    res
 }
 
 pub async fn logout(State(pool): State<Db>, claims: Claims, jar: CookieJar) -> AppResult<Response> {
@@ -131,13 +244,7 @@ pub async fn logout(State(pool): State<Db>, claims: Claims, jar: CookieJar) -> A
     blocklist_token(&pool, &claims.jti, expires_at).await?;
 
     let jar = jar.remove(Cookie::build(("token", "")).path("/"));
-
-    let body = Json(LogoutResponse {
-        message: "Logged out".into(),
-    });
-
-    let mut res = (jar, body).into_response();
-    res.headers_mut()
-        .insert("HX-Redirect", "/login".parse().unwrap());
+    let mut res = (jar, Html("")).into_response();
+    res.headers_mut().insert("HX-Redirect", "/login".parse().unwrap());
     Ok(res)
 }

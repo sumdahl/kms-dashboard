@@ -27,3 +27,4 @@ tracing = "0.1.44"
 axum-extra = { version = "0.9", features = ["typed-header", "cookie"] }
 resend-rs = "0.22.0"
 tracing-subscriber = { version = "0.3.23", features = ["env-filter", "fmt"] }
+urlencoding = "2.1.3"

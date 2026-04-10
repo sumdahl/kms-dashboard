@@ -51,6 +51,10 @@
             >
                 <button
                     id="sidebar-toggle"
+                    hx-post="/ui/sidebar/pin"
+                    hx-vals='js:{pinned: document.getElementById("sidebar").dataset.pinned === "false"}'
+                    hx-target="#sidebar"
+                    hx-swap="outerHTML"
                     class="absolute bottom-2 left-2 flex items-center justify-center w-7 h-7 rounded-sm text-icon-muted hover:text-icon-secondary hover:bg-surface-active transition-colors"
                     title="Toggle sidebar"
                     aria-label="Toggle sidebar"

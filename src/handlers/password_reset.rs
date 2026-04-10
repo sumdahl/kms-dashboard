@@ -4,7 +4,13 @@ use crate::{
     auth::hashing::hash_password,
     error::{AppError, AppResult},
 };
-use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
+use askama::Template;
+use askama_axum::IntoResponse;
+use axum::{
+    extract::{Query, State},
+    http::StatusCode,
+    response::Json,
+};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -31,6 +37,60 @@ pub struct PasswordResetToken {
     pub user_id: Uuid,
     pub expires_at: DateTime<Utc>,
     pub used_at: Option<DateTime<Utc>>,
+}
+
+// --- Templates ---
+
+#[derive(Template)]
+#[template(path = "forgot_password.html")]
+pub struct ForgotPasswordTemplate {}
+
+#[derive(Deserialize)]
+pub struct ResetTokenQuery {
+    pub token: Option<String>,
+}
+
+#[derive(Template)]
+#[template(path = "reset_password.html")]
+pub struct ResetPasswordTemplate {
+    pub token_valid: bool,
+    pub token: String,
+}
+
+// --- Handlers ---
+
+pub async fn forgot_password_page() -> impl IntoResponse {
+    ForgotPasswordTemplate {}
+}
+
+pub async fn reset_password_page(
+    State(state): State<AppState>,
+    Query(query): Query<ResetTokenQuery>,
+) -> impl IntoResponse {
+    let (token_valid, token) = match query.token {
+        None => (false, String::new()),
+        Some(ref t) => match Uuid::parse_str(t) {
+            Err(_) => (false, String::new()),
+            Ok(token_uuid) => {
+                let result = sqlx::query!(
+                    "SELECT expires_at, used_at FROM password_reset_tokens WHERE token = $1",
+                    token_uuid
+                )
+                .fetch_optional(&state.db)
+                .await;
+
+                match result {
+                    Ok(Some(record)) => {
+                        let valid = record.used_at.is_none() && Utc::now() < record.expires_at;
+                        (valid, if valid { t.clone() } else { String::new() })
+                    }
+                    _ => (false, String::new()),
+                }
+            }
+        },
+    };
+
+    ResetPasswordTemplate { token_valid, token }
 }
 
 pub async fn forgot_password(
@@ -63,7 +123,13 @@ pub async fn forgot_password(
         .execute(&state.db)
         .await?;
 
-        send_reset_email(&state.resend, &payload.email, &token.to_string(), &state.app_base_url).await?;
+        send_reset_email(
+            &state.resend,
+            &payload.email,
+            &token.to_string(),
+            &state.app_base_url,
+        )
+        .await?;
     }
 
     Ok((
@@ -81,7 +147,6 @@ pub async fn reset_password(
     let token = Uuid::parse_str(&payload.token)
         .map_err(|_| AppError::BadRequest("Invalid token format".into()))?;
 
-    // Use query_as! to map to our struct and solve the type inference issue
     let record = sqlx::query_as!(
         PasswordResetToken,
         "SELECT id, user_id, expires_at, used_at as \"used_at: _\"
@@ -101,7 +166,6 @@ pub async fn reset_password(
         ));
     }
 
-    // Expired?
     if Utc::now() > record.expires_at {
         return Err(AppError::BadRequest("Reset token has expired".into()));
     }

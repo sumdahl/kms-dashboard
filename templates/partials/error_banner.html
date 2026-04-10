@@ -1,0 +1,24 @@
+<div id="banner-area" hx-swap-oob="afterbegin">
+    <div 
+        role="alert" 
+        class="flex items-center justify-between gap-3 px-4 min-h-[40px] border-b border-black/5 border-l-4 border-status-red bg-banner-danger-bg transition-all"
+    >
+        <div class="flex items-center gap-2.5 flex-1 min-w-0 py-2">
+            <i data-lucide="alert-circle" class="text-status-red w-3.5 h-3.5 shrink-0"></i>
+            <p class="text-[13px] font-medium text-text-primary break-words">
+                {{ message }}
+            </p>
+        </div>
+        <button 
+            type="button" 
+            onclick="this.parentElement.remove()"
+            class="flex-shrink-0 flex items-center justify-center w-7 h-7 rounded-sm hover:bg-black/5 text-icon-muted transition-colors"
+            aria-label="Dismiss"
+        >
+            <i data-lucide="x" class="w-3.25 h-3.25"></i>
+        </button>
+    </div>
+    <script>
+        if (window.lucide) { lucide.createIcons(); }
+    </script>
+</div>
