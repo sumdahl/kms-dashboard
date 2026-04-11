@@ -40,7 +40,7 @@ Dashboard{% endblock %} {% block content %}
                 {# Step 1 #}
                 <div class="flex flex-col items-center gap-2">
                     <div
-                        class="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-sm transition-all duration-500 {% if current_step == 1 %}bg-btn-primary text-white {% elif current_step > 1 %}bg-status-green text-white {% else %}bg-surface-02 text-text-helper{% endif %}"
+                        class="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-sm transition-all duration-500 {% if current_step == 1 %}bg-btn-primary text-white {% else if current_step > 1 %}bg-status-green text-white {% else %}bg-surface-02 text-text-helper{% endif %}"
                     >
                         {% if current_step > 1 %}
                         <svg
@@ -67,7 +67,7 @@ Dashboard{% endblock %} {% block content %}
                 {# Step 2 #}
                 <div class="flex flex-col items-center gap-2">
                     <div
-                        class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-500 {% if current_step == 2 %}bg-btn-primary text-white {% elif current_step > 2 %}bg-status-green text-white {% else %}bg-surface-02 text-text-helper{% endif %}"
+                        class="w-10 h-10 rounded-full flex items-center justify-center font-bold transition-all duration-500 {% if current_step == 2 %}bg-btn-primary text-white {% else if current_step > 2 %}bg-status-green text-white {% else %}bg-surface-02 text-text-helper{% endif %}"
                     >
                         {% if current_step > 2 %}
                         <svg
@@ -110,7 +110,7 @@ Dashboard{% endblock %} {% block content %}
                 class="absolute top-5 left-0 right-0 h-px bg-surface-active -z-0 mx-12"
             >
                 <div
-                    class="h-full bg-btn-primary transition-all duration-700 ease-in-out {% if current_step == 1 %}w-0 {% elif current_step == 2 %}w-1/2 {% else %}w-full{% endif %}"
+                    class="h-full bg-btn-primary transition-all duration-700 ease-in-out {% if current_step == 1 %}w-0 {% else if current_step == 2 %}w-1/2 {% else %}w-full{% endif %}"
                 ></div>
             </div>
         </div>
@@ -122,8 +122,8 @@ Dashboard{% endblock %} {% block content %}
         <div class="w-full lg:max-w-2xl">
             <div id="wizard-step">
                 {% if current_step == 1 %} {% include
-                "partials/wizard/step1.html" %} {% elif current_step == 2 %} {%
-                include "partials/wizard/step2.html" %} {% else %} {% include
+                "partials/wizard/step1.html" %} {% else if current_step == 2 %}
+                {% include "partials/wizard/step2.html" %} {% else %} {% include
                 "partials/wizard/step3.html" %} {% endif %}
             </div>
         </div>

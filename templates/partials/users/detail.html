@@ -70,7 +70,7 @@
             </svg>
             <span class="body-xs">Admin accounts cannot be disabled</span>
         </div>
-        {% elif user.is_active %} {{ btn::button( label="Disable Account",
+        {% else if user.is_active %} {{ btn::button( label="Disable Account",
         btn_type="button", variant="danger", full_width=true, hx_get="/users/{{
         user.user_id }}/disable-modal", hx_target="#modal-container",
         hx_swap="innerHTML" ) }} {% else %} {{ btn::button( label="Re-enable

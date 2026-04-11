@@ -11,7 +11,7 @@
     class="flex items-center justify-between gap-3 min-h-[40px] px-4 py-2 rounded-sm border-l-[3px]
     {% if variant == "success" %}
         bg-banner-success-bg border-status-green
-    {% elif variant == "error" %}
+    {% else if variant == "error" %}
         bg-banner-danger-bg border-status-red
     {% else %}
         bg-banner-bg border-status-blue
@@ -22,14 +22,14 @@
         {# Icon #}
         <span class="shrink-0
             {% if variant == "success" %}text-status-green
-            {% elif variant == "error" %}text-status-red
+            {% else if variant == "error" %}text-status-red
             {% else %}text-status-blue{% endif %}
         ">
             {% if variant == "success" %}
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M20 6 9 17l-5-5"/>
             </svg>
-            {% elif variant == "error" %}
+            {% else if variant == "error" %}
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="12" y1="8" x2="12" y2="12"/>

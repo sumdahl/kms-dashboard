@@ -10,13 +10,13 @@
 <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium border
     {% if variant == "success" %}
         bg-green-500/10 text-green-600 border-green-500/20
-    {% elif variant == "danger" %}
+    {% else if variant == "danger" %}
         bg-red-500/10 text-status-red border-red-500/20
-    {% elif variant == "warning" %}
+    {% else if variant == "warning" %}
         bg-yellow-500/10 text-yellow-600 border-yellow-500/20
-    {% elif variant == "info" %}
+    {% else if variant == "info" %}
         bg-blue-500/10 text-status-blue border-blue-500/20
-    {% elif variant == "admin" %}
+    {% else if variant == "admin" %}
         bg-badge-bg text-badge-text border-border-subtle
     {% else %}
         bg-badge-bg text-badge-text border-border-subtle
@@ -25,9 +25,9 @@
     {# Status dot for success/danger #}
     {% if variant == "success" %}
         <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
-    {% elif variant == "danger" %}
+    {% else if variant == "danger" %}
         <span class="w-1.5 h-1.5 rounded-full bg-status-red"></span>
-    {% elif variant == "admin" %}
+    {% else if variant == "admin" %}
         <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
         </svg>

@@ -119,9 +119,9 @@ hx_swap="", hx_trigger="", hx_push_url="", hx_on="" ) %}
            placeholder:text-text-placeholder focus:outline-none transition-colors
            {% if !error.is_empty() %}
                bg-surface-02 border border-status-red focus:border-status-red
-           {% elif disabled %}
+           {% else if disabled %}
                bg-surface-02 border border-border-subtle opacity-50 cursor-not-allowed
-           {% elif readonly %}
+           {% else if readonly %}
                bg-surface-02 border border-border-subtle cursor-default
            {% else %}
                bg-surface-02 border border-border-subtle focus:border-border-strong
