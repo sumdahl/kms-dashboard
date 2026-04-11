@@ -10,16 +10,17 @@ use crate::auth::blocklist::purge_expired_tokens;
 use crate::config::Config;
 use crate::db;
 use crate::error::AppResult;
-use crate::routes::{create_router, error_page_response};
+use crate::routes::app_router;
 
 fn internal_error_response(
     _panic_info: Box<dyn std::any::Any + Send>,
 ) -> axum::http::Response<axum::body::Body> {
-    error_page_response(
-        500,
-        "Internal Server Error",
-        "An unexpected error occurred while processing your request. Please try again later.",
-    )
+    axum::http::Response::builder()
+        .status(500)
+        .body(axum::body::Body::from(
+            "<html><body><h1>Internal Server Error</h1></body></html>",
+        ))
+        .unwrap()
 }
 
 pub async fn init(config: &Config) -> AppResult<Router> {
@@ -40,7 +41,8 @@ pub async fn init(config: &Config) -> AppResult<Router> {
     };
 
     // 4. Router
-    let app = create_router(state)
+    let app = app_router()
+        .with_state(state)
         .nest_service("/static", ServeDir::new("static"))
         .nest_service("/nm", ServeDir::new("node_modules"))
         .nest_service("/public", ServeDir::new("public"))

@@ -1,16 +1,18 @@
 use askama::Template;
+use crate::render::render;
 use axum::{
     extract::{Path, Query, State},
-    response::{IntoResponse, Redirect, Response},
+    response::{IntoResponse, Response},
 };
 use chrono::Utc;
 use serde::Deserialize;
-use uuid::Uuid;
 
-use crate::app_state::AppState;
+use axum::http::StatusCode;
+use axum::response::Html;
+
 use crate::db::Db;
 use crate::models::types::{AccessLevel, Resource};
-use crate::models::{Claims, Role, RolePermission};
+use crate::models::{Role, RolePermission};
 use crate::page_context::PageContext;
 
 // ── Home ─────────────────────────────────────────────────────────────────────
@@ -313,8 +315,7 @@ pub async fn role_detail_page(
     {
         Ok(Some(r)) => r,
         _ => {
-            return crate::routes::error_page_response(404, "Not Found", "Role not found.")
-                .into_response()
+            return (StatusCode::NOT_FOUND, Html("Not Found".to_string())).into_response();
         }
     };
 

@@ -1,4 +1,5 @@
 use askama::Template;
+use crate::render::render;
 use axum::{
     extract::{Path, Query, State},
     response::{Html, IntoResponse, Response},
@@ -150,7 +151,7 @@ pub async fn user_detail(State(pool): State<Db>, Path(user_id): Path<Uuid>) -> A
 
 #[derive(Template)]
 #[template(path = "partials/users/disable_modal.html")]
-struct DisableModalTemplate {
+pub struct DisableModalTemplate {
     pub user: DisableModalUser,
     pub error: Option<String>,
     pub reason_error: String,
@@ -188,7 +189,7 @@ pub async fn disable_modal(
 
 #[derive(Template)]
 #[template(path = "partials/users/stats.html")]
-struct UsersStatsTemplate {
+pub struct UsersStatsTemplate {
     pub total: i64,
     pub active: i64,
     pub disabled: i64,
@@ -658,7 +659,34 @@ pub async fn search_results(
     Ok(SearchResultsTemplate { results, query: q }.into_response())
 }
 
+// ── User Row Template (public for actions.rs) ─────────────────────────────────
+
+#[derive(Template)]
+#[template(path = "partials/users/row.html")]
+pub struct UserRowTemplate {
+    pub user: UserRow,
+}
+
+pub fn render_user_row(user: UserRow) -> String {
+    UserRowTemplate { user }.render().unwrap_or_default()
+}
+
+// ── Wizard Step 1 Template (public for actions.rs) ────────────────────────────
+
+#[derive(Template)]
+#[template(path = "partials/wizard/step1.html")]
+pub struct WizardStep1Template {
+    pub form_name: String,
+    pub form_description: String,
+    pub name_error: String,
+    pub error: Option<String>,
+}
+
 // ── Helpers ───────────────────────────────────────────────────────────────────
+
+pub fn initials_pub(name: &str) -> String {
+    initials(name)
+}
 
 fn initials(name: &str) -> String {
     let parts: Vec<&str> = name.trim().split_whitespace().collect();

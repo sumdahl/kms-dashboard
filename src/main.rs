@@ -7,10 +7,10 @@ mod handlers;
 mod middleware;
 mod models;
 mod page_context;
+mod render;
 mod resend_mailer;
 mod routes;
 mod startup;
-
 use crate::config::Config;
 
 #[tokio::main]

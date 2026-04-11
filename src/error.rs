@@ -53,7 +53,7 @@ impl From<serde_json::Error> for AppError {
 #[template(path = "error.html")]
 struct ErrorPageTemplate {
     pub dark_mode: bool,
-    pub status: u16,
+    pub code: u16,
     pub title: String,
     pub message: String,
 }
@@ -61,7 +61,7 @@ struct ErrorPageTemplate {
 fn render_error_page(status: StatusCode, title: &str, message: &str) -> Response {
     let html = ErrorPageTemplate {
         dark_mode: false,
-        status: status.as_u16(),
+        code: status.as_u16(),
         title: title.to_string(),
         message: message.to_string(),
     };
