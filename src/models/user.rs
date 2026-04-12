@@ -15,6 +15,16 @@ pub struct User {
     pub created_at: DateTime<Utc>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, sqlx::FromRow)]
+pub struct UserSummary {
+    pub user_id: Uuid,
+    pub email: String,
+    pub full_name: String,
+    pub is_admin: bool,
+    pub is_active: bool,
+    pub disabled_reason: Option<String>,
+}
+
 impl User {
     pub fn new(email: &str, full_name: &str, password_hash: &str) -> Self {
         Self {

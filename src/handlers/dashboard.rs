@@ -2,7 +2,7 @@ use crate::db::Db;
 use crate::error::{AppError, AppResult};
 use crate::middleware::rbac::Permissions;
 use crate::models::types::{AccessLevel, Resource};
-use crate::models::{Claims, Role, RolePermission};
+use crate::models::{Claims, Role, RolePermission, user::UserSummary};
 use askama::Template;
 use askama_axum::IntoResponse;
 use axum::extract::{Form, Path, Query, State};
@@ -136,7 +136,7 @@ pub struct AssignTemplate {
     pub show_banner: bool,
     pub css_version: &'static str,
     pub is_admin: bool,
-    pub users: Vec<crate::handlers::admin::UserSummary>,
+    pub users: Vec<UserSummary>,
     pub roles: Vec<Role>,
     pub pre_role: Option<String>,
 }
@@ -169,7 +169,8 @@ pub struct CreateRoleWizardTemplate {
     pub step: u8,
     pub role_name: String,
     pub role_description: String,
-    pub error: Option<String>,
+    pub error: String,
+    pub permissions: Vec<(String, String)>,
 }
 
 #[derive(Template)]
@@ -265,6 +266,11 @@ pub async fn users_page(claims: Option<Claims>, jar: CookieJar) -> Response {
     }
 }
 
+#[derive(Deserialize)]
+pub struct AssignParams {
+    pub role: Option<String>,
+}
+
 pub async fn assign_page(
     claims: Option<Claims>,
     jar: CookieJar,
@@ -292,8 +298,8 @@ pub async fn assign_page(
         .into_response();
     }
 
-    // Fetch users (similar to list_users in admin.rs but we need it for the template)
-    let users = match sqlx::query_as::<_, crate::handlers::admin::UserSummary>(
+    // Fetch users
+    let users = match sqlx::query_as::<_, UserSummary>(
         "SELECT user_id, email, full_name, is_admin, is_active, disabled_reason
          FROM users
          WHERE is_admin = FALSE
@@ -328,11 +334,6 @@ pub async fn assign_page(
     .into_response()
 }
 
-#[derive(Deserialize)]
-pub struct AssignParams {
-    pub role: Option<String>,
-}
-
 pub async fn create_role_wizard_page(claims: Option<Claims>, jar: CookieJar) -> Response {
     match claims {
         None => Redirect::to("/login").into_response(),
@@ -342,6 +343,11 @@ pub async fn create_role_wizard_page(claims: Option<Claims>, jar: CookieJar) -> 
             show_banner: false,
             css_version: env!("CSS_VERSION"),
             is_admin: c.is_admin,
+            step: 1,
+            role_name: String::new(),
+            role_description: String::new(),
+            error: String::new(),
+            permissions: Vec::new(),
         }
         .into_response(),
     }

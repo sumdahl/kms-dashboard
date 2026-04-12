@@ -2,7 +2,7 @@ use crate::db::Db;
 use crate::error::{AppError, AppResult};
 use crate::middleware::auth::AdminClaims;
 use crate::models::types::{AccessLevel, Resource};
-use crate::models::{Role, RolePermission};
+use crate::models::{Role, RolePermission, user::UserSummary};
 use axum::{
     extract::{Path, Query, State},
     response::{IntoResponse, Response, Redirect},
@@ -11,16 +11,6 @@ use axum::{
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-
-#[derive(Debug, Serialize, sqlx::FromRow)]
-pub struct UserSummary {
-    pub user_id: Uuid,
-    pub email: String,
-    pub full_name: String,
-    pub is_admin: bool,
-    pub is_active: bool,
-    pub disabled_reason: Option<String>,
-}
 
 #[derive(askama::Template)]
 #[template(path = "partials/permission_row.html")]
@@ -215,8 +205,9 @@ pub async fn roles_summary(
 pub async fn create_role(
     _admin: AdminClaims,
     State(pool): State<Db>,
-    Json(payload): Json<CreateRoleRequest>,
-) -> AppResult<Json<serde_json::Value>> {
+    headers: axum::http::HeaderMap,
+    Form(payload): Form<CreateRoleRequest>,
+) -> AppResult<Response> {
     let mut tx = pool.begin().await?;
     let role_id = Uuid::new_v4();
 
@@ -226,15 +217,16 @@ pub async fn create_role(
             .bind(&payload.name)
             .bind(&payload.description)
             .execute(&mut *tx)
-            .await; //
+            .await;
 
     match insert_result {
         Ok(_) => {}
         Err(sqlx::Error::Database(db_err)) if db_err.code().as_deref() == Some("23505") => {
-            return Err(AppError::Conflict(format!(
+            return Ok(AppError::Conflict(format!(
                 "A role named '{}' already exists.",
                 payload.name
-            )));
+            ))
+            .smart_response(&headers));
         }
         Err(e) => return Err(e.into()),
     }
@@ -254,20 +246,22 @@ pub async fn create_role(
         {
             Ok(_) => {}
             Err(sqlx::Error::Database(db_err)) if db_err.code().as_deref() == Some("23505") => {
-                return Err(AppError::Conflict(format!(
+                return Ok(AppError::Conflict(format!(
                     "Duplicate permission: '{}' with '{}' is already assigned to this role.",
                     resource_str, access_str
-                )));
+                ))
+                .smart_response(&headers));
             }
             Err(e) => return Err(e.into()),
         }
     }
 
     tx.commit().await?;
-    Ok(Json(serde_json::json!({
-        "status": "success",
-        "role_id": role_id
-    })))
+
+    // On success, redirect to roles
+    let mut headers = axum::http::HeaderMap::new();
+    headers.insert("HX-Redirect", "/roles".parse().unwrap());
+    Ok((axum::http::StatusCode::CREATED, headers, Redirect::to("/roles")).into_response())
 }
 pub async fn assign_role(
     _admin: AdminClaims,
@@ -533,4 +527,103 @@ pub async fn enable_user(
     Ok(Json(
         serde_json::json!({ "status": "success", "message": "User re-enabled." }),
     ))
+}
+
+#[derive(Deserialize)]
+pub struct WizardStep1Form {
+    pub name: String,
+    pub description: String,
+}
+
+pub async fn wizard_step_1(
+    _admin: AdminClaims,
+    jar: axum_extra::extract::cookie::CookieJar,
+    Form(payload): Form<WizardStep1Form>,
+) -> impl IntoResponse {
+    let sidebar_pinned = jar.get("sidebar_pinned").map(|c| c.value() == "true").unwrap_or(true);
+
+    if payload.name.trim().is_empty() {
+        return crate::handlers::dashboard::CreateRoleWizardTemplate {
+            sidebar_pinned,
+            user_email: _admin.0.email,
+            show_banner: false,
+            css_version: env!("CSS_VERSION"),
+            is_admin: true,
+            step: 1,
+            role_name: payload.name,
+            role_description: payload.description,
+            error: "Role name is required.".to_string(),
+            permissions: Vec::new(),
+        }
+        .into_response();
+    }
+
+    // Advance to Step 2
+    crate::handlers::dashboard::CreateRoleWizardTemplate {
+        sidebar_pinned,
+        user_email: _admin.0.email,
+        show_banner: false,
+        css_version: env!("CSS_VERSION"),
+        is_admin: true,
+        step: 2,
+        role_name: payload.name,
+        role_description: payload.description,
+        error: String::new(),
+        permissions: Vec::new(),
+    }
+    .into_response()
+}
+
+#[derive(Deserialize)]
+pub struct WizardStep2Form {
+    pub role_name: String,
+    pub role_description: String,
+    pub resources: Vec<String>,
+    pub access_levels: Vec<String>,
+}
+
+pub async fn wizard_step_2(
+    _admin: AdminClaims,
+    jar: axum_extra::extract::cookie::CookieJar,
+    Form(payload): Form<WizardStep2Form>,
+) -> impl IntoResponse {
+    let sidebar_pinned = jar.get("sidebar_pinned").map(|c| c.value() == "true").unwrap_or(true);
+
+    let mut permissions = Vec::new();
+    for (res, acc) in payload.resources.iter().zip(payload.access_levels.iter()) {
+        if !res.is_empty() && !acc.is_empty() {
+            permissions.push((res.clone(), acc.clone()));
+        }
+    }
+
+    if permissions.is_empty() {
+        return crate::handlers::dashboard::CreateRoleWizardTemplate {
+            sidebar_pinned,
+            user_email: _admin.0.email,
+            show_banner: false,
+            css_version: env!("CSS_VERSION"),
+            is_admin: true,
+            step: 2,
+            role_name: payload.role_name,
+            role_description: payload.role_description,
+            error: "At least one permission is required.".to_string(),
+            permissions: Vec::new(),
+        }
+        .into_response();
+    }
+
+    // Advance to Step 3 (Review)
+    crate::handlers::dashboard::CreateRoleWizardTemplate {
+        sidebar_pinned,
+        user_email: _admin.0.email,
+        show_banner: false,
+        css_version: env!("CSS_VERSION"),
+        is_admin: true,
+        step: 3,
+        role_name: payload.role_name,
+        role_description: payload.role_description,
+        error: String::new(),
+        permissions,
+    }
+    .into_response()
 }

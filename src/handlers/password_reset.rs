@@ -1,15 +1,13 @@
 use crate::app_state::AppState;
 use crate::resend_mailer::mailer::send_reset_email;
-use crate::{
-    auth::hashing::hash_password,
-    error::{AppError, AppResult},
-};
+use crate::auth::hashing::hash_password;
+use crate::error::AppResult;
 use askama::Template;
 use askama_axum::IntoResponse;
 use axum::{
-    extract::{Query, State},
+    extract::{Form, Query, State},
     http::StatusCode,
-    response::Json,
+    response::Redirect,
 };
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -43,7 +41,11 @@ pub struct PasswordResetToken {
 
 #[derive(Template)]
 #[template(path = "forgot_password.html")]
-pub struct ForgotPasswordTemplate {}
+pub struct ForgotPasswordTemplate {
+    pub email: String,
+    pub error: String,
+    pub success: bool,
+}
 
 #[derive(Deserialize)]
 pub struct ResetTokenQuery {
@@ -55,12 +57,18 @@ pub struct ResetTokenQuery {
 pub struct ResetPasswordTemplate {
     pub token_valid: bool,
     pub token: String,
+    pub error: String,
+    pub success: bool,
 }
 
 // --- Handlers ---
 
 pub async fn forgot_password_page() -> impl IntoResponse {
-    ForgotPasswordTemplate {}
+    ForgotPasswordTemplate {
+        email: String::new(),
+        error: String::new(),
+        success: false,
+    }
 }
 
 pub async fn reset_password_page(
@@ -90,112 +98,185 @@ pub async fn reset_password_page(
         },
     };
 
-    ResetPasswordTemplate { token_valid, token }
+    ResetPasswordTemplate {
+        token_valid,
+        token,
+        error: String::new(),
+        success: false,
+    }
 }
 
 pub async fn forgot_password(
     State(state): State<AppState>,
-    Json(payload): Json<ForgotPasswordRequest>,
-) -> AppResult<impl IntoResponse> {
-    let user = sqlx::query!("SELECT user_id FROM users WHERE email = $1", payload.email)
+    Form(payload): Form<ForgotPasswordRequest>,
+) -> impl IntoResponse {
+    let user = match sqlx::query!("SELECT user_id FROM users WHERE email = $1", payload.email)
         .fetch_optional(&state.db)
-        .await?;
+        .await {
+            Ok(u) => u,
+            Err(_) => return (StatusCode::INTERNAL_SERVER_ERROR, ForgotPasswordTemplate {
+                email: payload.email,
+                error: "An internal error occurred".into(),
+                success: false,
+            }).into_response(),
+        };
 
     if let Some(user) = user {
         let token = Uuid::new_v4();
         let expires_at = Utc::now() + chrono::Duration::minutes(15);
 
-        sqlx::query!(
-            "DELETE FROM password_reset_tokens
-             WHERE user_id = $1 AND used_at IS NULL",
+        // Delete existing tokens
+        if let Err(e) = sqlx::query!(
+            "DELETE FROM password_reset_tokens WHERE user_id = $1 AND used_at IS NULL",
             user.user_id
         )
         .execute(&state.db)
-        .await?;
+        .await {
+            return (StatusCode::INTERNAL_SERVER_ERROR, ForgotPasswordTemplate {
+                email: payload.email,
+                error: format!("Database error: {}", e),
+                success: false,
+            }).into_response();
+        }
 
-        sqlx::query!(
-            "INSERT INTO password_reset_tokens (user_id, token, expires_at)
-             VALUES ($1, $2, $3)",
+        // Insert new token
+        if let Err(e) = sqlx::query!(
+            "INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)",
             user.user_id,
             token,
             expires_at
         )
         .execute(&state.db)
-        .await?;
+        .await {
+            return (StatusCode::INTERNAL_SERVER_ERROR, ForgotPasswordTemplate {
+                email: payload.email,
+                error: format!("Database error: {}", e),
+                success: false,
+            }).into_response();
+        }
 
-        send_reset_email(
+        // Send email
+        if let Err(e) = send_reset_email(
             &state.resend,
             &payload.email,
             &token.to_string(),
             &state.app_base_url,
-        )
-        .await?;
+        ).await {
+            return (StatusCode::INTERNAL_SERVER_ERROR, ForgotPasswordTemplate {
+                email: payload.email,
+                error: format!("Email error: {}", e),
+                success: false,
+            }).into_response();
+        }
     }
 
-    Ok((
-        StatusCode::OK,
-        Json(MessageResponse {
-            message: "If that email is registered, a reset link has been sent.".into(),
-        }),
-    ))
+    (StatusCode::OK, ForgotPasswordTemplate {
+        email: payload.email,
+        error: String::new(),
+        success: true,
+    }).into_response()
 }
 
 pub async fn reset_password(
     State(state): State<AppState>,
-    Json(payload): Json<ResetPasswordRequest>,
-) -> AppResult<impl IntoResponse> {
-    let token = Uuid::parse_str(&payload.token)
-        .map_err(|_| AppError::BadRequest("Invalid token format".into()))?;
+    Form(payload): Form<ResetPasswordRequest>,
+) -> impl IntoResponse {
+    let token_uuid = match Uuid::parse_str(&payload.token) {
+        Ok(u) => u,
+        Err(_) => return (StatusCode::BAD_REQUEST, ResetPasswordTemplate {
+            token_valid: false,
+            token: payload.token,
+            error: "Invalid token format".into(),
+            success: false,
+        }).into_response(),
+    };
 
-    let record = sqlx::query_as!(
+    let record = match sqlx::query_as!(
         PasswordResetToken,
         "SELECT id, user_id, expires_at, used_at as \"used_at: _\"
          FROM password_reset_tokens
          WHERE token = $1",
-        token
+        token_uuid
     )
     .fetch_optional(&state.db)
-    .await?
-    .ok_or(AppError::BadRequest(
-        "Invalid or expired reset token".into(),
-    ))?;
+    .await {
+        Ok(Some(r)) => r,
+        Ok(None) => return (StatusCode::BAD_REQUEST, ResetPasswordTemplate {
+            token_valid: false,
+            token: payload.token,
+            error: "Invalid or expired reset token".into(),
+            success: false,
+        }).into_response(),
+        Err(_) => return (StatusCode::INTERNAL_SERVER_ERROR, ResetPasswordTemplate {
+            token_valid: false,
+            token: payload.token,
+            error: "Internal error".into(),
+            success: false,
+        }).into_response(),
+    };
 
     if record.used_at.is_some() {
-        return Err(AppError::BadRequest(
-            "Reset token has already been used".into(),
-        ));
+        return (StatusCode::BAD_REQUEST, ResetPasswordTemplate {
+            token_valid: false,
+            token: payload.token,
+            error: "Reset token has already been used".into(),
+            success: false,
+        }).into_response();
     }
 
     if Utc::now() > record.expires_at {
-        return Err(AppError::BadRequest("Reset token has expired".into()));
+        return (StatusCode::BAD_REQUEST, ResetPasswordTemplate {
+            token_valid: false,
+            token: payload.token,
+            error: "Reset token has expired".into(),
+            success: false,
+        }).into_response();
     }
 
-    let hashed = hash_password(&payload.new_password)?;
+    let hashed = match hash_password(&payload.new_password) {
+        Ok(h) => h,
+        Err(_) => return (StatusCode::INTERNAL_SERVER_ERROR, ResetPasswordTemplate {
+            token_valid: true,
+            token: payload.token,
+            error: "Failed to process password".into(),
+            success: false,
+        }).into_response(),
+    };
 
-    let mut tx = state.db.begin().await?;
+    let res: AppResult<()> = async {
+        let mut tx = state.db.begin().await?;
 
-    sqlx::query!(
-        "UPDATE users SET password_hash = $1 WHERE user_id = $2",
-        hashed,
-        record.user_id
-    )
-    .execute(&mut *tx)
-    .await?;
+        sqlx::query!(
+            "UPDATE users SET password_hash = $1 WHERE user_id = $2",
+            hashed,
+            record.user_id
+        )
+        .execute(&mut *tx)
+        .await?;
 
-    sqlx::query!(
-        "UPDATE password_reset_tokens SET used_at = $1 WHERE id = $2",
-        Utc::now(),
-        record.id
-    )
-    .execute(&mut *tx)
-    .await?;
+        sqlx::query!(
+            "UPDATE password_reset_tokens SET used_at = $1 WHERE id = $2",
+            Utc::now(),
+            record.id
+        )
+        .execute(&mut *tx)
+        .await?;
 
-    tx.commit().await?;
+        tx.commit().await?;
+        Ok(())
+    }.await;
 
-    Ok((
-        StatusCode::OK,
-        Json(MessageResponse {
-            message: "Password reset successful. You can now log in.".into(),
-        }),
-    ))
+    if let Err(e) = res {
+        return (StatusCode::INTERNAL_SERVER_ERROR, ResetPasswordTemplate {
+            token_valid: true,
+            token: payload.token,
+            error: format!("Database error: {}", e),
+            success: false,
+        }).into_response();
+    }
+
+    // Success - redirect to login
+    let mut headers = axum::http::HeaderMap::new();
+    headers.insert("HX-Redirect", "/login".parse().unwrap());
+    (StatusCode::OK, headers, Redirect::to("/login")).into_response()
 }

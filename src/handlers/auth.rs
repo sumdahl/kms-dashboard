@@ -20,9 +20,9 @@ use uuid::Uuid;
 #[template(path = "login.html")]
 pub struct LoginTemplate {
     pub email: String,
-    pub email_error: Option<String>,
-    pub password_error: Option<String>,
-    pub global_error: Option<String>,
+    pub email_error: String,
+    pub password_error: String,
+    pub global_error: String,
     pub account_disabled: bool,
 }
 
@@ -31,10 +31,10 @@ pub struct LoginTemplate {
 pub struct SignupTemplate {
     pub email: String,
     pub full_name: String,
-    pub email_error: Option<String>,
-    pub full_name_error: Option<String>,
-    pub password_error: Option<String>,
-    pub global_error: Option<String>,
+    pub email_error: String,
+    pub full_name_error: String,
+    pub password_error: String,
+    pub global_error: String,
 }
 
 // --- Requests ---
@@ -57,9 +57,9 @@ pub struct SignupRequest {
 pub async fn login_page(Query(params): Query<HashMap<String, String>>) -> Response {
     let template = LoginTemplate {
         email: String::new(),
-        email_error: None,
-        password_error: None,
-        global_error: None,
+        email_error: String::new(),
+        password_error: String::new(),
+        global_error: String::new(),
         account_disabled: params
             .get("reason")
             .map(|r| r == "account_disabled")
@@ -72,10 +72,10 @@ pub async fn signup_page() -> Response {
     let template = SignupTemplate {
         email: String::new(),
         full_name: String::new(),
-        email_error: None,
-        full_name_error: None,
-        password_error: None,
-        global_error: None,
+        email_error: String::new(),
+        full_name_error: String::new(),
+        password_error: String::new(),
+        global_error: String::new(),
     };
     template.into_response()
 }
@@ -87,19 +87,19 @@ pub async fn login(
 ) -> Response {
     let mut template = LoginTemplate {
         email: payload.email.clone(),
-        email_error: None,
-        password_error: None,
-        global_error: None,
+        email_error: String::new(),
+        password_error: String::new(),
+        global_error: String::new(),
         account_disabled: false,
     };
 
     let mut has_error = false;
     if payload.email.is_empty() {
-        template.email_error = Some("Email is required".into());
+        template.email_error = "Email is required".into();
         has_error = true;
     }
     if payload.password.is_empty() {
-        template.password_error = Some("Password is required".into());
+        template.password_error = "Password is required".into();
         has_error = true;
     }
 
@@ -114,17 +114,17 @@ pub async fn login(
     {
         Ok(Some(u)) => u,
         Ok(None) => {
-            template.global_error = Some("Invalid email or password".into());
+            template.global_error = "Invalid email or password".into();
             return (StatusCode::UNAUTHORIZED, template).into_response();
         }
         Err(_) => {
-            template.global_error = Some("An internal error occurred".into());
+            template.global_error = "An internal error occurred".into();
             return (StatusCode::INTERNAL_SERVER_ERROR, template).into_response();
         }
     };
 
     if !verify_password(&payload.password, &user.password_hash) {
-        template.global_error = Some("Invalid email or password".into());
+        template.global_error = "Invalid email or password".into();
         return (StatusCode::UNAUTHORIZED, template).into_response();
     }
 
@@ -141,7 +141,7 @@ pub async fn login(
     ) {
         Ok(t) => t,
         Err(_) => {
-            template.global_error = Some("Failed to create session".into());
+            template.global_error = "Failed to create session".into();
             return (StatusCode::INTERNAL_SERVER_ERROR, template).into_response();
         }
     };
@@ -164,28 +164,28 @@ pub async fn signup(
     let mut template = SignupTemplate {
         email: payload.email.clone(),
         full_name: payload.full_name.clone(),
-        email_error: None,
-        full_name_error: None,
-        password_error: None,
-        global_error: None,
+        email_error: String::new(),
+        full_name_error: String::new(),
+        password_error: String::new(),
+        global_error: String::new(),
     };
 
     let mut has_error = false;
     if payload.email.is_empty() {
-        template.email_error = Some("Email is required".into());
+        template.email_error = "Email is required".into();
         has_error = true;
     } else if !payload.email.contains('@') {
-        template.email_error = Some("Invalid email address".into());
+        template.email_error = "Invalid email address".into();
         has_error = true;
     }
 
     if payload.full_name.is_empty() {
-        template.full_name_error = Some("Full name is required".into());
+        template.full_name_error = "Full name is required".into();
         has_error = true;
     }
 
     if payload.password.len() < 6 {
-        template.password_error = Some("Password must be at least 6 characters".into());
+        template.password_error = "Password must be at least 6 characters".into();
         has_error = true;
     }
 
@@ -200,20 +200,20 @@ pub async fn signup(
     {
         Ok(e) => e,
         Err(_) => {
-            template.global_error = Some("An internal error occurred".into());
+            template.global_error = "An internal error occurred".into();
             return (StatusCode::INTERNAL_SERVER_ERROR, template).into_response();
         }
     };
 
     if exists.is_some() {
-        template.email_error = Some("Email already registered".into());
+        template.email_error = "Email already registered".into();
         return (StatusCode::CONFLICT, template).into_response();
     }
 
     let hashed = match hash_password(&payload.password) {
         Ok(h) => h,
         Err(_) => {
-            template.global_error = Some("Failed to secure password".into());
+            template.global_error = "Failed to secure password".into();
             return (StatusCode::INTERNAL_SERVER_ERROR, template).into_response();
         }
     };
@@ -228,7 +228,7 @@ pub async fn signup(
     .execute(&pool)
     .await
     {
-        template.global_error = Some("Failed to save user".into());
+        template.global_error = "Failed to save user".into();
         return (StatusCode::INTERNAL_SERVER_ERROR, template).into_response();
     }
 

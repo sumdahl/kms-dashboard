@@ -33,10 +33,10 @@
                         <p class="text-[13px] text-text-helper mt-1.5">Log in to manage your keys and roles</p>
                     </div>
 
-                    {% if let Some(err) = global_error %}
+                    {% if !global_error.is_empty() %}
                     <div class="mb-6 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 text-xs flex items-center gap-2">
                         <i data-lucide="alert-circle" class="w-4 h-4"></i>
-                        {{ err }}
+                        {{ global_error }}
                     </div>
                     {% endif %}
 
