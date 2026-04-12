@@ -1,127 +1,353 @@
 use crate::auth::blocklist::blocklist_token;
+use crate::auth::dto::{first_field_message, LoginRequest, SignupRequest};
 use crate::auth::hashing::{hash_password, verify_password};
 use crate::auth::jwt::create_jwt;
 use crate::db::Db;
 use crate::error::{AppError, AppResult};
 use crate::models::{Claims, User};
+use askama::Template;
 use axum::response::Response;
-use axum::{extract::State, http::StatusCode, response::IntoResponse, Json};
+use axum::{
+    extract::{Form, State},
+    http::{HeaderName, StatusCode},
+    response::{Html, IntoResponse},
+    Json,
+};
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use uuid::Uuid;
-
-#[derive(Deserialize)]
-pub struct LoginRequest {
-    pub email: String,
-    pub password: String,
-}
-
-#[derive(Deserialize)]
-pub struct SignupRequest {
-    pub email: String,
-    pub full_name: String,
-    pub password: String,
-}
-
-#[derive(Serialize)]
-pub struct SigninResponse {
-    pub token: String,
-    pub user_id: String,
-    pub message: String,
-    pub is_admin: bool,
-}
-
-#[derive(Serialize)]
-pub struct SignupResponse {
-    pub user_id: String,
-    pub message: String,
-}
+use validator::Validate;
 
 #[derive(Serialize)]
 pub struct LogoutResponse {
     pub message: String,
 }
 
+#[derive(Template)]
+#[template(path = "login.html")]
+pub struct LoginView {
+    pub full_page: bool,
+    pub oob_swap: bool,
+    pub account_disabled: bool,
+    pub email: String,
+    pub email_error: Option<String>,
+    pub password_error: Option<String>,
+    pub banner: Option<String>,
+}
+
+impl LoginView {
+    pub fn page(account_disabled: bool) -> Self {
+        Self {
+            full_page: true,
+            oob_swap: false,
+            account_disabled,
+            email: String::new(),
+            email_error: None,
+            password_error: None,
+            banner: None,
+        }
+    }
+}
+
+#[derive(Template)]
+#[template(path = "signup.html")]
+pub struct SignupView {
+    pub full_page: bool,
+    pub oob_swap: bool,
+    pub full_name: String,
+    pub email: String,
+    pub full_name_error: Option<String>,
+    pub email_error: Option<String>,
+    pub password_error: Option<String>,
+    pub banner: Option<String>,
+}
+
+impl SignupView {
+    pub fn page() -> Self {
+        Self {
+            full_page: true,
+            oob_swap: false,
+            full_name: String::new(),
+            email: String::new(),
+            full_name_error: None,
+            email_error: None,
+            password_error: None,
+            banner: None,
+        }
+    }
+}
+
+pub async fn signup_page() -> impl IntoResponse {
+    let view = SignupView::page();
+    let html = view
+        .render()
+        .unwrap_or_else(|e| format!("<!-- template error: {e} -->"));
+    (StatusCode::OK, Html(html))
+}
+
 pub async fn login(
     State(pool): State<Db>,
-    Json(payload): Json<LoginRequest>,
-) -> AppResult<Response> {
-    let user = sqlx::query_as::<_, User>("SELECT * FROM users WHERE email = $1")
-        .bind(&payload.email)
-        .fetch_optional(&pool)
-        .await?
-        .ok_or(AppError::BadCredentials)?;
+    form: Result<Form<LoginRequest>, axum::extract::rejection::FormRejection>,
+) -> axum::response::Response {
+    use axum::response::Html;
 
-    if !verify_password(&payload.password, &user.password_hash) {
-        return Err(AppError::BadCredentials);
+    fn render_form(view: LoginView) -> Html<String> {
+        Html(
+            view.render()
+                .unwrap_or_else(|e| format!("<!-- template error: {e} -->")),
+        )
     }
 
-    if !user.is_active {
-        return Err(AppError::AccountDisabled(user.disabled_reason));
+    let payload = match form {
+        Ok(f) => f.0,
+        Err(_) => {
+            let view = LoginView {
+                full_page: false,
+                oob_swap: true,
+                account_disabled: false,
+                email: String::new(),
+                email_error: None,
+                password_error: None,
+                banner: Some("Enter a valid email and password.".into()),
+            };
+            return (StatusCode::OK, render_form(view)).into_response();
+        }
+    };
+
+    if let Err(ref errs) = payload.validate() {
+        let email = payload.email.trim().to_string();
+        let view = LoginView {
+            full_page: false,
+            oob_swap: true,
+            account_disabled: false,
+            email,
+            email_error: first_field_message(errs, "email"),
+            password_error: first_field_message(errs, "password"),
+            banner: None,
+        };
+        return (StatusCode::OK, render_form(view)).into_response();
     }
 
-    let token = create_jwt(
-        &user.user_id.to_string(),
-        &user.email,
-        user.is_admin,
-        user.session_version,
-    )?;
+    let email = payload.email.trim().to_string();
+    let password = payload.password;
 
-    let cookie = Cookie::build(("token", token.clone()))
-        .http_only(true)
-        .same_site(SameSite::Lax)
-        .path("/")
-        .build();
-    let jar = CookieJar::new().add(cookie);
+    let attempt: Result<(User, String), AppError> = async {
+        let user = sqlx::query_as::<_, User>("SELECT * FROM users WHERE email = $1")
+            .bind(&email)
+            .fetch_optional(&pool)
+            .await?
+            .ok_or(AppError::BadCredentials)?;
 
-    let body = Json(SigninResponse {
-        token,
-        user_id: user.user_id.to_string(),
-        message: "Login successful".into(),
-        is_admin: user.is_admin,
-    });
+        if !verify_password(&password, &user.password_hash) {
+            return Err(AppError::BadCredentials);
+        }
 
-    let mut res = (jar, body).into_response();
-    res.headers_mut()
-        .insert("HX-Redirect", "/".parse().unwrap());
-    Ok(res)
+        if !user.is_active {
+            return Err(AppError::AccountDisabled(user.disabled_reason));
+        }
+
+        let token = create_jwt(
+            &user.user_id.to_string(),
+            &user.email,
+            user.is_admin,
+            user.session_version,
+        )?;
+
+        Ok((user, token))
+    }
+    .await;
+
+    match attempt {
+        Ok((_user, token)) => {
+            let cookie = Cookie::build(("token", token))
+                .http_only(true)
+                .same_site(SameSite::Lax)
+                .path("/")
+                .build();
+            let jar = CookieJar::new().add(cookie);
+            let mut res = jar.into_response();
+            *res.status_mut() = StatusCode::NO_CONTENT;
+            res.headers_mut()
+                .insert(HeaderName::from_static("hx-redirect"), "/".parse().unwrap());
+            res
+        }
+        Err(AppError::BadCredentials) => {
+            let view = LoginView {
+                full_page: false,
+                oob_swap: true,
+                account_disabled: false,
+                email,
+                email_error: None,
+                password_error: None,
+                banner: Some(AppError::BadCredentials.to_string()),
+            };
+            (StatusCode::OK, render_form(view)).into_response()
+        }
+        Err(AppError::AccountDisabled(reason)) => {
+            let msg = match &reason {
+                Some(r) => format!("Your account has been disabled. Reason: {r}"),
+                None => "Your account has been disabled. Contact an administrator.".into(),
+            };
+            let view = LoginView {
+                full_page: false,
+                oob_swap: true,
+                account_disabled: false,
+                email,
+                email_error: None,
+                password_error: None,
+                banner: Some(msg),
+            };
+            (StatusCode::OK, render_form(view)).into_response()
+        }
+        Err(e) => {
+            tracing::error!("login failed: {e}");
+            let view = LoginView {
+                full_page: false,
+                oob_swap: true,
+                account_disabled: false,
+                email,
+                email_error: None,
+                password_error: None,
+                banner: Some("Something went wrong. Please try again later.".into()),
+            };
+            (StatusCode::OK, render_form(view)).into_response()
+        }
+    }
+}
+
+fn render_signup(view: SignupView) -> Html<String> {
+    Html(
+        view.render()
+            .unwrap_or_else(|e| format!("<!-- template error: {e} -->")),
+    )
 }
 
 pub async fn signup(
     State(pool): State<Db>,
-    Json(payload): Json<SignupRequest>,
-) -> AppResult<Response> {
-    let exists = sqlx::query("SELECT user_id FROM users WHERE email = $1")
-        .bind(&payload.email)
-        .fetch_optional(&pool)
-        .await?;
+    form: Result<Form<SignupRequest>, axum::extract::rejection::FormRejection>,
+) -> Response {
+    let payload = match form {
+        Ok(f) => f.0,
+        Err(_) => {
+            let view = SignupView {
+                full_page: false,
+                oob_swap: true,
+                full_name: String::new(),
+                email: String::new(),
+                full_name_error: None,
+                email_error: None,
+                password_error: None,
+                banner: Some("Invalid form submission. Please try again.".into()),
+            };
+            return (StatusCode::OK, render_signup(view)).into_response();
+        }
+    };
 
-    if exists.is_some() {
-        return Err(AppError::EmailTaken);
+    if let Err(ref errs) = payload.validate() {
+        let full_name = payload.full_name.trim().to_string();
+        let email = payload.email.trim().to_string();
+        let view = SignupView {
+            full_page: false,
+            oob_swap: true,
+            full_name,
+            email,
+            full_name_error: first_field_message(errs, "full_name"),
+            email_error: first_field_message(errs, "email"),
+            password_error: first_field_message(errs, "password"),
+            banner: None,
+        };
+        return (StatusCode::OK, render_signup(view)).into_response();
     }
 
-    let hashed = hash_password(&payload.password)?;
-    let user_id = Uuid::new_v4();
+    let full_name = payload.full_name.trim().to_string();
+    let email = payload.email.trim().to_string();
+    let password = payload.password;
 
-    sqlx::query(
+    let exists = match sqlx::query("SELECT user_id FROM users WHERE email = $1")
+        .bind(&email)
+        .fetch_optional(&pool)
+        .await
+    {
+        Ok(r) => r,
+        Err(e) => {
+            tracing::error!("signup lookup failed: {e}");
+            let view = SignupView {
+                full_page: false,
+                oob_swap: true,
+                full_name,
+                email,
+                full_name_error: None,
+                email_error: None,
+                password_error: None,
+                banner: Some("Something went wrong. Please try again later.".into()),
+            };
+            return (StatusCode::OK, render_signup(view)).into_response();
+        }
+    };
+
+    if exists.is_some() {
+        let view = SignupView {
+            full_page: false,
+            oob_swap: true,
+            full_name,
+            email,
+            full_name_error: None,
+            email_error: None,
+            password_error: None,
+            banner: Some(AppError::EmailTaken.to_string()),
+        };
+        return (StatusCode::OK, render_signup(view)).into_response();
+    }
+
+    let hashed = match hash_password(&password) {
+        Ok(h) => h,
+        Err(e) => {
+            tracing::error!("signup hash failed: {e}");
+            let view = SignupView {
+                full_page: false,
+                oob_swap: true,
+                full_name,
+                email,
+                full_name_error: None,
+                email_error: None,
+                password_error: None,
+                banner: Some("Something went wrong. Please try again later.".into()),
+            };
+            return (StatusCode::OK, render_signup(view)).into_response();
+        }
+    };
+
+    let user_id = Uuid::new_v4();
+    if let Err(e) = sqlx::query(
         "INSERT INTO users (user_id, email, full_name, password_hash) VALUES ($1, $2, $3, $4)",
     )
     .bind(user_id)
-    .bind(&payload.email)
-    .bind(&payload.full_name)
+    .bind(&email)
+    .bind(&full_name)
     .bind(hashed)
     .execute(&pool)
-    .await?;
+    .await
+    {
+        tracing::error!("signup insert failed: {e}");
+        let view = SignupView {
+            full_page: false,
+            oob_swap: true,
+            full_name,
+            email,
+            full_name_error: None,
+            email_error: None,
+            password_error: None,
+            banner: Some("Something went wrong. Please try again later.".into()),
+        };
+        return (StatusCode::OK, render_signup(view)).into_response();
+    }
 
-    let body = Json(SignupResponse {
-        user_id: user_id.to_string(),
-        message: "Account created".into(),
-    });
-
-    let mut res = (StatusCode::CREATED, body).into_response();
-    res.headers_mut()
-        .insert("HX-Redirect", "/login".parse().unwrap());
-    Ok(res)
+    let mut res = StatusCode::NO_CONTENT.into_response();
+    res.headers_mut().insert(
+        HeaderName::from_static("hx-redirect"),
+        "/login".parse().unwrap(),
+    );
+    res
 }
 
 pub async fn logout(State(pool): State<Db>, claims: Claims, jar: CookieJar) -> AppResult<Response> {

@@ -1,3 +1,4 @@
+use axum::middleware::from_fn;
 use axum::Router;
 use resend_rs::Resend;
 use tower_http::catch_panic::CatchPanicLayer;
@@ -10,6 +11,7 @@ use crate::auth::blocklist::purge_expired_tokens;
 use crate::config::Config;
 use crate::db;
 use crate::error::AppResult;
+use crate::middleware::dev_delay::artificial_delay;
 use crate::routes::{create_router, error_page_response};
 
 fn internal_error_response(
@@ -45,7 +47,8 @@ pub async fn init(config: &Config) -> AppResult<Router> {
         .nest_service("/nm", ServeDir::new("node_modules"))
         .nest_service("/public", ServeDir::new("public"))
         .layer(CatchPanicLayer::custom(internal_error_response))
-        .layer(LiveReloadLayer::new());
+        .layer(LiveReloadLayer::new())
+        .layer(from_fn(artificial_delay));
 
     // 5. Background cleanup task
     tokio::spawn(async move {

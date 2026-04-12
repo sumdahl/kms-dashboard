@@ -58,4 +58,4 @@ npm run copy-htmx
 ## 🔗 Routes Overview
 - `GET /`: Main dashboard home page.
 - `POST /ui/sidebar/pin`: Persists the sidebar's pinned/unpinned state.
-- `DELETE /ui/banner`: Dismisses the announcement banner.
+- `GET /ui/global-message?message=…&kind=…`: Returns OOB HTML to append a global message (`success` | `error` | `warning` | `info`).

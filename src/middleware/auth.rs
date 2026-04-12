@@ -47,7 +47,7 @@ where
         let user_id = Uuid::parse_str(&claims.sub).map_err(|_| AppError::Unauthorized)?;
 
         let row = sqlx::query(
-            "SELECT is_active, disabled_reason, session_version FROM users WHERE user_id = $1"
+            "SELECT is_active, disabled_reason, session_version FROM users WHERE user_id = $1",
         )
         .bind(user_id)
         .fetch_optional(&pool)
@@ -76,6 +76,7 @@ where
     }
 }
 
+#[derive(Clone)]
 pub struct AdminClaims(pub Claims);
 
 #[async_trait]

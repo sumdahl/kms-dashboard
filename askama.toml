@@ -1,0 +1,4 @@
+# Explicit template roots (default is already `templates/`).
+[general]
+dirs = ["templates"]
+

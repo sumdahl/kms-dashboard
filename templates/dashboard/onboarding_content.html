@@ -1,0 +1,47 @@
+<div class="max-w-300 w-full py-4">
+    <div class="mb-10 flex flex-col gap-2">
+        <h1 class="text-3xl font-extrabold text-text-primary mb-1 leading-tight">Grant User Access</h1>
+        <p class="text-[16px] text-text-secondary max-w-xl leading-relaxed">
+            Assign a system role to a team member. Submits as a normal form — no separate API step.
+        </p>
+        <div class="mt-8 max-w-2xl relative px-4">
+            <div class="flex items-center justify-between relative z-10">
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-10 h-10 rounded-full bg-btn-primary text-white flex items-center justify-center font-bold shadow-sm">1</div>
+                    <span class="text-[11px] font-bold text-text-primary uppercase tracking-wider">Account</span>
+                </div>
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-10 h-10 rounded-full bg-btn-primary text-white flex items-center justify-center font-bold shadow-sm">2</div>
+                    <span class="text-[11px] font-bold text-text-primary uppercase tracking-wider">Assign</span>
+                </div>
+                <div class="flex flex-col items-center gap-2">
+                    <div class="w-10 h-10 rounded-full bg-surface-02 border border-border-subtle text-text-helper flex items-center justify-center font-bold">3</div>
+                    <span class="text-[11px] font-bold text-text-helper uppercase tracking-wider">Dashboard</span>
+                </div>
+            </div>
+            <div class="absolute top-5 left-0 right-0 h-px bg-border-subtle z-0 mx-12">
+                <div class="h-full bg-btn-primary" style="width: 50%"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-10 items-start">
+        <div class="w-full lg:max-w-2xl">
+            <div class="bg-surface-01 border border-border-strong rounded-card overflow-hidden shadow-sm">
+                <div class="p-8">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 rounded-lg bg-surface-02 flex items-center justify-center text-icon-secondary border border-border-subtle">
+                            <i data-lucide="user-check" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-text-primary">Role assignment</h3>
+                            <p class="text-sm text-text-secondary">Choose user, role, and optional duration.</p>
+                        </div>
+                    </div>
+                    {% include "dashboard/assign_form_fragment.html" %}
+                </div>
+            </div>
+        </div>
+        <div class="w-full lg:w-72 shrink-0"></div>
+    </div>
+</div>

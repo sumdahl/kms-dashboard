@@ -9,6 +9,7 @@ mod models;
 mod resend_mailer;
 mod routes;
 mod startup;
+mod ui;
 
 use crate::config::Config;
 

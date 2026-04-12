@@ -13,8 +13,11 @@
             {% endfor %}
         </select>
     </div>
-    <button type="button" onclick="this.closest('.permission-row').remove(); if(window.validateCurrentList) window.validateCurrentList();" class="w-9 h-9 flex items-center justify-center rounded-md text-text-helper hover:text-red-500 hover:bg-red-500/5 transition-all">
+    <button type="button"
+            hx-post="/admin/roles/permission-row/remove"
+            hx-target="closest .permission-row"
+            hx-swap="outerHTML"
+            class="w-9 h-9 flex items-center justify-center rounded-md text-text-helper hover:text-red-500 hover:bg-red-500/5 transition-all">
         <i data-lucide="trash-2" class="w-4 h-4"></i>
     </button>
 </div>
-<script>if (window.lucide) window.lucide.createIcons();</script>

@@ -5,44 +5,17 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>{% block title %}KMS Dashboard{% endblock %}</title>
 
-        <!-- Theme must run before CSS to avoid flash -->
-        <script>
-            (function () {
-                const theme = localStorage.getItem("theme");
-                if (
-                    theme === "dark" ||
-                    (!theme &&
-                        window.matchMedia("(prefers-color-scheme: dark)")
-                            .matches)
-                ) {
-                    document.documentElement.classList.add("dark");
-                }
-            })();
-        </script>
-
+        <script src="/static/js/theme-boot.js"></script>
         <link rel="stylesheet" href="/static/css/output.css" />
-        <!-- Local Libraries for Offline Support -->
         <script src="/static/js/htmx.min.js" defer></script>
         <script src="/static/js/json-enc.js" defer></script>
-        <script src="/static/js/lucide.min.js"></script>
+        <script defer src="/static/js/lucide.min.js"></script>
+        <script defer src="/static/js/ui-init.js"></script>
         {% block head_scripts %}{% endblock %}
     </head>
     <body class="bg-bg-page flex items-center justify-center min-h-screen px-4">
         {% block content %}{% endblock %}
 
-        <script>
-            // Initialize icons for auth pages
-            document.addEventListener("DOMContentLoaded", () => {
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
-            });
-            document.addEventListener("htmx:afterSwap", () => {
-                if (window.lucide) {
-                    window.lucide.createIcons();
-                }
-            });
-        </script>
         {% block body_scripts %}{% endblock %}
     </body>
 </html>

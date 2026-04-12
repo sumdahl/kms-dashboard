@@ -1,7 +1,7 @@
-use axum::{routing::get, Router};
-use crate::handlers::dashboard::{inventory_status, my_roles};
-use crate::handlers::api::global_search;
 use crate::app_state::AppState;
+use crate::handlers::api::global_search;
+use crate::handlers::dashboard::{inventory_status, my_roles};
+use axum::{routing::get, Router};
 
 pub fn router() -> Router<AppState> {
     Router::new()

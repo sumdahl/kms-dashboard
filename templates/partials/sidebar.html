@@ -18,7 +18,7 @@
                     user_email }}
                 </span>
                 <!-- Lucide icon: chevrons-up-down -->
-                <i data-lucide="chevrons-up-down" class="text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                <i data-lucide="chevrons-up-down" class="text-icon-muted shrink-0 w-3.5 h-3.5"></i>
             </div>
         </div>
         <!-- Search -->
@@ -34,12 +34,16 @@
         </div>
         <!-- Nav -->
         <nav class="p-1 flex flex-col gap-0.5 flex-1 pb-8" aria-label="Main navigation">
-            <!-- Account home (active) -->
             <a href="/?skip_onboarding=true"
-                class="flex items-center gap-3 h-10 px-3 rounded-md text-text-primary font-semibold overflow-hidden"
-                aria-current="page">
-                <!-- Lucide icon: home -->
-                <i data-lucide="home" class="w-[18px] h-[18px] min-w-[18px] text-icon-secondary shrink-0"></i>
+                hx-get="/?skip_onboarding=true"
+                hx-target="#dashboard-outlet"
+                hx-swap="innerHTML"
+                hx-push-url="/"
+                data-nav="home"
+                class="flex items-center gap-3 h-10 px-3 rounded-md overflow-hidden transition-colors {% if nav_active == "home" %}bg-surface-active text-text-primary font-semibold{% else %}text-text-secondary hover:bg-surface-hover hover:text-text-primary{% endif %}"
+                {% if nav_active == "home" %}aria-current="page"{% endif %}>
+                <i data-lucide="home"
+                    class="w-4.5 h-4.5 min-w-4.5 shrink-0 {% if nav_active == "home" %}text-icon-secondary{% else %}text-icon-muted{% endif %}"></i>
                 <span class="sidebar-label text-[14px] flex-1">Account home</span>
             </a>
             <!-- Recents -->
@@ -47,16 +51,16 @@
                 <summary
                     class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
                     <!-- Lucide icon: clock -->
-                    <i data-lucide="clock" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                    <i data-lucide="clock" class="w-4.5 h-4.5 min-w-4.5 text-icon-muted shrink-0"></i>
                     <span class="sidebar-label text-[14px] flex-1">Recents</span>
                     <!-- Lucide icon: chevron-right -->
                     <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                        class="sidebar-label chevron text-icon-muted shrink-0 w-3.5 h-3.5"></i>
                 </summary>
                 <div class="sidebar-label flex flex-col pb-1">
                     <!-- sub-items have no icons -->
                     <a href="#"
-                        class="flex flex-col justify-center min-h-[44px] px-3 pl-9 rounded-sm hover:bg-surface-hover transition-colors">
+                        class="flex flex-col justify-center min-h-11 px-3 pl-9 rounded-sm hover:bg-surface-hover transition-colors">
                         <span class="text-[13px] font-medium text-text-primary leading-tight">Workers &amp; Pages</span>
                         <span class="text-[11px] text-text-helper leading-tight">Compute</span>
                     </a>
@@ -68,11 +72,11 @@
                 <summary
                     class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
                     <!-- Lucide icon: bar-chart-3 -->
-                    <i data-lucide="bar-chart-3" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                    <i data-lucide="bar-chart-3" class="w-4.5 h-4.5 min-w-4.5 text-icon-muted shrink-0"></i>
                     <span class="sidebar-label text-[14px] flex-1">Analytics &amp; logs</span>
                     <!-- Lucide icon: chevron-right -->
                     <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                        class="sidebar-label chevron text-icon-muted shrink-0 w-3.5 h-3.5"></i>
                 </summary>
             </details>
 
@@ -81,11 +85,11 @@
                 <summary
                     class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
                     <!-- Lucide icon: globe -->
-                    <i data-lucide="globe" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                    <i data-lucide="globe" class="w-4.5 h-4.5 min-w-4.5 text-icon-muted shrink-0"></i>
                     <span class="sidebar-label text-[14px] flex-1">Domains</span>
                     <!-- Lucide icon: chevron-right -->
                     <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                        class="sidebar-label chevron text-icon-muted shrink-0 w-3.5 h-3.5"></i>
                 </summary>
             </details>
 
@@ -101,11 +105,11 @@
                 <summary
                     class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
                     <!-- Lucide icon: package -->
-                    <i data-lucide="package" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                    <i data-lucide="package" class="w-4.5 h-4.5 min-w-4.5 text-icon-muted shrink-0"></i>
                     <span class="sidebar-label text-[14px] flex-1">Compute</span>
                     <!-- Lucide icon: chevron-right -->
                     <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                        class="sidebar-label chevron text-icon-muted shrink-0 w-3.5 h-3.5"></i>
                 </summary>
             </details>
 
@@ -114,11 +118,11 @@
                 <summary
                     class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
                     <!-- Lucide icon: sparkles -->
-                    <i data-lucide="sparkles" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                    <i data-lucide="sparkles" class="w-4.5 h-4.5 min-w-4.5 text-icon-muted shrink-0"></i>
                     <span class="sidebar-label text-[14px] flex-1">AI</span>
                     <!-- Lucide icon: chevron-right -->
                     <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                        class="sidebar-label chevron text-icon-muted shrink-0 w-3.5 h-3.5"></i>
                 </summary>
             </details>
 
@@ -127,11 +131,11 @@
                 <summary
                     class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
                     <!-- Lucide icon: database -->
-                    <i data-lucide="database" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                    <i data-lucide="database" class="w-4.5 h-4.5 min-w-4.5 text-icon-muted shrink-0"></i>
                     <span class="sidebar-label text-[14px] flex-1">Storage &amp; databases</span>
                     <!-- Lucide icon: chevron-right -->
                     <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                        class="sidebar-label chevron text-icon-muted shrink-0 w-3.5 h-3.5"></i>
                 </summary>
             </details>
 
@@ -140,11 +144,11 @@
                 <summary
                     class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
                     <!-- Lucide icon: play-circle -->
-                    <i data-lucide="play-circle" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                    <i data-lucide="play-circle" class="w-4.5 h-4.5 min-w-4.5 text-icon-muted shrink-0"></i>
                     <span class="sidebar-label text-[14px] flex-1">Media</span>
                     <!-- Lucide icon: chevron-right -->
                     <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                        class="sidebar-label chevron text-icon-muted shrink-0 w-3.5 h-3.5"></i>
                 </summary>
             </details>
 
@@ -161,11 +165,11 @@
                 <summary
                     class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
                     <!-- Lucide icon: shield -->
-                    <i data-lucide="shield" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                    <i data-lucide="shield" class="w-4.5 h-4.5 min-w-4.5 text-icon-muted shrink-0"></i>
                     <span class="sidebar-label text-[14px] flex-1">Application security</span>
                     <!-- Lucide icon: chevron-right -->
                     <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                        class="sidebar-label chevron text-icon-muted shrink-0 w-3.5 h-3.5"></i>
                 </summary>
             </details>
 
@@ -173,7 +177,7 @@
             <a href="#"
                 class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors overflow-hidden">
                 <!-- Lucide icon: shield-check -->
-                <i data-lucide="shield-check" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                <i data-lucide="shield-check" class="w-4.5 h-4.5 min-w-4.5 text-icon-muted shrink-0"></i>
                 <span class="sidebar-label text-[14px]">Zero Trust</span>
             </a>
 
@@ -182,11 +186,11 @@
                 <summary
                     class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
                     <!-- Lucide icon: share-2 -->
-                    <i data-lucide="share-2" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                    <i data-lucide="share-2" class="w-4.5 h-4.5 min-w-4.5 text-icon-muted shrink-0"></i>
                     <span class="sidebar-label text-[14px] flex-1">Networking</span>
                     <!-- Lucide icon: chevron-right -->
                     <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                        class="sidebar-label chevron text-icon-muted shrink-0 w-3.5 h-3.5"></i>
                 </summary>
             </details>
 
@@ -195,11 +199,11 @@
                 <summary
                     class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
                     <!-- Lucide icon: zap -->
-                    <i data-lucide="zap" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                    <i data-lucide="zap" class="w-4.5 h-4.5 min-w-4.5 text-icon-muted shrink-0"></i>
                     <span class="sidebar-label text-[14px] flex-1">Delivery &amp; performance</span>
                     <!-- Lucide icon: chevron-right -->
                     <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                        class="sidebar-label chevron text-icon-muted shrink-0 w-3.5 h-3.5"></i>
                 </summary>
             </details>
 
@@ -209,11 +213,11 @@
                 <summary
                     class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors cursor-pointer overflow-hidden">
                     <!-- Lucide icon: settings -->
-                    <i data-lucide="settings" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                    <i data-lucide="settings" class="w-4.5 h-4.5 min-w-4.5 text-icon-muted shrink-0"></i>
                     <span class="sidebar-label text-[14px] flex-1">Manage account</span>
                     <!-- Lucide icon: chevron-right -->
                     <i data-lucide="chevron-right"
-                        class="sidebar-label chevron text-icon-muted shrink-0 w-[14px] h-[14px]"></i>
+                        class="sidebar-label chevron text-icon-muted shrink-0 w-3.5 h-3.5"></i>
                 </summary>
             </details>
 
@@ -226,18 +230,39 @@
                         class="section-label flex items-end px-3 pb-1 text-[11px] text-text-helper whitespace-nowrap overflow-hidden">Admin</span>
                 </div>
                 <a href="/roles"
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors overflow-hidden">
-                    <i data-lucide="shield-alert" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                    hx-get="/roles"
+                    hx-target="#dashboard-outlet"
+                    hx-swap="innerHTML"
+                    hx-push-url="true"
+                    data-nav="roles"
+                    class="flex items-center gap-3 h-10 px-3 rounded-md overflow-hidden transition-colors {% if nav_active == "roles" %}bg-surface-active text-text-primary font-semibold{% else %}text-text-secondary hover:bg-surface-hover hover:text-text-primary{% endif %}"
+                    {% if nav_active == "roles" %}aria-current="page"{% endif %}>
+                    <i data-lucide="shield-alert"
+                        class="w-4.5 h-4.5 min-w-4.5 shrink-0 {% if nav_active == "roles" %}text-icon-secondary{% else %}text-icon-muted{% endif %}"></i>
                     <span class="sidebar-label text-[14px] flex-1">Roles</span>
                 </a>
                 <a href="/users"
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors overflow-hidden">
-                    <i data-lucide="users" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                    hx-get="/users"
+                    hx-target="#dashboard-outlet"
+                    hx-swap="innerHTML"
+                    hx-push-url="true"
+                    data-nav="users"
+                    class="flex items-center gap-3 h-10 px-3 rounded-md overflow-hidden transition-colors {% if nav_active == "users" %}bg-surface-active text-text-primary font-semibold{% else %}text-text-secondary hover:bg-surface-hover hover:text-text-primary{% endif %}"
+                    {% if nav_active == "users" %}aria-current="page"{% endif %}>
+                    <i data-lucide="users"
+                        class="w-4.5 h-4.5 min-w-4.5 shrink-0 {% if nav_active == "users" %}text-icon-secondary{% else %}text-icon-muted{% endif %}"></i>
                     <span class="sidebar-label text-[14px] flex-1">Users</span>
                 </a>
                 <a href="/assign"
-                    class="flex items-center gap-3 h-10 px-3 rounded-md text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors overflow-hidden">
-                    <i data-lucide="user-check" class="w-[18px] h-[18px] min-w-[18px] text-icon-muted shrink-0"></i>
+                    hx-get="/assign"
+                    hx-target="#dashboard-outlet"
+                    hx-swap="innerHTML"
+                    hx-push-url="true"
+                    data-nav="assign"
+                    class="flex items-center gap-3 h-10 px-3 rounded-md overflow-hidden transition-colors {% if nav_active == "assign" %}bg-surface-active text-text-primary font-semibold{% else %}text-text-secondary hover:bg-surface-hover hover:text-text-primary{% endif %}"
+                    {% if nav_active == "assign" %}aria-current="page"{% endif %}>
+                    <i data-lucide="user-check"
+                        class="w-4.5 h-4.5 min-w-4.5 shrink-0 {% if nav_active == "assign" %}text-icon-secondary{% else %}text-icon-muted{% endif %}"></i>
                     <span class="sidebar-label text-[14px] flex-1">Assign Role</span>
                 </a>
             </div>

@@ -1,0 +1,120 @@
+<div id="quick-create-role-form-root" {% if oob_swap %} hx-swap-oob="true" {% endif %}>
+  {% match banner %}
+  {% when Some with (msg) %}
+  <div class="mb-4 rounded-sm border-l-[3px] border-l-status-red bg-banner-danger-bg px-3 py-2.5" role="alert">
+    <p class="text-[12px] font-medium text-text-primary leading-relaxed">{{ msg }}</p>
+  </div>
+  {% when None %}
+  {% endmatch %}
+
+  <form id="quick-create-role-form" method="post" action="/admin/roles/create" hx-post="/admin/roles/create" hx-swap="none"
+    hx-indicator="#qc-submit-indicator" class="flex flex-col">
+    <input type="hidden" name="error_redirect" value="/roles/quick" />
+    <div class="p-6 space-y-6">
+      <div>
+        <label for="qc-role-name" class="block text-[14px] font-bold text-text-secondary uppercase tracking-widest mb-1">Role
+          Name</label>
+        <p class="text-[12px] text-text-helper mb-2">Each role must have a unique, descriptive name.</p>
+        <input id="qc-role-name" name="name" type="text" value="{{ name }}" placeholder="e.g. Inventory Manager"
+          class="w-full px-4 py-2.5 h-10 border rounded-md bg-surface-02 text-[15px] text-text-primary placeholder:text-text-placeholder focus:border-btn-primary focus:bg-surface-01 focus:outline-none transition-all shadow-sm {% if name_error.is_some() %}border-red-500{% else %}border-border-subtle{% endif %}" />
+        {% match name_error %}
+        {% when Some with (msg) %}
+        <p class="mt-1.5 text-[11px] text-red-500 flex items-center gap-1" role="alert">
+          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span>{{ msg }}</span>
+        </p>
+        {% when None %}
+        {% endmatch %}
+      </div>
+
+      <div>
+        <label for="qc-role-desc" class="block text-[14px] font-bold text-text-secondary uppercase tracking-widest mb-1">Description</label>
+        <p class="text-[12px] text-text-helper mb-2">Brief overview of responsibilities.</p>
+        <textarea id="qc-role-desc" name="description" rows="3" placeholder="Short description of this role's purpose"
+          class="w-full px-4 py-2.5 border rounded-md bg-surface-02 text-[15px] text-text-primary placeholder:text-text-placeholder focus:border-btn-primary focus:bg-surface-01 focus:outline-none transition-all shadow-sm resize-none {% if description_error.is_some() %}border-red-500{% else %}border-border-subtle{% endif %}">{{ description }}</textarea>
+        {% match description_error %}
+        {% when Some with (msg) %}
+        <p class="mt-1.5 text-[11px] text-red-500 flex items-center gap-1" role="alert">
+          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span>{{ msg }}</span>
+        </p>
+        {% when None %}
+        {% endmatch %}
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between mb-1">
+          <label class="text-[14px] font-bold text-text-secondary uppercase tracking-widest">Permissions</label>
+          <button type="button" hx-get="/admin/roles/permission-row" hx-target="#qc-permissions-list" hx-swap="beforeend"
+            class="inline-flex items-center gap-1.5 text-[11px] font-bold text-btn-primary hover:underline transition-colors">
+            <i data-lucide="plus" class="w-3.5 h-3.5"></i>
+            Add permission
+          </button>
+        </div>
+        <p class="text-[12px] text-text-helper mb-3">At least one permission row is required.</p>
+        {% match resource_error %}
+        {% when Some with (msg) %}
+        <p class="mb-2 text-[11px] text-red-500 flex items-center gap-1" role="alert">
+          <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="12" y1="8" x2="12" y2="12" />
+            <line x1="12" y1="16" x2="12.01" y2="16" />
+          </svg>
+          <span>{{ msg }}</span>
+        </p>
+        {% when None %}
+        {% endmatch %}
+        <div id="qc-permissions-list" class="flex flex-col gap-2.5">
+          {% for row in permission_rows %}
+          <div class="permission-row flex items-center gap-3 animate-in fade-in slide-in-from-top-1 duration-200">
+            <div class="flex-1">
+              <select name="resource"
+                class="permission-resource w-full px-3 py-2 bg-surface-02 border border-border-subtle rounded-md text-[13px] text-text-primary outline-none focus:border-btn-primary transition-all appearance-none cursor-pointer">
+                {% for res in resources %}
+                <option value="{{ res }}" {% if loop.index0 == row.resource_sel %}selected{% endif %}>{{ res }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="flex-1">
+              <select name="access"
+                class="permission-access w-full px-3 py-2 bg-surface-02 border border-border-subtle rounded-md text-[13px] text-text-primary outline-none focus:border-btn-primary transition-all appearance-none cursor-pointer">
+                {% for acc in access_levels %}
+                <option value="{{ acc }}" {% if loop.index0 == row.access_sel %}selected{% endif %}>{{ acc }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <button type="button" hx-post="/admin/roles/permission-row/remove" hx-target="closest .permission-row"
+              hx-swap="outerHTML"
+              class="w-9 h-9 flex items-center justify-center rounded-md text-text-helper hover:text-red-500 hover:bg-red-500/5 transition-all">
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-3 px-6 py-4 bg-surface-02 border-t border-border-subtle">
+      <span id="qc-submit-indicator" class="htmx-indicator mr-auto text-[11px] text-text-helper flex items-center gap-2">
+        <span class="h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2 border-btn-primary border-t-transparent" aria-hidden="true"></span>
+        Saving…
+      </span>
+      <a href="/roles"
+        class="px-5 h-9 inline-flex items-center justify-center border border-border-subtle rounded-md text-[13px] font-medium text-text-secondary bg-surface-01 hover:bg-surface-hover transition-colors shadow-sm">Cancel</a>
+      <button type="submit"
+        class="px-8 h-9 bg-btn-primary text-white rounded-md text-[13px] font-bold hover:bg-btn-primary-hover transition-all shadow-md active:scale-95">Create
+        Role Now</button>
+    </div>
+  </form>
+</div>

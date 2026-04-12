@@ -1,4 +1,4 @@
-<div id="search-modal" class="fixed inset-0 z-[100] hidden overflow-y-auto" role="dialog" aria-modal="true">
+<div id="search-modal" class="fixed inset-0 z-100 hidden overflow-y-auto" role="dialog" aria-modal="true">
     <!-- Backdrop -->
     <div class="fixed inset-0 bg-zinc-900/40 transition-opacity" onclick="closeSearch()"></div>
 
@@ -95,78 +95,3 @@
         </div>
     </div>
 </div>
-
-<script>
-    let activeIndex = -1;
-
-    function openSearch() {
-        const modal = document.getElementById('search-modal');
-        const input = document.getElementById('search-input');
-        modal.classList.remove('hidden');
-        input.value = '';
-        input.focus();
-        activeIndex = -1;
-        document.body.style.overflow = 'hidden';
-        
-
-    }
-
-    function closeSearch() {
-        const modal = document.getElementById('search-modal');
-        modal.classList.add('hidden');
-        document.body.style.overflow = '';
-    }
-
-    // Keyboard shortcuts
-    window.addEventListener('keydown', (e) => {
-        const modal = document.getElementById('search-modal');
-        if (modal.classList.contains('hidden')) {
-            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
-                e.preventDefault();
-                openSearch();
-            }
-            return;
-        }
-
-        // Modal is open, handle navigation
-        const results = document.querySelectorAll('#search-results a, #search-results .cursor-default');
-        
-        if (e.key === 'ArrowDown') {
-            e.preventDefault();
-            activeIndex = Math.min(activeIndex + 1, results.length - 1);
-            updateSelection(results);
-        } else if (e.key === 'ArrowUp') {
-            e.preventDefault();
-            activeIndex = Math.max(activeIndex - 1, 0);
-            updateSelection(results);
-        } else if (e.key === 'Enter' && activeIndex >= 0) {
-            e.preventDefault();
-            results[activeIndex].click();
-        } else if (e.key === 'Escape') {
-            closeSearch();
-        }
-    });
-
-    function updateSelection(results) {
-        results.forEach((el, i) => {
-            if (i === activeIndex) {
-                el.classList.add('bg-surface-02');
-                el.scrollIntoView({ block: 'nearest' });
-                // Show arrow icon if it exists
-                const arrow = el.querySelector('.lucide-arrow-right');
-                if (arrow) arrow.style.opacity = '1';
-            } else {
-                el.classList.remove('bg-surface-02');
-                const arrow = el.querySelector('.lucide-arrow-right');
-                if (arrow) arrow.style.opacity = '0';
-            }
-        });
-    }
-
-    // Reset index on new search
-    document.addEventListener('htmx:afterOnLoad', (e) => {
-        if (e.detail.target.id === 'search-results') {
-            activeIndex = -1;
-        }
-    });
-</script>
