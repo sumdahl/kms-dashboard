@@ -5,7 +5,8 @@ use crate::models::types::{AccessLevel, Resource};
 use crate::models::{Role, RolePermission};
 use axum::{
     extract::{Path, Query, State},
-    Json,
+    response::{IntoResponse, Response, Redirect},
+    Form, Json,
 };
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -271,24 +272,31 @@ pub async fn create_role(
 pub async fn assign_role(
     _admin: AdminClaims,
     State(pool): State<Db>,
-    Json(payload): Json<AssignRoleRequest>,
-) -> AppResult<Json<serde_json::Value>> {
+    headers: axum::http::HeaderMap,
+    Form(payload): Form<AssignRoleRequest>,
+) -> AppResult<Response> {
     use sqlx::Row;
 
     // 1. Find user_id by email
-    let user_row = sqlx::query("SELECT user_id FROM users WHERE email = $1")
+    let user_row = match sqlx::query("SELECT user_id FROM users WHERE email = $1")
         .bind(&payload.email)
         .fetch_optional(&pool)
         .await?
-        .ok_or(AppError::UserNotFound)?;
+    {
+        Some(row) => row,
+        None => return Ok(AppError::UserNotFound.smart_response(&headers)),
+    };
     let user_id: Uuid = user_row.get("user_id");
 
     // 2. Find role_id by name
-    let role_row = sqlx::query("SELECT role_id FROM roles WHERE name = $1")
+    let role_row = match sqlx::query("SELECT role_id FROM roles WHERE name = $1")
         .bind(&payload.role_name)
         .fetch_optional(&pool)
         .await?
-        .ok_or(AppError::RoleNotFound)?;
+    {
+        Some(row) => row,
+        None => return Ok(AppError::RoleNotFound.smart_response(&headers)),
+    };
     let role_id: Uuid = role_row.get("role_id");
 
     // 3. Calculate expiry
@@ -310,11 +318,10 @@ pub async fn assign_role(
     .execute(&pool)
     .await?;
 
-    Ok(Json(serde_json::json!({
-        "status": "success",
-        "message": format!("Role '{}' assigned to {}", payload.role_name, payload.email),
-        "expires_at": expires_at
-    })))
+    // On success, redirect to roles or roles list
+    let mut headers = axum::http::HeaderMap::new();
+    headers.insert("HX-Redirect", "/roles".parse().unwrap());
+    Ok((axum::http::StatusCode::SEE_OTHER, headers, Redirect::to("/roles")).into_response())
 }
 
 pub async fn delete_role(

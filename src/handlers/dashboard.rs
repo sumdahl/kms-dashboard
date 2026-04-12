@@ -136,6 +136,15 @@ pub struct AssignTemplate {
     pub show_banner: bool,
     pub css_version: &'static str,
     pub is_admin: bool,
+    pub users: Vec<crate::handlers::admin::UserSummary>,
+    pub roles: Vec<Role>,
+    pub pre_role: Option<String>,
+}
+
+impl AssignTemplate {
+    pub fn is_pre_selected(&self, role_name: &str) -> bool {
+        self.pre_role.as_deref() == Some(role_name)
+    }
 }
 
 #[derive(Template)]
@@ -157,6 +166,10 @@ pub struct CreateRoleWizardTemplate {
     pub show_banner: bool,
     pub css_version: &'static str,
     pub is_admin: bool,
+    pub step: u8,
+    pub role_name: String,
+    pub role_description: String,
+    pub error: Option<String>,
 }
 
 #[derive(Template)]
@@ -252,34 +265,72 @@ pub async fn users_page(claims: Option<Claims>, jar: CookieJar) -> Response {
     }
 }
 
-pub async fn assign_page(claims: Option<Claims>, jar: CookieJar, Query(params): Query<HomeParams>) -> Response {
-    match claims {
-        None => Redirect::to("/login").into_response(),
-        Some(c) => {
-            let skip = params.skip_onboarding.unwrap_or(false);
-            let pinned = get_sidebar_pinned(&jar);
-            if skip {
-                AssignTemplate {
-                    sidebar_pinned: pinned,
-                    user_email: c.email,
-                    show_banner: false,
-                    css_version: env!("CSS_VERSION"),
-                    is_admin: c.is_admin,
-                }
-                .into_response()
-            } else {
-                OnboardingTemplate {
-                    sidebar_pinned: pinned,
-                    user_email: c.email,
-                    show_banner: false,
-                    css_version: env!("CSS_VERSION"),
-                    is_admin: c.is_admin,
-                    current_step: 2,
-                }
-                .into_response()
-            }
+pub async fn assign_page(
+    claims: Option<Claims>,
+    jar: CookieJar,
+    State(pool): State<Db>,
+    Query(params): Query<HomeParams>,
+    Query(assign_params): Query<AssignParams>,
+) -> Response {
+    let c = match claims {
+        None => return Redirect::to("/login").into_response(),
+        Some(c) => c,
+    };
+
+    let skip = params.skip_onboarding.unwrap_or(false);
+    let pinned = get_sidebar_pinned(&jar);
+
+    if !skip {
+        return OnboardingTemplate {
+            sidebar_pinned: pinned,
+            user_email: c.email,
+            show_banner: false,
+            css_version: env!("CSS_VERSION"),
+            is_admin: c.is_admin,
+            current_step: 2,
         }
+        .into_response();
     }
+
+    // Fetch users (similar to list_users in admin.rs but we need it for the template)
+    let users = match sqlx::query_as::<_, crate::handlers::admin::UserSummary>(
+        "SELECT user_id, email, full_name, is_admin, is_active, disabled_reason
+         FROM users
+         WHERE is_admin = FALSE
+         ORDER BY created_at DESC",
+    )
+    .fetch_all(&pool)
+    .await {
+        Ok(u) => u,
+        Err(_) => Vec::new(),
+    };
+
+    // Fetch roles
+    let roles = match sqlx::query_as::<_, Role>(
+        "SELECT role_id, name, description, created_at FROM roles ORDER BY name ASC",
+    )
+    .fetch_all(&pool)
+    .await {
+        Ok(r) => r,
+        Err(_) => Vec::new(),
+    };
+
+    AssignTemplate {
+        sidebar_pinned: pinned,
+        user_email: c.email,
+        show_banner: false,
+        css_version: env!("CSS_VERSION"),
+        is_admin: c.is_admin,
+        users,
+        roles,
+        pre_role: assign_params.role,
+    }
+    .into_response()
+}
+
+#[derive(Deserialize)]
+pub struct AssignParams {
+    pub role: Option<String>,
 }
 
 pub async fn create_role_wizard_page(claims: Option<Claims>, jar: CookieJar) -> Response {
