@@ -68,7 +68,7 @@
                         
                         <div id="permissions-list" class="flex flex-col gap-2.5 min-h-[50px]">
                             <!-- Load first row automatically -->
-                            <div hx-post="/admin/roles/permission-row" hx-trigger="load" hx-swap="outerHTML"></div>
+                            <div hx-post="/admin/roles/permission-row" hx-trigger="load" hx-target="this" hx-swap="outerHTML"></div>
                         </div>
                     </div>
 

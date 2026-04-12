@@ -339,13 +339,18 @@ content %}
             errorEl.classList.add('hidden');
 
             try {
-                const body = { email: selectedUser, role_name: selectedRole };
-                if (hours) body.duration_secs = parseInt(hours) * 3600;
+                const params = new URLSearchParams();
+                params.append('email', selectedUser);
+                params.append('role_name', selectedRole);
+                if (hours) params.append('duration_secs', String(parseInt(hours) * 3600));
 
                 const res = await fetch('/admin/assign', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(body)
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'HX-Request': 'true'
+                    },
+                    body: params.toString()
                 });
 
                 if (res.ok) {
@@ -353,13 +358,15 @@ content %}
                     wizardSuccess.classList.remove('hidden');
                     if (window.lucide) window.lucide.createIcons();
                 } else {
-                    const data = await res.json();
-                    errorEl.textContent = data.error || "Assignment failed. Please try again.";
-                    errorEl.classList.remove('hidden');
+                    try {
+                        const data = await res.json();
+                        window.showBanner(data.error || "Assignment failed. Please try again.", "error");
+                    } catch (_) {
+                        window.showBanner("Assignment failed. Please try again.", "error");
+                    }
                 }
             } catch (e) {
-                errorEl.textContent = "Network error occurred.";
-                errorEl.classList.remove('hidden');
+                window.showBanner("Network error. The server may be unreachable.", "error");
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = "Activate Access Now";

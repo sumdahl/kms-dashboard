@@ -46,13 +46,10 @@ pub async fn list_users(
 pub struct CreateRoleRequest {
     pub name: String,
     pub description: String,
-    pub permissions: Vec<PermissionRequest>,
-}
-
-#[derive(Deserialize)]
-pub struct PermissionRequest {
-    pub resource: Resource,
-    pub access: AccessLevel,
+    #[serde(default)]
+    pub resources: Vec<String>,
+    #[serde(default)]
+    pub access_levels: Vec<String>,
 }
 
 #[derive(Deserialize)]
@@ -231,16 +228,17 @@ pub async fn create_role(
         Err(e) => return Err(e.into()),
     }
 
-    for perm in payload.permissions {
-        let resource_str = perm.resource.to_string();
-        let access_str = perm.access.to_string();
+    for (resource_str, access_str) in payload.resources.iter().zip(payload.access_levels.iter()) {
+        if resource_str.is_empty() || access_str.is_empty() {
+            continue;
+        }
 
         match sqlx::query(
             "INSERT INTO role_permissions (role_id, resource, access_level) VALUES ($1, $2, $3)",
         )
         .bind(role_id)
-        .bind(&resource_str)
-        .bind(&access_str)
+        .bind(resource_str)
+        .bind(access_str)
         .execute(&mut *tx)
         .await
         {
