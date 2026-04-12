@@ -1,4 +1,4 @@
-{% import "macros/forms.html" as forms %}
+{% import "macros/forms.html" as ui %}
 <!doctype html>
 <html lang="en">
     <head>
@@ -48,18 +48,11 @@
                         hx-swap="outerHTML"
                         class="space-y-4"
                     >
-                        {% call forms::input_field("Full Name", "full_name", "text", full_name, full_name_error, "") %}
-                        {% call forms::input_field("Email address", "email", "email", email, email_error, "") %}
-                        {% call forms::input_field("Password", "password", "password", "", password_error, "") %}
+                        {% call ui::input_field("Full Name", "full_name", "text", full_name, full_name_error, "") %}
+                        {% call ui::input_field("Email address", "email", "email", email, email_error, "") %}
+                        {% call ui::input_field("Password", "password", "password", "", password_error, "") %}
 
-                        <button
-                            type="submit"
-                            id="submit-btn"
-                            class="w-full h-9 bg-btn-primary text-white text-[13px] font-medium rounded-sm hover:bg-btn-primary-hover transition-colors mt-1 htmx-request:opacity-50"
-                        >
-                            <span class="htmx-indicator">Creating account...</span>
-                            <span class="htmx-request:hidden">Create account</span>
-                        </button>
+                        {% call ui::button("Create account", "submit", "primary", "class=\"w-full mt-1\"", "Creating account...", "") %}
                     </form>
 
                     <div class="mt-6 text-center">

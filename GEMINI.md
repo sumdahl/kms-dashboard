@@ -20,10 +20,14 @@ A high-performance web dashboard built with **Rust (Axum)**, **Tailwind CSS v4**
 
 ## ⚠️ Pitfalls & Solutions
 
-1. **Tailwind Purging:** Always use full class names in templates (e.g., `border-red-500`). Never construct them dynamically like `border-{{ color }}-500`.
-2. **HTMX Partials:** Every handler must detect the `HX-Request` header to decide between returning a partial fragment or a full page layout.
-3. **Form Resubmission:** Always follow the **Post/Redirect/Get** pattern. Use `HX-Redirect` on success.
-4. **Validation Status:** Return `422 Unprocessable Entity` for form errors so HTMX knows to swap the content.
+1.  **Tailwind Purging:** Always use full class names in templates (e.g., `border-red-500`). Never construct them dynamically like `border-{{ color }}-500`.
+2.  **HTMX Partials:** Every handler must detect the `HX-Request` header to decide between returning a partial fragment or a full page layout.
+3.  **Form Resubmission:** Always follow the **Post/Redirect/Get** pattern. Use `HX-Redirect` on success.
+4.  **Validation Status:** Return `422 Unprocessable Entity` for form errors so HTMX knows to swap the content.
+5.  **Askama Macros (Critical):**
+    *   **Syntax:** Always use `{% call ui::macro_name(...) %}`. Using `{{ ui::macro_name(...) }}` will cause "unresolved module ui" errors.
+    *   **Keywords:** Never use Rust reserved keywords (like `type`, `match`, `let`) as macro parameter names.
+
 
 ## 🚀 Tech Stack
 - **Backend:** [Rust](https://www.rust-lang.org/) with the [Axum](https://github.com/tokio-rs/axum) web framework.

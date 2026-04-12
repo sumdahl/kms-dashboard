@@ -1,4 +1,4 @@
-{% import "macros/forms.html" as forms %}
+{% import "macros/forms.html" as ui %}
 <!doctype html>
 <html lang="en">
     <head>
@@ -52,23 +52,17 @@
                         hx-swap="outerHTML"
                         class="space-y-4"
                     >
-                        {% call forms::input_field("Email address", "email", "email", email, email_error, "") %}
+                        {% call ui::input_field("Email address", "email", "email", email, email_error, "") %}
                         
                         <div>
                             <div class="flex items-center justify-between mb-1.5">
                                 <label for="password" class="block text-[11px] font-medium text-text-secondary tracking-wider uppercase">Password</label>
                                 <a href="/forgot-password" class="text-[11px] text-text-helper hover:text-text-secondary transition-colors">Forgot password?</a>
                             </div>
-                            {% call forms::input_field("", "password", "password", "", password_error, "") %}
+                            {% call ui::input_field("", "password", "password", "", password_error, "") %}
                         </div>
 
-                        <button
-                            type="submit"
-                            class="w-full h-9 bg-btn-primary text-white text-[13px] font-medium rounded-sm hover:bg-btn-primary-hover transition-colors mt-1 htmx-request:opacity-50"
-                        >
-                            <span class="htmx-indicator">Signing in...</span>
-                            <span class="htmx-request:hidden">Sign in</span>
-                        </button>
+                        {% call ui::button("Sign in", "submit", "primary", "class=\"w-full mt-1\"", "Signing in...", "") %}
                     </form>
 
                     <div class="mt-6 text-center">

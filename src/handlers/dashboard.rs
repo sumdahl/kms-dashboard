@@ -1,12 +1,11 @@
 use crate::db::Db;
-use crate::error::{AppError, AppResult};
+use crate::error::AppResult;
 use crate::middleware::rbac::Permissions;
 use crate::models::types::{AccessLevel, Resource};
 use crate::models::{Claims, Role, RolePermission, user::UserSummary};
 use askama::Template;
 use askama_axum::IntoResponse;
 use axum::extract::{Form, Path, Query, State};
-use axum::http::StatusCode;
 use axum::response::{Html, Redirect, Response};
 use axum::Json;
 use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
@@ -116,6 +115,9 @@ pub struct RolesTemplate {
     pub show_banner: bool,
     pub css_version: &'static str,
     pub is_admin: bool,
+    pub roles: Vec<Role>,
+    pub total_roles: i64,
+    pub total_permissions: i64,
 }
 
 #[derive(Template)]
@@ -126,6 +128,7 @@ pub struct UsersTemplate {
     pub show_banner: bool,
     pub css_version: &'static str,
     pub is_admin: bool,
+    pub users: Vec<UserSummary>,
 }
 
 #[derive(Template)]
@@ -238,32 +241,94 @@ pub async fn home(claims: Option<Claims>, jar: CookieJar) -> Response {
     }
 }
 
-pub async fn roles_page(claims: Option<Claims>, jar: CookieJar) -> Response {
-    match claims {
-        None => Redirect::to("/login").into_response(),
-        Some(c) => RolesTemplate {
-            sidebar_pinned: get_sidebar_pinned(&jar),
-            user_email: c.email,
-            show_banner: false,
-            css_version: env!("CSS_VERSION"),
-            is_admin: c.is_admin,
-        }
-        .into_response(),
+pub async fn roles_page(
+    claims: Option<Claims>,
+    jar: CookieJar,
+    State(pool): State<Db>,
+) -> Response {
+    let c = match claims {
+        None => return Redirect::to("/login").into_response(),
+        Some(c) => c,
+    };
+
+    // 1. Fetch Summary Stats
+    let total_roles = sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM roles")
+        .fetch_one(&pool)
+        .await
+        .unwrap_or(0);
+
+    let total_permissions = sqlx::query_scalar::<_, i64>("SELECT COUNT(*) FROM role_permissions")
+        .fetch_one(&pool)
+        .await
+        .unwrap_or(0);
+
+    // 2. Fetch Roles with their permissions
+    let mut roles = match sqlx::query_as::<_, Role>(
+        "SELECT role_id, name, description, created_at FROM roles ORDER BY created_at DESC",
+    )
+    .fetch_all(&pool)
+    .await
+    {
+        Ok(r) => r,
+        Err(_) => Vec::new(),
+    };
+
+    // Populate permissions for each role
+    for role in &mut roles {
+        let perms = sqlx::query_as::<_, crate::models::role::RolePermission>(
+            "SELECT resource, access_level as \"access: _\" FROM role_permissions WHERE role_id = $1",
+        )
+        .bind(role.role_id)
+        .fetch_all(&pool)
+        .await
+        .unwrap_or_default();
+        role.permissions = perms;
     }
+
+    RolesTemplate {
+        sidebar_pinned: get_sidebar_pinned(&jar),
+        user_email: c.email,
+        show_banner: false,
+        css_version: env!("CSS_VERSION"),
+        is_admin: c.is_admin,
+        roles,
+        total_roles,
+        total_permissions,
+    }
+    .into_response()
 }
 
-pub async fn users_page(claims: Option<Claims>, jar: CookieJar) -> Response {
-    match claims {
-        None => Redirect::to("/login").into_response(),
-        Some(c) => UsersTemplate {
-            sidebar_pinned: get_sidebar_pinned(&jar),
-            user_email: c.email,
-            show_banner: false,
-            css_version: env!("CSS_VERSION"),
-            is_admin: c.is_admin,
-        }
-        .into_response(),
+pub async fn users_page(
+    claims: Option<Claims>,
+    jar: CookieJar,
+    State(pool): State<Db>,
+) -> Response {
+    let c = match claims {
+        None => return Redirect::to("/login").into_response(),
+        Some(c) => c,
+    };
+
+    let users = match sqlx::query_as::<_, UserSummary>(
+        "SELECT user_id, email, full_name, is_admin, is_active, disabled_reason
+         FROM users
+         ORDER BY created_at DESC",
+    )
+    .fetch_all(&pool)
+    .await
+    {
+        Ok(u) => u,
+        Err(_) => Vec::new(),
+    };
+
+    UsersTemplate {
+        sidebar_pinned: get_sidebar_pinned(&jar),
+        user_email: c.email,
+        show_banner: false,
+        css_version: env!("CSS_VERSION"),
+        is_admin: c.is_admin,
+        users,
     }
+    .into_response()
 }
 
 #[derive(Deserialize)]
@@ -334,7 +399,16 @@ pub async fn assign_page(
     .into_response()
 }
 
-pub async fn create_role_wizard_page(claims: Option<Claims>, jar: CookieJar) -> Response {
+#[derive(Deserialize)]
+pub struct WizardParams {
+    pub step: Option<u8>,
+}
+
+pub async fn create_role_wizard_page(
+    claims: Option<Claims>,
+    jar: CookieJar,
+    Query(params): Query<WizardParams>,
+) -> Response {
     match claims {
         None => Redirect::to("/login").into_response(),
         Some(c) => CreateRoleWizardTemplate {
@@ -343,7 +417,7 @@ pub async fn create_role_wizard_page(claims: Option<Claims>, jar: CookieJar) -> 
             show_banner: false,
             css_version: env!("CSS_VERSION"),
             is_admin: c.is_admin,
-            step: 1,
+            step: params.step.unwrap_or(1),
             role_name: String::new(),
             role_description: String::new(),
             error: String::new(),

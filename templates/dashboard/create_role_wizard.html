@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% import "macros/forms.html" as forms %}
+{% import "macros/forms.html" as ui %}
 {% block title %}Create New Role — KMS Dashboard{% endblock %}
 {% block content %}
 
@@ -111,7 +111,7 @@
                         </div>
 
                         <div class="space-y-6">
-                            {% call forms::input_field("Role Name", "name", "text", role_name, error, "font-mono") %}
+                            {% call ui::input_field("Role Name", "name", "text", role_name, error, "font-mono") %}
                             <p class="text-[12px] text-text-helper -mt-4">
                                 Each role must have a unique, descriptive name.
                             </p>
@@ -134,13 +134,7 @@
                             </div>
 
                             <div class="flex justify-end pt-4">
-                                <button
-                                    type="submit"
-                                    class="bg-btn-primary hover:bg-btn-primary-hover text-white px-10 py-2.5 rounded-md font-bold text-[14px] transition-all shadow-sm active:scale-[0.98] flex items-center gap-2"
-                                >
-                                    Next: Configure Permissions
-                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                                </button>
+                                {% call ui::button("Next: Configure Permissions", "submit", "primary", "", "Processing...", "<i data-lucide=\"arrow-right\" class=\"w-4 h-4 group-hover:translate-x-0.5 transition-transform\"></i>") %}
                             </div>
                         </div>
                     </div>
@@ -200,7 +194,7 @@
                                 <div hx-get="/admin/roles/permission-row" hx-trigger="load" hx-swap="outerHTML"></div>
                             {% else %}
                                 {% for (res, acc) in permissions %}
-                                    <!-- Here we would render existing rows, but let's keep it simple for now -->
+                                    <!-- Here we would render existing rows -->
                                 {% endfor %}
                             {% endif %}
                         </div>
@@ -217,17 +211,10 @@
                                 Back to Identity
                             </a>
                             <form hx-post="/admin/roles/wizard/step-2" hx-target="#wizard-container" hx-swap="outerHTML">
-                                <!-- We need to preserve the Step 1 data in hidden fields -->
                                 <input type="hidden" name="role_name" value="{{ role_name }}">
                                 <input type="hidden" name="role_description" value="{{ role_description }}">
                                 
-                                <button
-                                    type="submit"
-                                    class="bg-btn-primary hover:bg-btn-primary-hover text-white px-10 py-2.5 rounded-md font-bold text-[14px] transition-all shadow-sm active:scale-[0.98] flex items-center gap-2"
-                                >
-                                    Next: Review
-                                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
-                                </button>
+                                {% call ui::button("Next: Review", "submit", "primary", "", "Processing...", "<i data-lucide=\"arrow-right\" class=\"w-4 h-4 group-hover:translate-x-0.5 transition-transform\"></i>") %}
                             </form>
                         </div>
                     </div>
@@ -297,7 +284,6 @@
                                             <span class="w-1.5 h-1.5 rounded-full bg-btn-primary"></span> 
                                             {{ res }} • <span class="text-text-primary font-bold uppercase text-[10px]">{{ acc }}</span>
                                             
-                                            <!-- Pass permission data to the final POST -->
                                             <input type="hidden" name="permissions[{{ loop.index0 }}][resource]" value="{{ res }}">
                                             <input type="hidden" name="permissions[{{ loop.index0 }}][access]" value="{{ acc }}">
                                         </div>
@@ -324,12 +310,7 @@
                                     ></i>
                                     Back to Permissions
                                 </a>
-                                <button
-                                    type="submit"
-                                    class="bg-btn-primary hover:bg-btn-primary-hover text-white px-12 py-3 rounded-md font-bold text-[14px] transition-all shadow-md active:scale-[0.95]"
-                                >
-                                    Create Role Now
-                                </button>
+                                {% call ui::button("Create Role Now", "submit", "primary", "class=\"px-12\"", "Establishing...", "<i data-lucide=\"check\" class=\"w-4 h-4\"></i>") %}
                             </div>
                         </div>
                     </div>
