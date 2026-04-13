@@ -1390,6 +1390,12 @@ pub async fn create_role_form(
     let permissions = match validate_and_parse_create_role_form(&form) {
         Ok(p) => p,
         Err(errs) => {
+            let resource_error = first_field_message(&errs, "resource");
+            let is_duplicate_error = resource_error
+                .as_ref()
+                .map(|e| e.contains("Duplicate"))
+                .unwrap_or(false);
+
             if is_quick_htmx {
                 let view = quick_create_shell(
                     &admin,
@@ -1397,12 +1403,17 @@ pub async fn create_role_form(
                     None,
                     first_field_message(&errs, "name"),
                     first_field_message(&errs, "description"),
-                    first_field_message(&errs, "resource"),
+                    if is_duplicate_error { None } else { resource_error },
                     true,
                 );
-                let html = view
+                let mut html = view
                     .render()
                     .unwrap_or_else(|e| format!("<!-- template error: {e} -->"));
+
+                if is_duplicate_error {
+                    html.insert_str(0, &global_message::with_error("Duplicate permission rows."));
+                }
+
                 return Html(html).into_response();
             }
             if is_wizard_htmx {
@@ -1412,12 +1423,17 @@ pub async fn create_role_form(
                     None,
                     first_field_message(&errs, "name"),
                     first_field_message(&errs, "description"),
-                    first_field_message(&errs, "resource"),
+                    if is_duplicate_error { None } else { resource_error },
                     true,
                 );
-                let html = view
+                let mut html = view
                     .render()
                     .unwrap_or_else(|e| format!("<!-- template error: {e} -->"));
+
+                if is_duplicate_error {
+                    html.insert_str(0, &global_message::with_error("Duplicate permission rows."));
+                }
+
                 return Html(html).into_response();
             }
             let msg = first_field_message(&errs, "name")
