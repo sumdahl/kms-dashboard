@@ -7,7 +7,7 @@
   {% when None %}
   {% endmatch %}
 
-  <form id="role-wizard-form" method="post" action="/admin/roles/create" hx-post="/admin/roles/create" hx-swap="none"
+  <form id="role-wizard-form" method="post" action="/admin/roles/create" hx-post="/admin/roles/create"
     hx-indicator="#wizard-form-submit-indicator" class="flex flex-col gap-6">
     <input type="hidden" name="redirect" value="{{ redirect }}" />
     <input type="hidden" name="error_redirect" value="/roles/new" />

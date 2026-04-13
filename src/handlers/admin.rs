@@ -6,6 +6,7 @@ use crate::error::{AppError, AppResult};
 use crate::middleware::auth::AdminClaims;
 use crate::models::types::{AccessLevel, Resource, RolePermissionInput};
 use crate::models::{Role, RolePermission};
+use crate::ui::global_message;
 use askama::Template;
 use axum::{
     body::Body,
@@ -16,7 +17,6 @@ use axum::{
     response::{Html, IntoResponse, Redirect, Response},
     Json,
 };
-use crate::ui::global_message;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -109,9 +109,7 @@ pub fn quick_create_access_level_list() -> Vec<String> {
 }
 
 fn option_index(opts: &[String], value: &str) -> usize {
-    opts.iter()
-        .position(|o| o == value)
-        .unwrap_or(0)
+    opts.iter().position(|o| o == value).unwrap_or(0)
 }
 
 pub fn quick_create_default_permission_rows() -> Vec<QuickPermissionRow> {
@@ -273,8 +271,6 @@ fn empty_wizard_form() -> CreateRoleFormRequest {
     }
 }
 
-
-
 pub async fn list_users(
     _admin: AdminClaims,
     State(pool): State<Db>,
@@ -347,10 +343,7 @@ pub fn query_param_encode(value: &str) -> String {
 }
 
 fn is_htmx(headers: &HeaderMap) -> bool {
-    headers
-        .get("hx-request")
-        .and_then(|v| v.to_str().ok())
-        == Some("true")
+    headers.get("hx-request").and_then(|v| v.to_str().ok()) == Some("true")
 }
 
 fn users_htmx_initials(full_name: &str) -> String {
@@ -406,11 +399,10 @@ impl UsersHtmxFragment {
 
 async fn users_htmx_html(pool: &Db, admin: &AdminClaims) -> Result<String, AppError> {
     let users = fetch_user_summaries(pool).await?;
-    let admin_users = sqlx::query_scalar::<_, i64>(
-        "SELECT COUNT(*)::bigint FROM users WHERE is_admin = TRUE",
-    )
-    .fetch_one(pool)
-    .await? as usize;
+    let admin_users =
+        sqlx::query_scalar::<_, i64>("SELECT COUNT(*)::bigint FROM users WHERE is_admin = TRUE")
+            .fetch_one(pool)
+            .await? as usize;
     let total_users = users.len();
     let active_users = users.iter().filter(|u| u.is_active).count();
     let disabled_users = total_users.saturating_sub(active_users);
@@ -432,6 +424,51 @@ async fn users_htmx_html(pool: &Db, admin: &AdminClaims) -> Result<String, AppEr
     .map_err(|e| AppError::Internal(e.to_string()))
 }
 
+// ── Roles HTMX fragment ───────────────────────────────────────────────────────
+
+#[derive(askama::Template)]
+#[template(path = "dashboard/roles_partial.html")]
+struct RolesHtmxFragment {
+    banner: Option<String>,
+    roles: Vec<RoleDisplay>,
+    total: i64,
+    page: i64,
+    pages: i64,
+    prev_page: i64,
+    next_page: i64,
+    search: String,
+    start: i64,
+    end: i64,
+    summary_total: i64,
+    summary_perms: i64,
+    summary_res: i64,
+    summary_admin: i64,
+    summary_date: String,
+}
+
+async fn roles_htmx_html(pool: &Db, _admin: &AdminClaims) -> Result<String, AppError> {
+    let d = load_roles_list_data(pool, 1, "").await?;
+    let summary = load_roles_summary(pool).await?;
+    RolesHtmxFragment {
+        banner: None,
+        roles: d.roles,
+        total: d.total,
+        page: d.page,
+        pages: d.pages,
+        prev_page: d.prev_page,
+        next_page: d.next_page,
+        search: d.search,
+        start: d.start,
+        end: d.end,
+        summary_total: summary.total_roles,
+        summary_perms: summary.total_permissions,
+        summary_res: summary.unique_resources,
+        summary_admin: summary.admin_count,
+        summary_date: Utc::now().format("%b %d").to_string(),
+    }
+    .render()
+    .map_err(|e| AppError::Internal(e.to_string()))
+}
 
 // ── Role display helpers ──────────────────────────────────────────────────────
 
@@ -524,11 +561,7 @@ pub struct RolesListData {
     pub end: i64,
 }
 
-pub async fn load_roles_list_data(
-    pool: &Db,
-    page: i64,
-    search: &str,
-) -> AppResult<RolesListData> {
+pub async fn load_roles_list_data(pool: &Db, page: i64, search: &str) -> AppResult<RolesListData> {
     let size = 8i64;
     let data = load_paginated_roles(pool, page, size, search).await?;
 
@@ -570,7 +603,6 @@ pub struct RolesListFragment {
     pub end: i64,
 }
 
-
 fn roles_list_fragment_render(d: RolesListData) -> Result<String, AppError> {
     let frag = RolesListFragment {
         roles: d.roles,
@@ -583,8 +615,7 @@ fn roles_list_fragment_render(d: RolesListData) -> Result<String, AppError> {
         start: d.start,
         end: d.end,
     };
-    frag.render()
-        .map_err(|e| AppError::Internal(e.to_string()))
+    frag.render().map_err(|e| AppError::Internal(e.to_string()))
 }
 
 pub async fn roles_list_htmx(
@@ -667,14 +698,11 @@ pub async fn delete_role_htmx(
             };
             Html(html + &global_message::with_success("Role deleted.")).into_response()
         }
-        Ok(_) => Html(
-            list_html
-                + &global_message::with_error("Role not found or already deleted."),
-        )
-        .into_response(),
-        Err(e) => {
-            Html(list_html + &global_message::with_error(&e.to_string())).into_response()
+        Ok(_) => {
+            Html(list_html + &global_message::with_error("Role not found or already deleted."))
+                .into_response()
         }
+        Err(e) => Html(list_html + &global_message::with_error(&e.to_string())).into_response(),
     }
 }
 
@@ -820,7 +848,6 @@ pub async fn load_roles_summary(pool: &Db) -> AppResult<RolesSummary> {
         admin_count: row.get("admin_count"),
     })
 }
-
 pub async fn persist_new_role(pool: &Db, payload: &CreateRoleRequest) -> AppResult<Uuid> {
     let mut tx = pool.begin().await?;
     let role_id = Uuid::new_v4();
@@ -871,7 +898,6 @@ pub async fn persist_new_role(pool: &Db, payload: &CreateRoleRequest) -> AppResu
     tx.commit().await?;
     Ok(role_id)
 }
-
 
 pub async fn assign_role(
     admin: AdminClaims,
@@ -946,8 +972,7 @@ pub async fn assign_role(
     let base = form.redirect.as_deref().unwrap_or("/assign");
     let sep = if base.contains('?') { '&' } else { '?' };
     match res {
-        Ok(()) => Redirect::to("/assign?notice=assigned")
-        .into_response(),
+        Ok(()) => Redirect::to("/assign?notice=assigned").into_response(),
         Err(e) => {
             let sep_err = if base.contains('?') { '&' } else { '?' };
             Redirect::to(&format!(
@@ -1069,10 +1094,9 @@ pub async fn disable_user(
         Err(_) => {
             if is_htmx(&headers) {
                 return match users_htmx_html(&pool, &admin).await {
-                    Ok(body) => Html(
-                        body + &global_message::with_error("Unauthorized"),
-                    )
-                    .into_response(),
+                    Ok(body) => {
+                        Html(body + &global_message::with_error("Unauthorized")).into_response()
+                    }
                     Err(_) => Redirect::to(&format!(
                         "/users?error={}",
                         query_param_encode("Unauthorized")
@@ -1091,11 +1115,10 @@ pub async fn disable_user(
     if actor_id == user_id {
         if is_htmx(&headers) {
             return match users_htmx_html(&pool, &admin).await {
-                Ok(body) => Html(
-                    body
-                        + &global_message::with_error("You cannot disable your own account."),
-                )
-                .into_response(),
+                Ok(body) => {
+                    Html(body + &global_message::with_error("You cannot disable your own account."))
+                        .into_response()
+                }
                 Err(_) => Redirect::to(&format!(
                     "/users?error={}",
                     query_param_encode("You cannot disable your own account.")
@@ -1160,10 +1183,9 @@ pub async fn disable_user(
         Ok(()) => {
             if is_htmx(&headers) {
                 return match users_htmx_html(&pool, &admin).await {
-                    Ok(body) => Html(
-                        body + &global_message::with_success("User disabled."),
-                    )
-                    .into_response(),
+                    Ok(body) => {
+                        Html(body + &global_message::with_success("User disabled.")).into_response()
+                    }
                     Err(_) => Redirect::to("/users").into_response(),
                 };
             }
@@ -1172,10 +1194,9 @@ pub async fn disable_user(
         Err(e) => {
             if is_htmx(&headers) {
                 return match users_htmx_html(&pool, &admin).await {
-                    Ok(body) => Html(
-                        body + &global_message::with_error(&e.to_string()),
-                    )
-                    .into_response(),
+                    Ok(body) => {
+                        Html(body + &global_message::with_error(&e.to_string())).into_response()
+                    }
                     Err(_) => Redirect::to(&format!(
                         "/users?error={}",
                         query_param_encode(&e.to_string())
@@ -1203,10 +1224,9 @@ pub async fn enable_user(
         Err(_) => {
             if is_htmx(&headers) {
                 return match users_htmx_html(&pool, &admin).await {
-                    Ok(body) => Html(
-                        body + &global_message::with_error("Unauthorized"),
-                    )
-                    .into_response(),
+                    Ok(body) => {
+                        Html(body + &global_message::with_error("Unauthorized")).into_response()
+                    }
                     Err(_) => Redirect::to(&format!(
                         "/users?error={}",
                         query_param_encode("Unauthorized")
@@ -1266,10 +1286,9 @@ pub async fn enable_user(
         Ok(()) => {
             if is_htmx(&headers) {
                 return match users_htmx_html(&pool, &admin).await {
-                    Ok(body) => Html(
-                        body + &global_message::with_success("User enabled."),
-                    )
-                    .into_response(),
+                    Ok(body) => {
+                        Html(body + &global_message::with_success("User enabled.")).into_response()
+                    }
                     Err(_) => Redirect::to("/users").into_response(),
                 };
             }
@@ -1278,10 +1297,9 @@ pub async fn enable_user(
         Err(e) => {
             if is_htmx(&headers) {
                 return match users_htmx_html(&pool, &admin).await {
-                    Ok(body) => Html(
-                        body + &global_message::with_error(&e.to_string()),
-                    )
-                    .into_response(),
+                    Ok(body) => {
+                        Html(body + &global_message::with_error(&e.to_string())).into_response()
+                    }
                     Err(_) => Redirect::to(&format!(
                         "/users?error={}",
                         query_param_encode(&e.to_string())
@@ -1330,7 +1348,9 @@ pub async fn create_role_form(
                     None,
                     true,
                 );
-                let html = view.render().unwrap_or_else(|e| format!("<!-- template error: {e} -->"));
+                let html = view
+                    .render()
+                    .unwrap_or_else(|e| format!("<!-- template error: {e} -->"));
                 return Html(html).into_response();
             }
             if is_wizard {
@@ -1343,7 +1363,9 @@ pub async fn create_role_form(
                     None,
                     true,
                 );
-                let html = view.render().unwrap_or_else(|e| format!("<!-- template error: {e} -->"));
+                let html = view
+                    .render()
+                    .unwrap_or_else(|e| format!("<!-- template error: {e} -->"));
                 return Html(html).into_response();
             }
             return Redirect::to(&format!(
@@ -1378,7 +1400,9 @@ pub async fn create_role_form(
                     first_field_message(&errs, "resource"),
                     true,
                 );
-                let html = view.render().unwrap_or_else(|e| format!("<!-- template error: {e} -->"));
+                let html = view
+                    .render()
+                    .unwrap_or_else(|e| format!("<!-- template error: {e} -->"));
                 return Html(html).into_response();
             }
             if is_wizard_htmx {
@@ -1391,19 +1415,17 @@ pub async fn create_role_form(
                     first_field_message(&errs, "resource"),
                     true,
                 );
-                let html = view.render().unwrap_or_else(|e| format!("<!-- template error: {e} -->"));
+                let html = view
+                    .render()
+                    .unwrap_or_else(|e| format!("<!-- template error: {e} -->"));
                 return Html(html).into_response();
             }
             let msg = first_field_message(&errs, "name")
                 .or_else(|| first_field_message(&errs, "description"))
                 .or_else(|| first_field_message(&errs, "resource"))
                 .unwrap_or_else(|| "Invalid form.".into());
-            return Redirect::to(&format!(
-                "{}?error={}",
-                err_base,
-                query_param_encode(&msg)
-            ))
-            .into_response();
+            return Redirect::to(&format!("{}?error={}", err_base, query_param_encode(&msg)))
+                .into_response();
         }
     };
 
@@ -1422,16 +1444,10 @@ pub async fn create_role_form(
 
     match persist_new_role(&pool, &req).await {
         Ok(_) => {
-            if is_quick_htmx || is_wizard_htmx {
-                return hx_redirect_response(&ok_target);
-            }
-            Redirect::to(&ok_target).into_response()
-        }
-        Err(e) => {
             if is_quick_htmx {
                 let view = quick_create_shell(
                     &admin,
-                    &form,
+                    &empty_quick_create_form(),
                     None,
                     None,
                     None,
@@ -1441,19 +1457,25 @@ pub async fn create_role_form(
                 let mut html = view
                     .render()
                     .unwrap_or_else(|e| format!("<!-- template error: {e} -->"));
+                html.push_str(&global_message::with_success("Role created successfully."));
+                return Html(html).into_response();
+            }
+            if is_wizard_htmx {
+                return hx_redirect_response(&ok_target);
+            }
+            Redirect::to(&ok_target).into_response()
+        }
+        Err(e) => {
+            if is_quick_htmx {
+                let view = quick_create_shell(&admin, &form, None, None, None, None, true);
+                let mut html = view
+                    .render()
+                    .unwrap_or_else(|e| format!("<!-- template error: {e} -->"));
                 html.push_str(&global_message::with_error(&e.to_string()));
                 return Html(html).into_response();
             }
             if is_wizard_htmx {
-                let view = wizard_shell(
-                    &admin,
-                    &form,
-                    None,
-                    None,
-                    None,
-                    None,
-                    true,
-                );
+                let view = wizard_shell(&admin, &form, None, None, None, None, true);
                 let mut html = view
                     .render()
                     .unwrap_or_else(|e| format!("<!-- template error: {e} -->"));

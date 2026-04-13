@@ -7,7 +7,7 @@
   {% when None %}
   {% endmatch %}
 
-  <form id="quick-create-role-form" method="post" action="/admin/roles/create" hx-post="/admin/roles/create" hx-swap="none"
+  <form id="quick-create-role-form" method="post" action="/admin/roles/create" hx-post="/admin/roles/create"
     hx-indicator="#qc-submit-indicator" class="flex flex-col">
     <input type="hidden" name="error_redirect" value="/roles/quick" />
     <div class="p-6 space-y-6">
