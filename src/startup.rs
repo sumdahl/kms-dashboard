@@ -1,4 +1,3 @@
-use axum::middleware::from_fn;
 use axum::Router;
 use resend_rs::Resend;
 use tower_http::catch_panic::CatchPanicLayer;

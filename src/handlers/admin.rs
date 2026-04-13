@@ -375,6 +375,7 @@ fn users_htmx_avatar_style(email: &str) -> String {
 
 #[derive(askama::Template)]
 #[template(path = "dashboard/users_partial.html")]
+#[allow(dead_code)]
 struct UsersHtmxFragment {
     sidebar_pinned: bool,
     user_email: String,
@@ -429,6 +430,7 @@ async fn users_htmx_html(pool: &Db, admin: &AdminClaims) -> Result<String, AppEr
 
 #[derive(askama::Template)]
 #[template(path = "dashboard/roles_partial.html")]
+#[allow(dead_code)]
 struct RolesHtmxFragment {
     banner: Option<String>,
     roles: Vec<RoleDisplay>,
@@ -971,7 +973,6 @@ pub async fn assign_role(
     .await;
 
     let base = form.redirect.as_deref().unwrap_or("/assign");
-    let sep = if base.contains('?') { '&' } else { '?' };
     match res {
         Ok(()) => Redirect::to("/assign?notice=assigned").into_response(),
         Err(e) => {

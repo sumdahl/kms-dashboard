@@ -126,7 +126,8 @@ async fn not_found_handler() -> impl IntoResponse {
 
 #[derive(Deserialize)]
 pub struct SidebarPinForm {
-    pub pinned: String,
+    #[serde(rename = "pinned")]
+    pub _pinned: String,
 }
 
 async fn sidebar_pin(Form(_form): Form<SidebarPinForm>) -> Html<&'static str> {

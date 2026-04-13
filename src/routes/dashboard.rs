@@ -11,12 +11,10 @@ use crate::models::types::{AccessLevel, Resource};
 use crate::models::{Claims, Role, RolePermission};
 use crate::routes::error_page;
 
-use crate::ui::global_message;
-use askama::Template;
 use axum::{
     extract::{Path, Query, State},
     http::HeaderMap,
-    response::{Html, IntoResponse, Redirect, Response},
+    response::{IntoResponse, Redirect, Response},
     routing::get,
     Router,
 };
@@ -100,6 +98,7 @@ impl UsersTemplate {
 
 #[derive(askama::Template)]
 #[template(path = "dashboard/users_partial.html")]
+#[allow(dead_code)]
 struct UsersPartialTemplate {
     pub sidebar_pinned: bool,
     pub user_email: String,
@@ -207,6 +206,7 @@ async fn users_page(
 
 #[derive(askama::Template)]
 #[template(path = "dashboard/home_partial.html")]
+#[allow(dead_code)]
 struct HomePartialTemplate {
     pub sidebar_pinned: bool,
     pub user_email: String,
@@ -218,6 +218,7 @@ struct HomePartialTemplate {
 
 #[derive(askama::Template)]
 #[template(path = "dashboard/assign_partial.html")]
+#[allow(dead_code)]
 struct AssignPartialTemplate {
     pub sidebar_pinned: bool,
     pub user_email: String,
@@ -234,6 +235,7 @@ struct AssignPartialTemplate {
 
 #[derive(askama::Template)]
 #[template(path = "dashboard/onboarding_partial.html")]
+#[allow(dead_code)]
 struct OnboardingPartialTemplate {
     pub sidebar_pinned: bool,
     pub user_email: String,
@@ -251,6 +253,7 @@ struct OnboardingPartialTemplate {
 
 #[derive(askama::Template)]
 #[template(path = "dashboard/role_detail_partial.html")]
+#[allow(dead_code)]
 struct RoleDetailPartialTemplate {
     pub sidebar_pinned: bool,
     pub user_email: String,
@@ -337,6 +340,7 @@ struct HomeTemplate {
 
 #[derive(askama::Template)]
 #[template(path = "dashboard/onboarding.html")]
+#[allow(dead_code)]
 struct OnboardingTemplate {
     sidebar_pinned: bool,
     user_email: String,
@@ -447,6 +451,7 @@ struct RolesTemplate {
 
 #[derive(askama::Template)]
 #[template(path = "dashboard/roles_partial.html")]
+#[allow(dead_code)]
 struct RolesPartialTemplate {
     sidebar_pinned: bool,
     user_email: String,
