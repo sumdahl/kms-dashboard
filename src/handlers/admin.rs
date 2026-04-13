@@ -343,6 +343,32 @@ pub fn query_param_encode(value: &str) -> String {
     })
 }
 
+fn append_query_param(base: &str, key: &str, value: &str) -> String {
+    let sep = if base.contains('?') { '&' } else { '?' };
+    format!("{base}{sep}{key}={}", query_param_encode(value))
+}
+
+#[cfg(test)]
+mod admin_tests {
+    use super::append_query_param;
+
+    #[test]
+    fn append_query_param_uses_question_mark_for_clean_urls() {
+        assert_eq!(
+            append_query_param("/assign", "notice", "assigned"),
+            "/assign?notice=assigned"
+        );
+    }
+
+    #[test]
+    fn append_query_param_uses_ampersand_when_query_exists() {
+        assert_eq!(
+            append_query_param("/?skip_onboarding=true", "notice", "assigned"),
+            "/?skip_onboarding=true&notice=assigned"
+        );
+    }
+}
+
 fn is_htmx(headers: &HeaderMap) -> bool {
     headers.get("hx-request").and_then(|v| v.to_str().ok()) == Some("true")
 }
@@ -907,6 +933,8 @@ pub async fn assign_role(
     State(pool): State<Db>,
     Form(form): Form<AssignRoleHtmlForm>,
 ) -> impl IntoResponse {
+    let base = form.redirect.as_deref().unwrap_or("/assign");
+
     let duration_secs = match form
         .duration_hours
         .as_ref()
@@ -916,13 +944,10 @@ pub async fn assign_role(
         Some(s) => match s.parse::<i64>() {
             Ok(h) if h > 0 => Some(h * 3600),
             _ => {
-                let base = form.redirect.as_deref().unwrap_or("/assign");
-                let sep = if base.contains('?') { '&' } else { '?' };
-                return Redirect::to(&format!(
-                    "{}{}error={}",
+                return Redirect::to(&append_query_param(
                     base,
-                    sep,
-                    query_param_encode("Invalid duration (hours).")
+                    "error",
+                    "Invalid duration (hours).",
                 ))
                 .into_response();
             }
@@ -972,19 +997,9 @@ pub async fn assign_role(
     }
     .await;
 
-    let base = form.redirect.as_deref().unwrap_or("/assign");
     match res {
-        Ok(()) => Redirect::to("/assign?notice=assigned").into_response(),
-        Err(e) => {
-            let sep_err = if base.contains('?') { '&' } else { '?' };
-            Redirect::to(&format!(
-                "{}{}error={}",
-                base,
-                sep_err,
-                query_param_encode(&e.to_string())
-            ))
-            .into_response()
-        }
+        Ok(()) => Redirect::to(&append_query_param(base, "notice", "assigned")).into_response(),
+        Err(e) => Redirect::to(&append_query_param(base, "error", &e.to_string())).into_response(),
     }
 }
 

@@ -78,6 +78,16 @@ fn oob_append_beforeend(row: String) -> String {
     format!(r#"<div id="app-notification-container" hx-swap-oob="beforeend">{row}</div>"#)
 }
 
+pub fn row_for_kind(message: &str, kind: Option<&str>) -> String {
+    match kind.unwrap_or("info").trim() {
+        "success" => row_html(message, "success"),
+        "error" => row_html(message, "error"),
+        "warning" => row_html(message, "warning"),
+        "info" => row_html(message, "info"),
+        _ => row_html(message, "info"),
+    }
+}
+
 pub fn with_success(message: &str) -> String {
     oob_append_beforeend(row_html(message, "success"))
 }

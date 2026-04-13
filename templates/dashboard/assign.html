@@ -1,4 +1,13 @@
 {% extends "dashboard_layout.html" %} {% block title %}Assign Role — KMS Dashboard{%
-endblock %} {% block dashboard_content %}
+endblock %} {% block dashboard_shell_top %}
+<div id="app-notification-container" class="flex flex-col shrink-0 w-full" aria-live="polite" aria-atomic="false"
+  aria-label="Application messages">
+  {% match global_message_row_html %}
+  {% when Some with (html) %}
+  {{ html|safe }}
+  {% when None %}
+  {% endmatch %}
+</div>
+{% endblock %} {% block dashboard_content %}
 {% include "dashboard/assign_content.html" %}
 {% endblock %}
