@@ -476,7 +476,7 @@
         const nameDisplay = document.getElementById("delete-role-name-display");
         const cancelBtn = document.getElementById("delete-cancel-btn");
         const confirmBtn = document.getElementById("delete-confirm-btn");
-        const pendingForm = null;
+        let pendingForm = null;
 
         function showModal(roleName, form) {
             nameDisplay.textContent = roleName;

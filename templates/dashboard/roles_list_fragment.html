@@ -14,7 +14,9 @@
                     </svg>
                 </div>
                 <p class="text-[13px] font-medium text-text-primary">No roles yet</p>
-                <p class="text-xs text-text-helper max-w-xs">Use "Create Application" above to create the first role and start managing access control.</p>
+                <p class="text-xs text-text-helper max-w-xs">
+                    Use "Create Application" above to create the first role and start managing access control.
+                </p>
             </div>
             {% endif %}
         {% else %}
@@ -47,7 +49,8 @@
                 <!-- Footer: permissions info + action buttons -->
                 <div class="bg-surface-02 border-t border-border-subtle px-4 py-2.5 flex items-center justify-between gap-4 rounded-b-card">
                     <div class="flex items-center gap-2 min-w-0 flex-1">
-                        <svg class="text-icon-muted shrink-0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <svg class="text-icon-muted shrink-0" width="14" height="14"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
                         </svg>
                         <span class="text-[12px] text-text-secondary truncate">
@@ -67,23 +70,20 @@
                             </svg>
                             Assign
                         </a>
-                        <form method="POST" action="/admin/roles/{{ role.role_id }}/htmx-delete"
-                              hx-post="/admin/roles/{{ role.role_id }}/htmx-delete"
-                              hx-target="#roles-list-area"
-                              hx-swap="outerHTML"
-                              hx-include="[name='search']"
-                              class="delete-role-form">
-                            <button type="button"
-                                    class="flex items-center gap-1.5 px-2 h-6 rounded text-[11px] text-red-500 hover:bg-red-500/8 transition-colors delete-role-btn"
-                                    data-role-name="{{ role.name }}"
-                                    title="Delete role">
-                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="3 6 5 6 21 6"/>
-                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                                </svg>
-                                Delete
-                            </button>
-                        </form>
+                        <button type="button"
+                                hx-post="/admin/roles/{{ role.role_id }}/htmx-delete"
+                                hx-target="#roles-list-area"
+                                hx-swap="outerHTML"
+                                hx-include="[name='search']"
+                                class="flex items-center gap-1.5 px-2 h-6 rounded text-[11px] text-red-500 hover:bg-red-500/8 transition-colors delete-role-btn"
+                                data-role-name="{{ role.name }}"
+                                title="Delete role">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
+                            Delete
+                        </button>
                     </div>
                 </div>
             </div>

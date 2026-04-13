@@ -1,26 +1,30 @@
-{% extends "dashboard_layout.html" %}
-{% block title %}Quick Create Role — KMS Dashboard{% endblock %}
-{% block dashboard_content %}
+{% extends "dashboard_layout.html" %} {% block title %}Quick Create Role — KMS
+Dashboard{% endblock %} {% block dashboard_content %}
 
 <div class="max-w-300 w-full py-4">
-  <div class="mb-8 flex flex-col gap-2">
-    <div class="flex items-center gap-2 text-[13px] text-text-secondary mb-2">
-      <a href="/roles" class="hover:text-text-primary transition-colors">Roles</a>
-      <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
-      <span class="text-text-primary font-medium">Quick Setup</span>
+    <div class="mb-8 flex flex-col gap-2">
+        <div
+            class="flex items-center gap-2 text-[13px] text-text-secondary mb-2"
+        >
+            <a href="/roles" class="hover:text-text-primary transition-colors"
+                >Roles</a
+            >
+            <i data-lucide="chevron-right" class="w-3.5 h-3.5"></i>
+            <span class="text-text-primary font-medium">Quick Setup</span>
+        </div>
+        <h1 class="text-2xl font-bold text-text-primary">Quick Create Role</h1>
+        <p class="text-[14px] text-text-secondary">
+            Create a role with basic access to selected resources, quick and
+            easy to set up
+        </p>
     </div>
-    <h1 class="text-2xl font-bold text-text-primary">Quick Create Role</h1>
-    <p class="text-[14px] text-text-secondary">
-      Create a role
-      </p>
-  </div>
 
-  <div class="flex flex-col lg:flex-row gap-10 items-start">
-    <div class="w-full lg:max-w-2xl">
-      <div class="bg-surface-01 overflow-hidden">
-        {% include "dashboard/quick_create_role_form_fragment.html" %}
+    <div class="flex flex-col lg:flex-row gap-10 items-start">
+        <div class="w-full lg:max-w-2xl">
+            <div class="bg-surface-01 overflow-hidden">
+                {% include "dashboard/quick_create_role_form_fragment.html" %}
+            </div>
         </div>
-        </div>
-        </div>
+    </div>
 </div>
 {% endblock %}

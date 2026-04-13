@@ -1,64 +1,101 @@
 {% if !notice.is_empty() %}
-<div data-app-notification data-auto-dismiss="5000" class="flex items-center justify-between gap-3 px-4 md:px-8 py-2 border-b border-border-subtle min-h-10 shrink-0" style="background:var(--color-banner-success-bg);" role="alert">
+<div
+    data-app-notification
+    data-auto-dismiss="5000"
+    class="flex items-center justify-between gap-3 px-4 md:px-8 py-2 border-b border-border-subtle min-h-10 shrink-0"
+    style="background: var(--color-banner-success-bg)"
+    role="alert"
+>
     <div class="flex items-center gap-3 min-w-0 flex-1">
-        <span class="shrink-0" style="color:var(--color-status-green);">
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        <span class="shrink-0" style="color: var(--color-status-green)">
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            >
+                <path d="M20 6 9 17l-5-5" />
+            </svg>
         </span>
-        <p class="text-xs sm:text-sm font-medium text-text-primary leading-snug flex-1">{{ notice }}</p>
+        <p
+            class="text-xs sm:text-sm font-medium text-text-primary leading-snug flex-1"
+        >
+            {{ notice }}
+        </p>
     </div>
-    <button type="button" class="shrink-0 flex h-8 w-8 items-center justify-center rounded-sm text-banner-text hover:bg-black/5 dark:hover:bg-white/5 transition-colors" aria-label="Dismiss" onclick="var el=this.closest('[data-app-notification]'); if(el) el.remove();">
-        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    <button
+        type="button"
+        class="shrink-0 flex h-8 w-8 items-center justify-center rounded-sm text-banner-text hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+        aria-label="Dismiss"
+        onclick="
+            const el = this.closest('[data-app-notification]');
+            if (el) el.remove();
+        "
+    >
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="14"
+            height="14"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+        >
+            <path d="M18 6 6 18" />
+            <path d="m6 6 12 12" />
+        </svg>
     </button>
 </div>
 <script>
     history.replaceState(null, "", window.location.pathname);
-    setTimeout(function() { window.location.href = "/"; }, 5000);
+    setTimeout(function () {
+        window.location.href = "/";
+    }, 5000);
 </script>
 {% endif %}
 <div class="max-w-300 w-full py-4">
-    <div class="mb-10 flex flex-col gap-2">
-        <h1 class="text-3xl font-extrabold text-text-primary mb-1 leading-tight">Grant User Access</h1>
-        <p class="text-[16px] text-text-secondary max-w-xl leading-relaxed">
-            Assign a system role to a team member. Submits as a normal form — no separate API step.
-        </p>
-        <div class="mt-8 max-w-2xl relative px-4">
-            <div class="flex items-center justify-between relative z-10">
-                <div class="flex flex-col items-center gap-2">
-                    <div class="w-10 h-10 rounded-full bg-btn-primary text-white flex items-center justify-center font-bold shadow-sm">1</div>
-                    <span class="text-[11px] font-bold text-text-primary uppercase tracking-wider">Account</span>
-                </div>
-                <div class="flex flex-col items-center gap-2">
-                    <div class="w-10 h-10 rounded-full bg-btn-primary text-white flex items-center justify-center font-bold shadow-sm">2</div>
-                    <span class="text-[11px] font-bold text-text-primary uppercase tracking-wider">Assign</span>
-                </div>
-                <div class="flex flex-col items-center gap-2">
-                    <div class="w-10 h-10 rounded-full bg-surface-02 border border-border-subtle text-text-helper flex items-center justify-center font-bold">3</div>
-                    <span class="text-[11px] font-bold text-text-helper uppercase tracking-wider">Dashboard</span>
-                </div>
+    <div class="mb-8 flex flex-col gap-2">
+        <div class="flex items-start gap-3">
+            <div class="text-icon-secondary mt-1 shrink-0">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <polyline points="16 11 18 13 22 9" />
+                </svg>
             </div>
-            <div class="absolute top-5 left-0 right-0 h-px bg-border-subtle z-0 mx-12">
-                <div class="h-full bg-btn-primary" style="width: 50%"></div>
+            <div>
+                <h1 class="text-[22px] font-bold text-text-primary">
+                    Grant User Access
+                </h1>
+                <p class="text-[13px] text-text-secondary mt-0.5">
+                    Assign a system role to a team member. Submits as a normal
+                    form — no separate API step.
+                </p>
             </div>
         </div>
     </div>
-
     <div class="flex flex-col lg:flex-row gap-10 items-start">
         <div class="w-full lg:max-w-2xl">
-            <div class="bg-surface-01 border border-border-strong rounded-card overflow-hidden shadow-sm">
-                <div class="p-8">
-                    <div class="flex items-center gap-4 mb-6">
-                        <div class="w-12 h-12 rounded-lg bg-surface-02 flex items-center justify-center text-icon-secondary border border-border-subtle">
-                            <i data-lucide="user-check" class="w-6 h-6"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-text-primary">Role assignment</h3>
-                            <p class="text-sm text-text-secondary">Choose user, role, and optional duration.</p>
-                        </div>
-                    </div>
-                    {% include "dashboard/assign_form_fragment.html" %}
-                </div>
+            <div class="bg-surface-01 overflow-hidden">
+                {% include "dashboard/assign_form_fragment.html" %}
             </div>
         </div>
-        <div class="w-full lg:w-72 shrink-0"></div>
     </div>
 </div>
