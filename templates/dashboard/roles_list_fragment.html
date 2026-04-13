@@ -72,9 +72,10 @@
                               hx-target="#roles-list-area"
                               hx-swap="outerHTML"
                               hx-include="[name='search']"
-                              hx-confirm="Delete role '{{ role.name }}'? This cannot be undone.">
-                            <button type="submit"
-                                    class="flex items-center gap-1.5 px-2 h-6 rounded text-[11px] text-red-500 hover:bg-red-500/8 transition-colors"
+                              class="delete-role-form">
+                            <button type="button"
+                                    class="flex items-center gap-1.5 px-2 h-6 rounded text-[11px] text-red-500 hover:bg-red-500/8 transition-colors delete-role-btn"
+                                    data-role-name="{{ role.name }}"
                                     title="Delete role">
                                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polyline points="3 6 5 6 21 6"/>

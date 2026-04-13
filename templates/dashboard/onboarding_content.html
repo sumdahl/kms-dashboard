@@ -1,3 +1,20 @@
+{% if !notice.is_empty() %}
+<div data-app-notification data-auto-dismiss="5000" class="flex items-center justify-between gap-3 px-4 md:px-8 py-2 border-b border-border-subtle min-h-10 shrink-0" style="background:var(--color-banner-success-bg);" role="alert">
+    <div class="flex items-center gap-3 min-w-0 flex-1">
+        <span class="shrink-0" style="color:var(--color-status-green);">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+        </span>
+        <p class="text-xs sm:text-sm font-medium text-text-primary leading-snug flex-1">{{ notice }}</p>
+    </div>
+    <button type="button" class="shrink-0 flex h-8 w-8 items-center justify-center rounded-sm text-banner-text hover:bg-black/5 dark:hover:bg-white/5 transition-colors" aria-label="Dismiss" onclick="var el=this.closest('[data-app-notification]'); if(el) el.remove();">
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+</div>
+<script>
+    history.replaceState(null, "", window.location.pathname);
+    setTimeout(function() { window.location.href = "/"; }, 5000);
+</script>
+{% endif %}
 <div class="max-w-300 w-full py-4">
     <div class="mb-10 flex flex-col gap-2">
         <h1 class="text-3xl font-extrabold text-text-primary mb-1 leading-tight">Grant User Access</h1>

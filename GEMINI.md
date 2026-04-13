@@ -59,3 +59,18 @@ npm run copy-htmx
 - `GET /`: Main dashboard home page.
 - `POST /ui/sidebar/pin`: Persists the sidebar's pinned/unpinned state.
 - `GET /ui/global-message?message=…&kind=…`: Returns OOB HTML to append a global message (`success` | `error` | `warning` | `info`).
+
+## 🚩 Current Status & Technical Debt (As of April 12, 2026)
+
+### Ongoing Workflow
+- **Branch:** `feat/migrate-to-mvc-v2`
+- **Rebase in Progress:** Currently rebasing onto `3043adc`. Completion is a priority.
+- **Modified:** `src/startup.rs` (Temporary disabling of `artificial_delay` middleware for faster dev cycle).
+
+### Key Issues & Tech Debt
+- **Unused Code:** Several backend components are currently unreferenced:
+    - `send_reset_email` and password reset templates.
+    - `artificial_delay` middleware.
+    - Various `AppError` variants and model constructors.
+- **Askama Structs:** Numerous template structs in `src/handlers/admin.rs` and `src/routes/dashboard.rs` have defined fields (e.g., `sidebar_pinned`, `user_email`, `is_admin`) that are not yet populated by the handler logic.
+- **Warnings:** Currently generating ~22 compiler warnings related to unused variables and fields that need systematic cleanup.

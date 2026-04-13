@@ -9,10 +9,13 @@ use crate::handlers::dashboard::{load_my_roles, MyRole};
 use crate::models::types::{AccessLevel, Resource};
 use crate::models::{Claims, Role, RolePermission};
 use crate::routes::error_page;
+
+use crate::ui::global_message;
+use askama::Template;
 use axum::{
     extract::{Path, Query, State},
     http::HeaderMap,
-    response::{IntoResponse, Redirect, Response},
+    response::{Html, IntoResponse, Redirect, Response},
     routing::get,
     Router,
 };
@@ -286,7 +289,7 @@ async fn create_role_wizard_page(
             resources: quick_create_resource_list(),
             access_levels: quick_create_access_level_list(),
             permission_rows: quick_create_default_permission_rows(),
-            redirect: "/roles?skip_onboarding=true".to_string(),
+            redirect: "/roles?notice=created".to_string(),
         }
         .into_response(),
     }
@@ -411,6 +414,9 @@ async fn home(
 pub struct RolesPageQuery {
     pub page: Option<i64>,
     pub search: Option<String>,
+    pub notice: Option<String>,
+    pub error: Option<String>,
+    pub skip_onboarding: Option<bool>,
 }
 
 #[derive(askama::Template)]
@@ -421,6 +427,7 @@ struct RolesTemplate {
     css_version: &'static str,
     is_admin: bool,
     nav_active: &'static str,
+    banner: Option<String>,
     roles: Vec<RoleDisplay>,
     total: i64,
     page: i64,
@@ -445,6 +452,7 @@ struct RolesPartialTemplate {
     css_version: &'static str,
     is_admin: bool,
     nav_active: &'static str,
+    banner: Option<String>,
     roles: Vec<RoleDisplay>,
     total: i64,
     page: i64,
@@ -500,20 +508,27 @@ async fn roles_page(
 
             let summary_date = Utc::now().format("%B %d").to_string();
 
+            let banner = match params.notice.as_deref() {
+                Some("created") => Some("Role created successfully.".to_string()),
+                Some("deleted") => Some("Role deleted.".to_string()),
+                _ => params.error.as_ref().filter(|e| !e.trim().is_empty()).cloned(),
+            };
+
             if is_htmx_partial(&headers) {
-                RolesPartialTemplate {
+                let mut res = RolesPartialTemplate {
                     sidebar_pinned: true,
                     user_email: c.email,
                     css_version: env!("CSS_VERSION"),
                     is_admin: c.is_admin,
                     nav_active: "roles",
+                    banner,
                     roles: d.roles,
                     total: d.total,
                     page: d.page,
                     pages: d.pages,
                     prev_page: d.prev_page,
                     next_page: d.next_page,
-                    search: d.search,
+                    search: d.search.clone(),
                     start: d.start,
                     end: d.end,
                     summary_total: summary.total_roles,
@@ -522,7 +537,23 @@ async fn roles_page(
                     summary_admin: summary.admin_count,
                     summary_date,
                 }
-                .into_response()
+                .into_response();
+
+                // Clean up URL in the browser if notice/error/onboarding flags are present
+                if params.notice.is_some() || params.error.is_some() || params.skip_onboarding.is_some() {
+                    let mut clean_url = "/roles".to_string();
+                    let mut parts = Vec::new();
+                    if let Some(p) = params.page { if p > 1 { parts.push(format!("page={p}")); } }
+                    if !d.search.is_empty() { parts.push(format!("search={}", d.search)); }
+                    if !parts.is_empty() {
+                        clean_url.push('?');
+                        clean_url.push_str(&parts.join("&"));
+                    }
+                    if let Ok(hv) = axum::http::HeaderValue::from_str(&clean_url) {
+                        res.headers_mut().insert("HX-Replace-Url", hv);
+                    }
+                }
+                res
             } else {
                 RolesTemplate {
                     sidebar_pinned: true,
@@ -530,6 +561,7 @@ async fn roles_page(
                     css_version: env!("CSS_VERSION"),
                     is_admin: c.is_admin,
                     nav_active: "roles",
+                    banner,
                     roles: d.roles,
                     total: d.total,
                     page: d.page,
@@ -580,14 +612,19 @@ async fn assign_page(
             let users = fetch_user_summaries(&pool).await.unwrap_or_default();
             let roles = fetch_all_role_names(&pool).await.unwrap_or_default();
             let pre_role = params.role.clone().unwrap_or_default();
-            let error = params.error.clone().unwrap_or_default();
-            let notice = params.notice.clone().unwrap_or_default();
             let skip = params.skip_onboarding.unwrap_or(false);
             let htmx = is_htmx_partial(&headers);
 
+            let banner = match params.notice.as_deref() {
+                Some("assigned") => Some("Role assigned successfully.".to_string()),
+                _ => params.error.filter(|e| !e.trim().is_empty()),
+            };
+
+            let notice_text = banner.clone().unwrap_or_default();
+
             if skip {
                 if htmx {
-                    AssignPartialTemplate {
+                    let mut res = AssignPartialTemplate {
                         sidebar_pinned: true,
                         user_email: c.email.clone(),
                         css_version: env!("CSS_VERSION"),
@@ -596,11 +633,17 @@ async fn assign_page(
                         users: users.clone(),
                         roles: roles.clone(),
                         pre_role: pre_role.clone(),
-                        error: error.clone(),
-                        notice: notice.clone(),
+                        error: String::new(),
+                        notice: notice_text.clone(),
                         assign_redirect: "/assign".to_string(),
                     }
-                    .into_response()
+                    .into_response();
+
+                    if banner.is_some() || params.skip_onboarding.is_some() {
+                        let hv = axum::http::HeaderValue::from_static("/assign");
+                        res.headers_mut().insert("HX-Replace-Url", hv);
+                    }
+                    res
                 } else {
                     AssignTemplate {
                         sidebar_pinned: true,
@@ -611,14 +654,14 @@ async fn assign_page(
                         users,
                         roles,
                         pre_role,
-                        error,
-                        notice,
+                        error: String::new(),
+                        notice: notice_text,
                         assign_redirect: "/assign".to_string(),
                     }
                     .into_response()
                 }
             } else if htmx {
-                OnboardingPartialTemplate {
+                let mut res = OnboardingPartialTemplate {
                     sidebar_pinned: true,
                     user_email: c.email.clone(),
                     css_version: env!("CSS_VERSION"),
@@ -628,11 +671,17 @@ async fn assign_page(
                     users: users.clone(),
                     roles: roles.clone(),
                     pre_role: pre_role.clone(),
-                    error: error.clone(),
-                    notice: notice.clone(),
+                    error: String::new(),
+                    notice: notice_text.clone(),
                     assign_redirect: "/?skip_onboarding=true".to_string(),
                 }
-                .into_response()
+                .into_response();
+
+                if banner.is_some() {
+                    let hv = axum::http::HeaderValue::from_static("/assign");
+                    res.headers_mut().insert("HX-Replace-Url", hv);
+                }
+                res
             } else {
                 OnboardingTemplate {
                     sidebar_pinned: true,
@@ -644,8 +693,8 @@ async fn assign_page(
                     users,
                     roles,
                     pre_role,
-                    error,
-                    notice,
+                    error: String::new(),
+                    notice: notice_text,
                     assign_redirect: "/?skip_onboarding=true".to_string(),
                 }
                 .into_response()

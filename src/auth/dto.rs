@@ -88,14 +88,40 @@ pub struct CreateRoleFormRequest {
     pub name: String,
     #[serde(default)]
     pub description: String,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "deserialize_form_vec")]
     pub resource: Vec<String>,
-    #[serde(default)]
+    #[serde(default, deserialize_with = "deserialize_form_vec")]
     pub access: Vec<String>,
     #[serde(default)]
     pub redirect: Option<String>,
     #[serde(default)]
     pub error_redirect: Option<String>,
+}
+
+/// Helper to handle cases where a form field might be a single string or a list of strings.
+fn deserialize_form_vec<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    use serde::Deserialize;
+    #[derive(Deserialize)]
+    #[serde(untagged)]
+    enum OneOrMany {
+        One(String),
+        Many(Vec<String>),
+    }
+
+    match OneOrMany::deserialize(deserializer) {
+        Ok(OneOrMany::One(s)) => {
+            if s.is_empty() {
+                Ok(vec![])
+            } else {
+                Ok(vec![s])
+            }
+        }
+        Ok(OneOrMany::Many(v)) => Ok(v),
+        Err(_) => Ok(vec![]),
+    }
 }
 
 /// Parse + validate; returns typed permissions for DB insert.

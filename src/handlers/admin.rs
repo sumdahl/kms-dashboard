@@ -946,12 +946,7 @@ pub async fn assign_role(
     let base = form.redirect.as_deref().unwrap_or("/assign");
     let sep = if base.contains('?') { '&' } else { '?' };
     match res {
-        Ok(()) => Redirect::to(&format!(
-            "{}{}notice={}",
-            base,
-            sep,
-            query_param_encode("Role assigned successfully.")
-        ))
+        Ok(()) => Redirect::to("/assign?notice=assigned")
         .into_response(),
         Err(e) => {
             let sep_err = if base.contains('?') { '&' } else { '?' };
@@ -1320,12 +1315,16 @@ pub async fn create_role_form(
 
     let form = match form {
         Ok(f) => f.0,
-        Err(_) => {
-            if is_quick_create_htmx(&headers, None) {
+        Err(e) => {
+            let is_wizard = is_wizard_htmx(&headers, None);
+            let is_quick = is_quick_create_htmx(&headers, None);
+            let msg = format!("Form submission error: {}", e);
+
+            if is_quick {
                 let view = quick_create_shell(
                     &admin,
                     &empty_quick_create_form(),
-                    Some("Invalid form submission. Please try again.".into()),
+                    Some(msg),
                     None,
                     None,
                     None,
@@ -1334,11 +1333,11 @@ pub async fn create_role_form(
                 let html = view.render().unwrap_or_else(|e| format!("<!-- template error: {e} -->"));
                 return Html(html).into_response();
             }
-            if is_wizard_htmx(&headers, None) {
+            if is_wizard {
                 let view = wizard_shell(
                     &admin,
                     &empty_wizard_form(),
-                    Some("Invalid form submission. Please try again.".into()),
+                    Some(msg),
                     None,
                     None,
                     None,
@@ -1350,7 +1349,7 @@ pub async fn create_role_form(
             return Redirect::to(&format!(
                 "{}?error={}",
                 fallback,
-                query_param_encode("Invalid or incomplete form submission.")
+                query_param_encode("Invalid form submission.")
             ))
             .into_response();
         }

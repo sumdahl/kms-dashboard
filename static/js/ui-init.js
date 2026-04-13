@@ -89,4 +89,22 @@
             syncThemeUI();
         }
     });
+
+    /* ── Auto-dismiss notifications ─────────────────────────────────── */
+
+    function initAutoDismiss() {
+        document.querySelectorAll("[data-auto-dismiss]").forEach(function (el) {
+            var ms = parseInt(el.dataset.autoDismiss) || 5000;
+            setTimeout(function () {
+                el.style.opacity = "0";
+                el.style.transition = "opacity 0.5s ease-out";
+                setTimeout(function () {
+                    el.remove();
+                }, 300);
+            }, ms);
+        });
+    }
+
+    initAutoDismiss();
+    document.addEventListener("htmx:afterSettle", initAutoDismiss);
 })();

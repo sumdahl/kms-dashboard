@@ -58,7 +58,7 @@ fn row_html(message: &str, kind: &str) -> String {
         concat!(
             r#"<div id=""#,
             r#"{id}"#,
-            r#"" data-app-notification class="flex items-center justify-between gap-3 px-4 md:px-8 py-2 border-b border-border-subtle min-h-10 shrink-0" style="background:"#,
+            r#"" data-app-notification data-auto-dismiss="5000" class="flex items-center justify-between gap-3 px-4 md:px-8 py-2 border-b border-border-subtle min-h-10 shrink-0" style="background:"#,
             r#"{bg}"#,
             r#";" role="alert"><div class="flex items-center gap-3 min-w-0 flex-1"><span class="shrink-0" style="color:"#,
             r#"{accent}"#,
