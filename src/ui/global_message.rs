@@ -75,9 +75,7 @@ fn row_html(message: &str, kind: &str) -> String {
 }
 
 fn oob_append_beforeend(row: String) -> String {
-    format!(
-        r#"<div id="app-notification-container" hx-swap-oob="beforeend">{row}</div>"#
-    )
+    format!(r#"<div id="app-notification-container" hx-swap-oob="beforeend">{row}</div>"#)
 }
 
 pub fn with_success(message: &str) -> String {

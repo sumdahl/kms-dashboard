@@ -10,13 +10,14 @@ use crate::ui::global_message;
 use askama::Template;
 use axum::{
     body::Body,
-    extract::rejection::FormRejection,
     extract::{Form, Path, Query, State},
     http::header::REFERER,
     http::{HeaderMap, HeaderName, HeaderValue, StatusCode},
     response::{Html, IntoResponse, Redirect, Response},
     Json,
 };
+use axum_extra::extract::Form as HtmlForm;
+use axum_extra::extract::FormRejection;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -226,7 +227,7 @@ fn wizard_shell(
         .redirect
         .as_deref()
         .map(str::trim)
-        .filter(|s| !s.is_empty())
+        .filter(|s: &&str| !s.is_empty())
         .unwrap_or("/roles?skip_onboarding=true")
         .to_string();
     CreateRoleWizardView {
@@ -1327,7 +1328,7 @@ pub async fn create_role_form(
     admin: AdminClaims,
     State(pool): State<Db>,
     headers: HeaderMap,
-    form: Result<Form<CreateRoleFormRequest>, FormRejection>,
+    form: Result<HtmlForm<CreateRoleFormRequest>, FormRejection>,
 ) -> Response {
     let fallback = redirect_for_invalid_role_form(&headers);
 
@@ -1381,7 +1382,7 @@ pub async fn create_role_form(
         .error_redirect
         .as_deref()
         .map(str::trim)
-        .filter(|s| !s.is_empty())
+        .filter(|s: &&str| !s.is_empty())
         .unwrap_or("/roles/quick");
 
     let is_quick_htmx = is_quick_create_htmx(&headers, Some(&form));
@@ -1403,7 +1404,11 @@ pub async fn create_role_form(
                     None,
                     first_field_message(&errs, "name"),
                     first_field_message(&errs, "description"),
-                    if is_duplicate_error { None } else { resource_error },
+                    if is_duplicate_error {
+                        None
+                    } else {
+                        resource_error
+                    },
                     true,
                 );
                 let mut html = view
@@ -1423,7 +1428,11 @@ pub async fn create_role_form(
                     None,
                     first_field_message(&errs, "name"),
                     first_field_message(&errs, "description"),
-                    if is_duplicate_error { None } else { resource_error },
+                    if is_duplicate_error {
+                        None
+                    } else {
+                        resource_error
+                    },
                     true,
                 );
                 let mut html = view
@@ -1455,7 +1464,7 @@ pub async fn create_role_form(
         .redirect
         .as_deref()
         .map(str::trim)
-        .filter(|s| !s.is_empty())
+        .filter(|s: &&str| !s.is_empty())
         .unwrap_or("/roles?notice=created");
 
     match persist_new_role(&pool, &req).await {

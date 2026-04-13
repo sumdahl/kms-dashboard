@@ -88,40 +88,14 @@ pub struct CreateRoleFormRequest {
     pub name: String,
     #[serde(default)]
     pub description: String,
-    #[serde(default, deserialize_with = "deserialize_form_vec")]
+    #[serde(default)]
     pub resource: Vec<String>,
-    #[serde(default, deserialize_with = "deserialize_form_vec")]
+    #[serde(default)]
     pub access: Vec<String>,
     #[serde(default)]
     pub redirect: Option<String>,
     #[serde(default)]
     pub error_redirect: Option<String>,
-}
-
-/// Helper to handle cases where a form field might be a single string or a list of strings.
-fn deserialize_form_vec<'de, D>(deserializer: D) -> Result<Vec<String>, D::Error>
-where
-    D: serde::Deserializer<'de>,
-{
-    use serde::Deserialize;
-    #[derive(Deserialize)]
-    #[serde(untagged)]
-    enum OneOrMany {
-        One(String),
-        Many(Vec<String>),
-    }
-
-    match OneOrMany::deserialize(deserializer) {
-        Ok(OneOrMany::One(s)) => {
-            if s.is_empty() {
-                Ok(vec![])
-            } else {
-                Ok(vec![s])
-            }
-        }
-        Ok(OneOrMany::Many(v)) => Ok(v),
-        Err(_) => Ok(vec![]),
-    }
 }
 
 /// Parse + validate; returns typed permissions for DB insert.
@@ -158,21 +132,15 @@ fn parse_create_role_permissions(
         match (r.is_empty(), a.is_empty()) {
             (true, true) => {}
             (false, false) => {
-                let res: Resource = r
-                    .parse()
-                    .map_err(|_| format!("Invalid resource: {}", r))?;
-                let acc: AccessLevel = a
-                    .parse()
-                    .map_err(|_| format!("Invalid access: {}", a))?;
+                let res: Resource = r.parse().map_err(|_| format!("Invalid resource: {}", r))?;
+                let acc: AccessLevel = a.parse().map_err(|_| format!("Invalid access: {}", a))?;
                 permissions.push(RolePermissionInput {
                     resource: res,
                     access: acc,
                 });
             }
             _ => {
-                return Err(
-                    "Each permission row must have both resource and access.".into(),
-                );
+                return Err("Each permission row must have both resource and access.".into());
             }
         }
     }
@@ -219,5 +187,76 @@ fn validate_create_role_body(
         Ok(())
     } else {
         Err(errs)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn parse_form(input: &[u8]) -> CreateRoleFormRequest {
+        serde_html_form::from_bytes(input).expect("form should deserialize")
+    }
+
+    #[test]
+    fn create_role_form_deserializes_single_permission() {
+        let form = parse_form(
+            b"name=Inventory+Manager&description=Manages+stock&resource=inventory&access=read",
+        );
+
+        assert_eq!(form.name, "Inventory Manager");
+        assert_eq!(form.description, "Manages stock");
+        assert_eq!(form.resource, vec!["inventory"]);
+        assert_eq!(form.access, vec!["read"]);
+    }
+
+    #[test]
+    fn create_role_form_deserializes_repeated_permission_fields() {
+        let form = parse_form(
+            b"name=Operations&description=Ops&resource=orders&resource=inventory&access=read&access=write",
+        );
+
+        assert_eq!(form.resource, vec!["orders", "inventory"]);
+        assert_eq!(form.access, vec!["read", "write"]);
+    }
+
+    #[test]
+    fn create_role_form_validation_rejects_misaligned_permissions() {
+        let form = parse_form(
+            b"name=Operations&description=Ops&resource=orders&resource=inventory&access=read",
+        );
+
+        let errs = validate_and_parse_create_role_form(&form).expect_err("form should fail");
+
+        assert_eq!(
+            first_field_message(&errs, "resource").as_deref(),
+            Some("Permission rows are misaligned (resource/access count mismatch). Refresh and try again.")
+        );
+    }
+
+    #[test]
+    fn create_role_form_validation_requires_permissions() {
+        let form = parse_form(b"name=Operations&description=Ops");
+
+        let errs = validate_and_parse_create_role_form(&form).expect_err("form should fail");
+
+        assert_eq!(
+            first_field_message(&errs, "resource").as_deref(),
+            Some("At least one permission is required.")
+        );
+    }
+
+    #[test]
+    fn create_role_form_validation_rejects_duplicate_permissions() {
+        let form = parse_form(
+            b"name=Operations&description=Ops&resource=orders&resource=orders&access=read&access=read",
+        );
+
+        let errs = validate_and_parse_create_role_form(&form).expect_err("form should fail");
+
+        assert_eq!(
+            first_field_message(&errs, "resource").as_deref(),
+            Some("Duplicate permission rows.")
+        );
     }
 }

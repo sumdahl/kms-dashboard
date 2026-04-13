@@ -74,4 +74,3 @@ pub struct RolePermissionInput {
     pub resource: Resource,
     pub access: AccessLevel,
 }
-

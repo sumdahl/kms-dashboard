@@ -2,8 +2,9 @@ use crate::app_state::AppState;
 use crate::db::Db;
 use crate::handlers::admin::{
     fetch_all_role_names, fetch_user_summaries, load_roles_list_data, load_roles_summary,
-    quick_create_access_level_list, quick_create_default_permission_rows, quick_create_resource_list,
-    CreateRoleWizardView, QuickCreateRoleView, RoleDisplay, UserSummary,
+    quick_create_access_level_list, quick_create_default_permission_rows,
+    quick_create_resource_list, CreateRoleWizardView, QuickCreateRoleView, RoleDisplay,
+    UserSummary,
 };
 use crate::handlers::dashboard::{load_my_roles, MyRole};
 use crate::models::types::{AccessLevel, Resource};
@@ -511,7 +512,11 @@ async fn roles_page(
             let banner = match params.notice.as_deref() {
                 Some("created") => Some("Role created successfully.".to_string()),
                 Some("deleted") => Some("Role deleted.".to_string()),
-                _ => params.error.as_ref().filter(|e| !e.trim().is_empty()).cloned(),
+                _ => params
+                    .error
+                    .as_ref()
+                    .filter(|e| !e.trim().is_empty())
+                    .cloned(),
             };
 
             if is_htmx_partial(&headers) {
@@ -540,11 +545,20 @@ async fn roles_page(
                 .into_response();
 
                 // Clean up URL in the browser if notice/error/onboarding flags are present
-                if params.notice.is_some() || params.error.is_some() || params.skip_onboarding.is_some() {
+                if params.notice.is_some()
+                    || params.error.is_some()
+                    || params.skip_onboarding.is_some()
+                {
                     let mut clean_url = "/roles".to_string();
                     let mut parts = Vec::new();
-                    if let Some(p) = params.page { if p > 1 { parts.push(format!("page={p}")); } }
-                    if !d.search.is_empty() { parts.push(format!("search={}", d.search)); }
+                    if let Some(p) = params.page {
+                        if p > 1 {
+                            parts.push(format!("page={p}"));
+                        }
+                    }
+                    if !d.search.is_empty() {
+                        parts.push(format!("search={}", d.search));
+                    }
                     if !parts.is_empty() {
                         clean_url.push('?');
                         clean_url.push_str(&parts.join("&"));

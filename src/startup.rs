@@ -48,7 +48,7 @@ pub async fn init(config: &Config) -> AppResult<Router> {
         .nest_service("/public", ServeDir::new("public"))
         .layer(CatchPanicLayer::custom(internal_error_response))
         .layer(LiveReloadLayer::new());
-        //.layer(from_fn(artificial_delay));
+    //.layer(from_fn(artificial_delay));
 
     // 5. Background cleanup task
     tokio::spawn(async move {

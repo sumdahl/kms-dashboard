@@ -1,8 +1,8 @@
 use crate::app_state::AppState;
 use crate::handlers::admin::{
-    assign_role, create_role_form, delete_role, delete_role_htmx, delete_role_submit,
-    disable_user, enable_user, get_role_detail, list_roles, list_users, permission_row,
-    roles_list_htmx, roles_summary,
+    assign_role, create_role_form, delete_role, delete_role_htmx, delete_role_submit, disable_user,
+    enable_user, get_role_detail, list_roles, list_users, permission_row, roles_list_htmx,
+    roles_summary,
 };
 use axum::{
     http::StatusCode,
