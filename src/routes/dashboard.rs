@@ -38,7 +38,7 @@ pub fn router() -> Router<AppState> {
         .route("/users", get(users_page))
         .route("/roles/new", get(create_role_wizard_page))
         .route("/roles/quick", get(quick_create_role_page))
-        .route("/roles/:name", get(role_detail_page))
+        .route("/roles/:role_id", get(role_detail_page))
         .route("/assign", get(assign_page))
 }
 
@@ -756,7 +756,7 @@ async fn role_detail_page(
     headers: HeaderMap,
     claims: Option<Claims>,
     State(pool): State<Db>,
-    Path(role_name): Path<String>,
+    Path(role_id): Path<uuid::Uuid>,
 ) -> Response {
     let c = match claims {
         None => return Redirect::to("/login").into_response(),
@@ -764,9 +764,9 @@ async fn role_detail_page(
     };
 
     let mut role = match sqlx::query_as::<_, Role>(
-        "SELECT role_id, name, description, created_at FROM roles WHERE name = $1",
+        "SELECT role_id, name, description, created_at FROM roles WHERE role_id = $1",
     )
-    .bind(&role_name)
+    .bind(role_id)
     .fetch_optional(&pool)
     .await
     {
