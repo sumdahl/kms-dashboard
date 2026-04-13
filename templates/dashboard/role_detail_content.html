@@ -1,11 +1,11 @@
 <!-- ── LIGHT THEME OVERRIDE WRAPPER ────────────────────────────────────────── -->
-<div style="--color-bg-page:#fafafa;--color-surface-01:#ffffff;--color-surface-02:#f9fafb;--color-surface-active:#e5e7eb;--color-surface-hover:#f3f4f6;--color-text-primary:#171717;--color-text-secondary:#525252;--color-text-helper:#737373;--color-text-placeholder:#a3a3a3;--color-border-subtle:#e5e7eb;--color-border-strong:#d4d4d8;--color-icon-muted:#a3a3a3;--color-icon-secondary:#525252;--color-icon-primary:#171717;--color-btn-primary:#0051c3;--color-btn-primary-hover:#003681;--color-badge-bg:#f3f4f6;--color-badge-text:#525252;" 
-     class="bg-bg-page text-text-primary min-h-[calc(100vh-64px)] -m-6 p-6 md:p-10 font-sans transition-none">
+<div style="--color-bg-page:#fafafa;--color-surface-01:#ffffff;--color-surface-02:#f9fafb;--color-surface-active:#e5e7eb;--color-surface-hover:#f3f4f6;--color-text-primary:#171717;--color-text-secondary:#525252;--color-text-helper:#737373;--color-text-placeholder:#a3a3a3;--color-border-subtle:#e5e7eb;--color-border-strong:#d4d4d8;--color-icon-muted:#a3a3a3;--color-icon-secondary:#525252;--color-icon-primary:#171717;--color-btn-primary:#0051c3;--color-btn-primary-hover:#003681;--color-badge-bg:#f3f4f6;--color-badge-text:#525252;"
+     class="bg-bg-page text-text-primary min-h-[calc(100vh-64px)] -m-6 p-4 md:p-6 lg:p-10 font-sans transition-none">
 
-    <div class="max-w-300 w-full mx-auto">
+    <div class="max-w-6xl w-full mx-auto">
 
         <!-- Back link -->
-        <a href="/roles" class="inline-flex items-center gap-1.5 text-[13px] text-text-secondary hover:text-btn-primary transition-colors mb-6">
+        <a href="/roles" class="inline-flex items-center gap-1.5 text-[13px] text-text-secondary hover:text-btn-primary transition-colors mb-5">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="m15 18-6-6 6-6"/>
             </svg>
@@ -13,29 +13,36 @@
         </a>
 
         <!-- Page Header -->
-        <div class="flex items-start justify-between gap-4 mb-8">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-lg bg-[#0051c3] flex items-center justify-center text-white text-[18px] font-bold shadow-sm">
+        <div class="flex flex-col gap-4 mb-6 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+            <!-- Identity -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 shrink-0 rounded-lg bg-[#0051c3] flex items-center justify-center text-white text-[16px] font-bold shadow-sm sm:w-12 sm:h-12 sm:text-[18px]">
                     {{ role_name.chars().next().unwrap_or('R') }}
                 </div>
-                <div>
-                    <h1 class="text-[22px] font-bold text-text-primary leading-tight">{{ role_name }}</h1>
-                    <p class="mt-0.5 text-[13px] text-text-secondary">{{ role_description }}</p>
+                <div class="min-w-0">
+                    <h1 class="text-[18px] font-bold text-text-primary leading-tight truncate sm:text-[22px]">{{ role_name }}</h1>
+                    <p class="mt-0.5 text-[12px] text-text-secondary sm:text-[13px]">{{ role_description }}</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3 shrink-0">
-                <span class="text-[12px] text-text-helper">Created {{ created_at_display }}</span>
-                <a href="/assign?role={{ role_name }}" class="px-3.5 h-8 bg-[#0f62fe] hover:bg-[#0353e9] text-white rounded-md text-[13px] font-medium flex items-center justify-center transition-colors shadow-sm">Assign Users</a>
+            <!-- Actions row -->
+            <div class="flex items-center justify-between gap-3 sm:flex-col sm:items-end sm:justify-start sm:shrink-0">
+                <span class="text-[11px] text-text-helper sm:text-[12px]">Created {{ created_at_display }}</span>
+                <a href="/assign?role={{ role_name }}"
+                   class="px-3.5 h-8 bg-[#0f62fe] hover:bg-[#0353e9] text-white rounded-md text-[13px] font-medium flex items-center justify-center transition-colors shadow-sm whitespace-nowrap">
+                    Assign Users
+                </a>
             </div>
         </div>
 
-        <div class="flex items-start gap-8">
+        <!-- Main layout: stacks on mobile, side-by-side on lg -->
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
+
             <!-- LEFT: Permissions + Assignments -->
-            <div class="flex-1 min-w-0 flex flex-col gap-6">
+            <div class="flex-1 min-w-0 flex flex-col gap-6 order-2 lg:order-1">
 
                 <!-- Permissions card -->
                 <div class="bg-surface-01 border border-border-strong rounded-lg shadow-sm overflow-hidden">
-                    <div class="flex items-center justify-between px-5 py-3.5 border-b border-border-subtle">
+                    <div class="flex items-center justify-between px-4 py-3 border-b border-border-subtle sm:px-5 sm:py-3.5">
                         <div class="flex items-center gap-2">
                             <svg class="text-icon-secondary" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
@@ -45,7 +52,7 @@
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-badge-bg text-badge-text text-[11px] font-medium">{{ permissions_len }} total</span>
                     </div>
                     {% if permissions.is_empty() %}
-                    <div class="px-5 py-10 text-center text-[13px] text-text-helper">
+                    <div class="px-4 py-10 text-center text-[13px] text-text-helper sm:px-5">
                         <svg class="mx-auto mb-2 text-icon-muted" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
                         </svg>
@@ -54,17 +61,17 @@
                     {% else %}
                     <div class="flex flex-col divide-y divide-border-subtle">
                         {% for p in permissions %}
-                        <div class="flex items-center justify-between px-5 py-3 hover:bg-surface-hover transition-colors">
-                            <div class="flex items-center gap-3">
-                                <div class="w-7 h-7 rounded bg-surface-02 flex items-center justify-center">
+                        <div class="flex items-center justify-between px-4 py-3 hover:bg-surface-hover transition-colors sm:px-5">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-7 h-7 shrink-0 rounded bg-surface-02 flex items-center justify-center">
                                     <svg class="text-icon-muted" xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
                                         <line x1="7" y1="7" x2="7.01" y2="7"/>
                                     </svg>
                                 </div>
-                                <span class="text-[13px] font-medium text-text-primary">{{ p.0 }}</span>
+                                <span class="text-[13px] font-medium text-text-primary truncate">{{ p.0 }}</span>
                             </div>
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium
+                            <span class="ml-2 shrink-0 inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium
                                 {% if p.1 == "admin" %}bg-red-500/10 text-red-600{% else if p.1 == "write" %}bg-amber-500/10 text-amber-600{% else %}bg-green-500/10 text-green-600{% endif %}">{{ p.1 }}</span>
                         </div>
                         {% endfor %}
@@ -74,7 +81,7 @@
 
                 <!-- Assignments card -->
                 <div class="bg-surface-01 border border-border-strong rounded-lg shadow-sm overflow-hidden">
-                    <div class="flex items-center justify-between px-5 py-3.5 border-b border-border-subtle">
+                    <div class="flex items-center justify-between px-4 py-3 border-b border-border-subtle sm:px-5 sm:py-3.5">
                         <div class="flex items-center gap-2">
                             <svg class="text-icon-secondary" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
@@ -87,7 +94,7 @@
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-badge-bg text-badge-text text-[11px] font-medium">{{ assignments_len }} total</span>
                     </div>
                     {% if assignments.is_empty() %}
-                    <div class="px-5 py-10 text-center text-[13px] text-text-helper">
+                    <div class="px-4 py-10 text-center text-[13px] text-text-helper sm:px-5">
                         <svg class="mx-auto mb-2 text-icon-muted" xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
                             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
                             <circle cx="9" cy="7" r="4"/>
@@ -97,13 +104,13 @@
                     {% else %}
                     <div class="flex flex-col divide-y divide-border-subtle">
                         {% for a in assignments %}
-                        <div class="flex items-center justify-between px-5 py-3 hover:bg-surface-hover transition-colors">
-                            <div class="flex items-center gap-3">
-                                <div class="w-7 h-7 rounded-full bg-surface-02 flex items-center justify-center text-[11px] font-bold text-text-secondary">
+                        <div class="flex items-center justify-between px-4 py-3 hover:bg-surface-hover transition-colors sm:px-5">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div class="w-7 h-7 shrink-0 rounded-full bg-surface-02 flex items-center justify-center text-[11px] font-bold text-text-secondary">
                                     {{ a.0.chars().next().unwrap_or('U') }}
                                 </div>
-                                <div>
-                                    <p class="text-[13px] font-medium text-text-primary">{{ a.0 }}</p>
+                                <div class="min-w-0">
+                                    <p class="text-[13px] font-medium text-text-primary truncate">{{ a.0 }}</p>
                                     <p class="text-[11px] text-text-helper mt-0.5">
                                         Assigned {{ a.1 }}
                                         {% if a.2 != "" %}
@@ -114,15 +121,17 @@
                                     </p>
                                 </div>
                             </div>
-                            {% if a.3 %}
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-green-500/10 text-green-600 text-[11px] font-medium">
-                                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Active
-                            </span>
-                            {% else %}
-                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-red-500/10 text-red-600 text-[11px] font-medium">
-                                <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Expired
-                            </span>
-                            {% endif %}
+                            <div class="ml-2 shrink-0">
+                                {% if a.3 %}
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-green-500/10 text-green-600 text-[11px] font-medium">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Active
+                                </span>
+                                {% else %}
+                                <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-red-500/10 text-red-600 text-[11px] font-medium">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>Expired
+                                </span>
+                                {% endif %}
+                            </div>
                         </div>
                         {% endfor %}
                     </div>
@@ -130,10 +139,12 @@
                 </div>
             </div>
 
-            <!-- RIGHT: Overview sidebar -->
-            <div class="w-75 shrink-0 flex flex-col gap-6">
+            <!-- RIGHT: Overview sidebar — full width on mobile, fixed on lg -->
+            <div class="w-full order-1 flex flex-col gap-6 lg:order-2 lg:w-72 lg:shrink-0">
+
+                <!-- Overview stats: 2-col grid on mobile too since it's compact -->
                 <div>
-                    <h2 class="text-[16px] font-bold text-text-primary mb-2">Overview</h2>
+                    <h2 class="text-[15px] font-bold text-text-primary mb-2">Overview</h2>
                     <div class="bg-surface-01 border border-border-strong rounded-lg shadow-sm overflow-hidden">
                         <div class="grid grid-cols-2 border-b border-border-subtle">
                             <div class="p-3.5 border-r border-border-subtle">
@@ -146,15 +157,15 @@
                             </div>
                         </div>
                         <div class="flex flex-col divide-y divide-border-subtle">
-                            <div class="flex items-center justify-between px-4 py-3">
+                            <div class="flex items-center justify-between px-4 py-2.5">
                                 <span class="text-[12px] text-text-secondary">Role ID</span>
                                 <span class="text-[11px] font-mono text-text-helper">{{ role_id_short }}…</span>
                             </div>
-                            <div class="flex items-center justify-between px-4 py-3">
+                            <div class="flex items-center justify-between px-4 py-2.5">
                                 <span class="text-[12px] text-text-secondary">Created</span>
                                 <span class="text-[12px] text-text-primary">{{ created_at_display }}</span>
                             </div>
-                            <div class="flex items-center justify-between px-4 py-3">
+                            <div class="flex items-center justify-between px-4 py-2.5">
                                 <span class="text-[12px] text-text-secondary">Status</span>
                                 <span class="inline-flex items-center gap-1 text-[12px] text-green-600 font-medium">
                                     <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Active
@@ -166,7 +177,7 @@
 
                 <!-- Quick Actions -->
                 <div>
-                    <h2 class="text-[16px] font-bold text-text-primary mb-2">Quick Actions</h2>
+                    <h2 class="text-[15px] font-bold text-text-primary mb-2">Quick Actions</h2>
                     <div class="bg-surface-01 border border-border-strong rounded-lg shadow-sm overflow-hidden flex flex-col divide-y divide-border-subtle">
                         <a href="/assign?role={{ role_name }}" class="flex items-center gap-3 px-4 py-3 hover:bg-surface-hover transition-colors">
                             <svg class="text-icon-secondary shrink-0" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -187,6 +198,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
     </div>
 </div>
