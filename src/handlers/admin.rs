@@ -14,7 +14,6 @@ use axum::{
     http::header::REFERER,
     http::{HeaderMap, HeaderName, HeaderValue, StatusCode},
     response::{Html, IntoResponse, Redirect, Response},
-    Json,
 };
 use axum_extra::extract::Form as HtmlForm;
 use axum_extra::extract::FormRejection;
@@ -270,14 +269,6 @@ fn empty_wizard_form() -> CreateRoleFormRequest {
         redirect: Some("/roles?skip_onboarding=true".into()),
         error_redirect: Some("/roles/new".into()),
     }
-}
-
-pub async fn list_users(
-    _admin: AdminClaims,
-    State(pool): State<Db>,
-) -> AppResult<Json<Vec<UserSummary>>> {
-    let users = fetch_user_summaries(&pool).await?;
-    Ok(Json(users))
 }
 
 pub async fn fetch_user_summaries(pool: &Db) -> AppResult<Vec<UserSummary>> {
@@ -820,18 +811,6 @@ pub async fn load_paginated_roles(
     })
 }
 
-pub async fn list_roles(
-    _admin: AdminClaims,
-    State(pool): State<Db>,
-    Query(params): Query<ListRolesQuery>,
-) -> AppResult<Json<PaginatedRoles>> {
-    let page = params.page.unwrap_or(1).max(1);
-    let size = params.size.unwrap_or(8).clamp(1, 100);
-    let search = params.search.unwrap_or_default().trim().to_string();
-    let data = load_paginated_roles(&pool, page, size, &search).await?;
-    Ok(Json(data))
-}
-
 pub async fn fetch_all_role_names(pool: &Db) -> AppResult<Vec<String>> {
     sqlx::query_scalar("SELECT name FROM roles ORDER BY name ASC")
         .fetch_all(pool)
@@ -846,13 +825,6 @@ pub struct RolesSummary {
     pub unique_resources: i64,
     pub write_count: i64,
     pub admin_count: i64,
-}
-
-pub async fn roles_summary(
-    _admin: AdminClaims,
-    State(pool): State<Db>,
-) -> AppResult<Json<RolesSummary>> {
-    Ok(Json(load_roles_summary(&pool).await?))
 }
 
 pub async fn load_roles_summary(pool: &Db) -> AppResult<RolesSummary> {
@@ -1001,97 +973,6 @@ pub async fn assign_role(
         Ok(()) => Redirect::to(&append_query_param(base, "notice", "assigned")).into_response(),
         Err(e) => Redirect::to(&append_query_param(base, "error", &e.to_string())).into_response(),
     }
-}
-
-pub async fn delete_role(
-    _admin: AdminClaims,
-    State(pool): State<Db>,
-    Path(role_id): Path<Uuid>,
-) -> AppResult<Json<serde_json::Value>> {
-    let result = sqlx::query("DELETE FROM roles WHERE role_id = $1")
-        .bind(role_id)
-        .execute(&pool)
-        .await?;
-
-    if result.rows_affected() == 0 {
-        return Err(AppError::RoleNotFound);
-    }
-
-    Ok(Json(serde_json::json!({
-        "status": "success",
-        "message": "Role deleted."
-    })))
-}
-#[derive(Debug, Serialize, sqlx::FromRow)]
-pub struct RoleAssignmentRow {
-    pub email: String,
-    pub assigned_at: DateTime<Utc>,
-    pub expires_at: Option<DateTime<Utc>>,
-    pub is_active: bool,
-}
-
-#[derive(Serialize)]
-pub struct RoleDetailResponse {
-    pub role: Role,
-    pub assignments: Vec<RoleAssignmentRow>,
-}
-
-pub async fn get_role_detail(
-    _admin: AdminClaims,
-    State(pool): State<Db>,
-    Path(role_id): Path<Uuid>,
-) -> AppResult<Json<RoleDetailResponse>> {
-    use sqlx::Row;
-
-    let mut role = sqlx::query_as::<_, Role>(
-        "SELECT role_id, name, description, created_at FROM roles WHERE role_id = $1",
-    )
-    .bind(role_id)
-    .fetch_optional(&pool)
-    .await?
-    .ok_or(AppError::RoleNotFound)?;
-
-    let perms =
-        sqlx::query("SELECT resource, access_level FROM role_permissions WHERE role_id = $1")
-            .bind(role_id)
-            .fetch_all(&pool)
-            .await?;
-
-    role.permissions = perms
-        .into_iter()
-        .map(|p| {
-            let res_str: String = p.get("resource");
-            let acc_str: String = p.get("access_level");
-            RolePermission {
-                resource: res_str.parse().unwrap_or(Resource::Orders),
-                access: acc_str.parse().unwrap_or(AccessLevel::Read),
-            }
-        })
-        .collect();
-
-    let assignment_rows = sqlx::query(
-        "SELECT u.email, ra.assigned_at, ra.expires_at,
-                CASE WHEN ra.expires_at IS NULL OR ra.expires_at > NOW() THEN true ELSE false END AS is_active
-         FROM role_assignments ra
-         JOIN users u ON u.user_id = ra.user_id
-         WHERE ra.role_id = $1
-         ORDER BY ra.assigned_at DESC",
-    )
-    .bind(role_id)
-    .fetch_all(&pool)
-    .await?;
-
-    let assignments = assignment_rows
-        .into_iter()
-        .map(|r| RoleAssignmentRow {
-            email: r.get("email"),
-            assigned_at: r.get("assigned_at"),
-            expires_at: r.get("expires_at"),
-            is_active: r.get("is_active"),
-        })
-        .collect();
-
-    Ok(Json(RoleDetailResponse { role, assignments }))
 }
 
 #[derive(Deserialize)]
