@@ -10,6 +10,7 @@ use crate::auth::blocklist::purge_expired_tokens;
 use crate::config::Config;
 use crate::db;
 use crate::error::AppResult;
+//use crate::middleware::dev_delay::artificial_delay;
 use crate::routes::{create_router, error_page_response};
 
 fn internal_error_response(
@@ -46,6 +47,7 @@ pub async fn init(config: &Config) -> AppResult<Router> {
         .nest_service("/public", ServeDir::new("public"))
         .layer(CatchPanicLayer::custom(internal_error_response))
         .layer(LiveReloadLayer::new());
+    //.layer(from_fn(artificial_delay));
 
     // 5. Background cleanup task
     tokio::spawn(async move {

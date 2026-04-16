@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block dashboard_shell_top %}
+<div id="app-notification-container" class="flex flex-col shrink-0 w-full" aria-live="polite" aria-atomic="false"
+  aria-label="Application messages"></div>
+{% endblock %}
+
+{# Authenticated dashboard shell: sidebar + header in layout.html; global toast stack here;
+page bodies in `dashboard_content` (HTMX can swap #dashboard-outlet only). #}
+
+{% block content %}
+{% block dashboard_content %}{% endblock %}
+{% endblock %}

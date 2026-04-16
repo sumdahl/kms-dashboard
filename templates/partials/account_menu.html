@@ -54,29 +54,40 @@
     </button>
 
     <!-- Logout -->
-    <button
-        type="button"
-        role="menuitem"
-        class="w-full flex items-center gap-2 px-3 py-2 text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors border-none bg-transparent font-[inherit] cursor-pointer"
-        hx-post="/auth/logout"
-        hx-swap="none"
-    >
-        <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="13"
-            height="13"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            class="text-icon-muted"
+    <div class="relative w-full min-h-9">
+        <button
+            type="button"
+            role="menuitem"
+            class="relative z-1 w-full flex items-center gap-2 px-3 py-2 text-[13px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-opacity border-none bg-transparent font-[inherit] cursor-pointer htmx-request:opacity-0"
+            hx-post="/auth/logout"
+            hx-swap="none"
+            hx-indicator="#account-menu-logout-indicator"
         >
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" x2="9" y1="12" y2="12" />
-        </svg>
-        Log out
-    </button>
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="13"
+                height="13"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                class="text-icon-muted"
+            >
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" x2="9" y1="12" y2="12" />
+            </svg>
+            Log out
+        </button>
+        <div
+            id="account-menu-logout-indicator"
+            class="htmx-indicator pointer-events-none absolute inset-0 z-2 flex items-center justify-center gap-2 bg-surface-01/95 text-[12px] font-medium text-text-secondary"
+            aria-live="polite"
+        >
+            <span class="h-3.5 w-3.5 shrink-0 animate-spin rounded-full border-2 border-text-secondary border-t-transparent" aria-hidden="true"></span>
+            <span>Signing out…</span>
+        </div>
+    </div>
 </div>

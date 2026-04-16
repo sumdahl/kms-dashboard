@@ -1,0 +1,70 @@
+<form method="post" action="/admin/assign" class="p-5 space-y-4">
+    <input type="hidden" name="redirect" value="{{ assign_redirect }}" />
+
+    <div>
+        <label
+            class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase"
+            for="assign-email"
+            >User</label
+        >
+        <select
+            id="assign-email"
+            name="email"
+            required
+            class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary focus:border-border-strong focus:outline-none transition-colors appearance-none cursor-pointer"
+        >
+            <option value="">— Select a user —</option>
+            {% for u in users %}
+            <option value="{{ u.email }}">
+                {{ u.full_name }} ({{ u.email }}){% if u.is_admin %} — admin{% endif %}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div>
+        <label
+            class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase"
+            for="assign-role-name"
+            >Role</label
+        >
+        <select
+            id="assign-role-name"
+            name="role_name"
+            required
+            class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary focus:border-border-strong focus:outline-none transition-colors appearance-none cursor-pointer"
+        >
+            <option value="">— Select a role —</option>
+            {% for r in roles %}
+            <option value="{{ r }}"{% if self.role_selected(r.as_str()) %} selected{% endif %}>{{ r }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div>
+        <label
+            for="duration-hours"
+            class="block text-[11px] font-medium text-text-secondary mb-1.5 tracking-wider uppercase"
+        >
+            Duration
+            <span class="normal-case font-normal text-text-helper"
+                >(hours, optional — leave blank for permanent)</span
+            >
+        </label>
+        <input
+            id="duration-hours"
+            name="duration_hours"
+            type="number"
+            min="1"
+            placeholder="e.g. 24"
+            class="w-full px-3 h-10 bg-surface-02 border border-border-subtle rounded-sm text-sm text-text-primary placeholder:text-text-helper focus:border-border-strong focus:outline-none transition-colors"
+        />
+    </div>
+
+    <button
+        type="submit"
+        class="w-full h-9 bg-btn-primary text-white text-[13px] font-medium rounded-sm hover:bg-btn-primary-hover transition-colors shadow-md active:scale-95"
+    >
+        Assign Role
+    </button>
+</form>

@@ -1,8 +1,11 @@
-use axum::{extract::{Query, State}, response::IntoResponse};
-use serde::{Deserialize, Serialize};
-use askama::Template;
-use crate::db::Db;
+use crate::app_state::AppState;
 use crate::error::AppResult;
+use askama::Template;
+use axum::{
+    extract::{Query, State},
+    response::IntoResponse,
+};
+use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize)]
 pub struct SearchQuery {
@@ -25,11 +28,12 @@ pub struct SearchResult {
 }
 
 pub async fn global_search(
-    State(pool): State<Db>,
+    State(state): State<AppState>,
     Query(params): Query<SearchQuery>,
 ) -> AppResult<impl IntoResponse> {
+    let pool = state.db;
     let query = params.q.trim();
-    
+
     // The 3-character rule (backend safety)
     if query.len() < 3 {
         return Ok(SearchResultsTemplate {
@@ -49,7 +53,9 @@ pub async fn global_search(
     ];
 
     for (title, desc, url) in static_pages {
-        if title.to_lowercase().contains(&query.to_lowercase()) || desc.to_lowercase().contains(&query.to_lowercase()) {
+        if title.to_lowercase().contains(&query.to_lowercase())
+            || desc.to_lowercase().contains(&query.to_lowercase())
+        {
             results.push(SearchResult {
                 title: title.to_string(),
                 description: desc.to_string(),

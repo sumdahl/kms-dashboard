@@ -70,80 +70,19 @@
             <span class="text-[13px]">Support</span>
         </button>
 
-        <!-- Avatar + Dropdown -->
-        <div class="relative" id="account-menu-wrapper">
-            <!-- Avatar -->
-            <div
+        <!-- Account menu: fixed panel so main column does not steal clicks -->
+        <details class="relative group z-50" id="account-menu-wrapper">
+            <summary
                 id="account-avatar"
-                class="w-7 h-7 rounded-full bg-surface-active border border-border-subtle flex items-center justify-center text-[11px] font-semibold text-text-secondary cursor-pointer select-none"
-                role="button"
-                tabindex="0"
+                class="w-7 h-7 rounded-full bg-surface-active border border-border-subtle flex items-center justify-center text-[11px] font-semibold text-text-secondary cursor-pointer select-none list-none marker:content-none [&::-webkit-details-marker]:hidden"
                 aria-label="Account menu"
-                aria-expanded="false"
-                aria-haspopup="true"
+                aria-haspopup="menu"
             >
                 {{ user_email|truncate(1) }}
+            </summary>
+            <div class="fixed right-4 top-12 z-[100] pt-0.5 pointer-events-auto min-w-56">
+                {% include "partials/account_menu.html" %}
             </div>
-
-            <!-- Dropdown (hidden by default, populated by HTMX) -->
-            <div
-                id="account-dropdown"
-                class="hidden absolute right-0 top-9 z-50"
-            ></div>
-        </div>
+        </details>
     </div>
 </header>
-
-<script>
-    (function () {
-        const wrapper = document.getElementById("account-menu-wrapper");
-        const avatar = document.getElementById("account-avatar");
-        const dropdown = document.getElementById("account-dropdown");
-
-        function openMenu() {
-            // Only fetch if the dropdown is currently empty
-            if (!dropdown.innerHTML.trim()) {
-                htmx.ajax("GET", "/account-menu", {
-                    target: "#account-dropdown",
-                    swap: "innerHTML",
-                });
-            }
-            dropdown.classList.remove("hidden");
-            avatar.setAttribute("aria-expanded", "true");
-        }
-
-        function closeMenu() {
-            dropdown.classList.add("hidden");
-            avatar.setAttribute("aria-expanded", "false");
-        }
-
-        function isOpen() {
-            return !dropdown.classList.contains("hidden");
-        }
-
-        // Toggle on avatar click
-        avatar.addEventListener("click", (e) => {
-            e.stopPropagation();
-            isOpen() ? closeMenu() : openMenu();
-        });
-
-        // Keyboard: Enter / Space to toggle, Escape to close
-        avatar.addEventListener("keydown", (e) => {
-            if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                isOpen() ? closeMenu() : openMenu();
-            }
-            if (e.key === "Escape") closeMenu();
-        });
-
-        // Close on outside click (anywhere not inside the wrapper)
-        document.addEventListener("click", (e) => {
-            if (!wrapper.contains(e.target)) closeMenu();
-        });
-
-        // Close on Escape from anywhere on the page
-        document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") closeMenu();
-        });
-    })();
-</script>

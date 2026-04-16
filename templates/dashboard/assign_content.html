@@ -1,0 +1,63 @@
+{% match global_message_oob_html %}
+{% when Some with (html) %}
+{{ html|safe }}
+{% when None %}
+{% endmatch %}
+{% match history_replace_url %}
+{% when Some with (clean_url) %}
+<script>
+    history.replaceState(null, "", "{{ clean_url }}");
+</script>
+{% when None %}
+{% endmatch %}
+<div class="w-full py-4">
+    <div class="mb-8">
+        <h1 class="text-2xl font-semibold text-text-primary leading-tight">
+            Assign Role
+        </h1>
+        <p class="mt-1 text-[13px] text-text-secondary">
+            Assign users roles with duration that may expire.
+        </p>
+    </div>
+
+    <div class="flex flex-col lg:flex-row gap-10 items-start">
+        <div class="w-full lg:max-w-2xl">
+            <div
+                class="bg-surface-01 border border-border-subtle rounded-card overflow-hidden shadow-sm"
+            >
+                <div
+                    class="flex items-center gap-2 h-10 px-4 bg-surface-02 border-b border-border-subtle"
+                >
+                    <svg
+                        class="text-icon-secondary w-4 h-4"
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                    >
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <line x1="19" y1="8" x2="19" y2="14" />
+                        <line x1="22" y1="11" x2="16" y2="11" />
+                    </svg>
+                    <span class="text-[13px] font-medium text-text-secondary"
+                        >Grant a role to a user</span
+                    >
+                </div>
+
+                {% include "dashboard/assign_form_fragment.html" %}
+
+                <div class="px-5 pb-5">
+                    <p class="text-[11px] text-text-helper leading-relaxed italic">
+                        Assigning a role grants the user all permissions associated
+                        with it. If the user already has this role, the assignment
+                        will be updated with the new expiry.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

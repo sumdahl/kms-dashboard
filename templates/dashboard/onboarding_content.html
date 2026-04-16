@@ -1,0 +1,51 @@
+{% match global_message_oob_html %}
+{% when Some with (html) %}
+{{ html|safe }}
+{% when None %}
+{% endmatch %}
+{% match history_replace_url %}
+{% when Some with (clean_url) %}
+<script>
+    history.replaceState(null, "", "{{ clean_url }}");
+</script>
+{% when None %}
+{% endmatch %}
+<div class="max-w-300 w-full py-4">
+    <div class="mb-8 flex flex-col gap-2">
+        <div class="flex items-start gap-3">
+            <div class="text-icon-secondary mt-1 shrink-0">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="22"
+                    height="22"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                >
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+                    <circle cx="9" cy="7" r="4" />
+                    <polyline points="16 11 18 13 22 9" />
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-[22px] font-bold text-text-primary">
+                    Grant User Access
+                </h1>
+                <p class="text-[13px] text-text-secondary mt-0.5">
+                    Assign a system role to a team member. Submits as a normal
+                    form — no separate API step.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="flex flex-col lg:flex-row gap-10 items-start">
+        <div class="w-full lg:max-w-2xl">
+            <div class="bg-surface-01 overflow-hidden">
+                {% include "dashboard/assign_form_fragment.html" %}
+            </div>
+        </div>
+    </div>
+</div>

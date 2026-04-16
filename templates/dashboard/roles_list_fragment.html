@@ -1,0 +1,131 @@
+<div id="roles-list-area">
+    <div class="flex flex-col gap-3" id="roles-list">
+        {% if roles.is_empty() %}
+            {% if !search.is_empty() %}
+            <div class="py-12 text-center text-[13px] text-text-helper">
+                No roles match your search.
+            </div>
+            {% else %}
+            <div class="flex flex-col items-center justify-center py-16 gap-3 text-center">
+                <div class="flex items-center justify-center w-12 h-12 rounded-full bg-surface-02 text-icon-muted">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                         viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                    </svg>
+                </div>
+                <p class="text-[13px] font-medium text-text-primary">No roles yet</p>
+                <p class="text-xs text-text-helper max-w-xs">
+                    Use "Create Application" above to create the first role and start managing access control.
+                </p>
+            </div>
+            {% endif %}
+        {% else %}
+            {% for role in roles %}
+            <div class="bg-surface-01 border border-border-strong rounded-card overflow-visible hover:border-[#0051c3] transition-colors">
+                <!-- Top: link to role detail page -->
+                <a href="/roles/{{ role.role_id }}"
+                   class="block p-4 rounded-t-card hover:bg-surface-hover/30 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4 flex-1 min-w-0 pr-4">
+                            <div style="background:{{ role.bg_color }};color:{{ role.fg_color }};box-shadow:inset 0 0 0 1px rgba(0,0,0,0.1)"
+                                 class="w-10 h-10 rounded shrink-0 flex items-center justify-center text-[15px] font-bold select-none">
+                                {{ role.initial }}
+                            </div>
+                            <div class="flex flex-col flex-1 min-w-0">
+                                <span class="text-[14px] font-semibold text-text-primary truncate">{{ role.name }}</span>
+                                <div class="flex items-center gap-1.5 mt-0.5 text-[12px] text-text-secondary truncate">
+                                    <span class="truncate">{{ role.description_display }}</span>
+                                    <span class="text-text-placeholder">•</span>
+                                    <span class="flex items-center gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full {% if role.has_permissions %}bg-green-500{% else %}bg-red-500{% endif %}"></span>
+                                        {{ role.perm_count }} perms
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="text-[12px] text-text-secondary shrink-0">{{ role.created_at_display }}</span>
+                    </div>
+                </a>
+                <!-- Footer: permissions info + action buttons -->
+                <div class="bg-surface-02 border-t border-border-subtle px-4 py-2.5 flex items-center justify-between gap-4 rounded-b-card">
+                    <div class="flex items-center gap-2 min-w-0 flex-1">
+                        <svg class="text-icon-muted shrink-0" width="14" height="14"
+                             viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                        </svg>
+                        <span class="text-[12px] text-text-secondary truncate">
+                            <span class="font-medium text-text-primary">grants access to:</span>
+                            <span class="text-text-helper"> {{ role.perm_badges }}</span>
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-1 shrink-0">
+                        <a href="/assign?role={{ role.name_encoded }}"
+                           class="flex items-center gap-1.5 px-2 h-6 rounded text-[11px] text-text-secondary hover:bg-surface-hover hover:text-text-primary transition-colors"
+                           title="Assign users to this role">
+                            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+                                <circle cx="9" cy="7" r="4"/>
+                                <line x1="19" y1="8" x2="19" y2="14"/>
+                                <line x1="22" y1="11" x2="16" y2="11"/>
+                            </svg>
+                            Assign
+                        </a>
+                        <form hx-post="/admin/roles/{{ role.role_id }}/htmx-delete"
+                              hx-target="#roles-list-area"
+                              hx-swap="outerHTML"
+                              hx-include="[name='search']"
+                              class="delete-role-form">
+                            <button type="button"
+                                    class="flex items-center gap-1.5 px-2 h-6 rounded text-[11px] text-red-500 hover:bg-red-500/8 transition-colors delete-role-btn"
+                                    data-role-name="{{ role.name }}"
+                                    title="Delete role">
+                                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                </svg>
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Pagination -->
+    <div class="flex items-center justify-between mt-4">
+        <span class="text-[12px] text-text-secondary">
+            {% if total > 0 %}Showing {{ start }}–{{ end }} of {{ total }}{% endif %}
+        </span>
+        {% if total > 0 %}
+        <div class="flex items-center shadow-sm">
+            <button hx-get="/admin/roles/list?page=1"
+                    hx-include="[name='search']"
+                    hx-target="#roles-list-area"
+                    hx-swap="outerHTML"
+                    {% if page == 1 %}disabled{% endif %}
+                    class="w-8 h-7.5 flex items-center justify-center border border-border-strong rounded-l-md bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-40 disabled:cursor-not-allowed">«</button>
+            <button hx-get="/admin/roles/list?page={{ prev_page }}"
+                    hx-include="[name='search']"
+                    hx-target="#roles-list-area"
+                    hx-swap="outerHTML"
+                    {% if page == 1 %}disabled{% endif %}
+                    class="w-8 h-7.5 flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-40 disabled:cursor-not-allowed">‹</button>
+            <span class="w-8 h-7.5 flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-text-primary text-[13px] font-medium">{{ page }}</span>
+            <button hx-get="/admin/roles/list?page={{ next_page }}"
+                    hx-include="[name='search']"
+                    hx-target="#roles-list-area"
+                    hx-swap="outerHTML"
+                    {% if page == pages %}disabled{% endif %}
+                    class="w-8 h-7.5 flex items-center justify-center border-y border-r border-border-strong bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-40 disabled:cursor-not-allowed">›</button>
+            <button hx-get="/admin/roles/list?page={{ pages }}"
+                    hx-include="[name='search']"
+                    hx-target="#roles-list-area"
+                    hx-swap="outerHTML"
+                    {% if page == pages %}disabled{% endif %}
+                    class="w-8 h-7.5 flex items-center justify-center border-y border-r border-border-strong rounded-r-md bg-surface-01 text-icon-muted text-[12px] hover:bg-surface-hover disabled:opacity-40 disabled:cursor-not-allowed">»</button>
+        </div>
+        {% endif %}
+    </div>
+</div>

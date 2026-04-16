@@ -1,0 +1,7 @@
+# Project-local rust-analyzer settings (see https://rust-analyzer.github.io/book/configuration.html).
+[cargo.buildScripts]
+enable = true
+
+[procMacro]
+enable = true
+

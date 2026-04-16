@@ -1,0 +1,12 @@
+/* Sync, before CSS — applies saved or system dark preference (no flash). */
+(function () {
+    try {
+        var t = localStorage.getItem("theme");
+        if (
+            t === "dark" ||
+            (!t && window.matchMedia("(prefers-color-scheme: dark)").matches)
+        ) {
+            document.documentElement.classList.add("dark");
+        }
+    } catch (e) {}
+})();
