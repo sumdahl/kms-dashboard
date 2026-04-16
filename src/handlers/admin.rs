@@ -6,6 +6,7 @@ pub mod assignments;
 pub mod roles;
 pub mod users;
 pub mod views;
+pub mod settings;
 
 // ── Re-exports from repositories (routes/dashboard.rs imports these) ──────────
 pub use crate::repositories::roles::{fetch_all_role_names, load_roles_summary, RolesSummary};
@@ -22,3 +23,4 @@ pub use views::{
     quick_create_access_level_list, quick_create_default_permission_rows,
     quick_create_resource_list, CreateRoleWizardView, QuickCreateRoleView,
 };
+pub use settings::{get_settings, post_settings, AdminSettingsPage};

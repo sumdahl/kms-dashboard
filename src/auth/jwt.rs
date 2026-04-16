@@ -24,8 +24,9 @@ pub fn create_jwt(
     email: &str,
     is_admin: bool,
     session_version: i32,
+    ttl_minutes: i64,
 ) -> AppResult<String> {
-    let exp = Utc::now() + Duration::hours(24);
+    let exp = Utc::now() + Duration::minutes(ttl_minutes);
     let claims = Claims {
         sub: user_id.to_string(),
         email: email.to_string(),

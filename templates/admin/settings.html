@@ -1,0 +1,61 @@
+{% extends "dashboard_layout.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <h1 class="text-2xl font-bold mb-6">Admin Settings</h1>
+
+    <form action="/admin/settings" method="POST" class="space-y-6 bg-white shadow rounded-lg p-6">
+        <div>
+            <label class="block font-medium mb-2">Authentication Strategy</label>
+            <select name="auth_strategy" class="w-full rounded border-gray-300">
+                <option value="jwt" {% if config.auth_strategy.as_str() == "jwt" %}selected{% endif %}>JWT Only</option>
+                <option value="session" {% if config.auth_strategy.as_str() == "session" %}selected{% endif %}>Session Only</option>
+                <option value="hybrid" {% if config.auth_strategy.as_str() == "hybrid" %}selected{% endif %}>Hybrid JWT + Session</option>
+            </select>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block font-medium mb-2">JWT Access TTL (minutes)</label>
+                <input type="number" name="jwt_access_ttl_minutes" value="{{ config.jwt_access_ttl_minutes }}" class="w-full rounded border-gray-300">
+            </div>
+            <div>
+                <label class="block font-medium mb-2">Session Refresh TTL (hours)</label>
+                <input type="number" name="session_refresh_ttl_hours" value="{{ config.session_refresh_ttl_hours }}" class="w-full rounded border-gray-300">
+            </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div>
+                <label class="block font-medium mb-2">Max Concurrent Sessions</label>
+                <input type="number" name="max_concurrent_sessions" value="{{ config.max_concurrent_sessions }}" class="w-full rounded border-gray-300">
+            </div>
+            <div>
+                <label class="block font-medium mb-2">Remember Me Extension (hours)</label>
+                <input type="number" name="remember_me_extension_hours" value="{{ config.remember_me_extension_hours }}" class="w-full rounded border-gray-300">
+            </div>
+        </div>
+
+        <div class="space-y-3">
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="logout_on_browser_close" {% if config.logout_on_browser_close %}checked{% endif %} class="rounded">
+                Logout on browser close
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="force_logout_on_password_change" {% if config.force_logout_on_password_change %}checked{% endif %} class="rounded">
+                Force logout on password change
+            </label>
+            <label class="flex items-center gap-2">
+                <input type="checkbox" name="ip_restriction_enabled" {% if config.ip_restriction_enabled %}checked{% endif %} class="rounded">
+                Enable IP address restriction
+            </label>
+        </div>
+
+        <div class="pt-4 border-t">
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+                Save Settings
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}

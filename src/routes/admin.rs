@@ -2,7 +2,7 @@ use crate::app_state::AppState;
 use crate::handlers::admin::{
     assign_role, create_role_form, delete_role_htmx, delete_role_submit,
     disable_user, enable_user, permission_row,
-    roles_list_htmx,
+    roles_list_htmx, get_settings, post_settings,
 };
 use axum::{
     http::StatusCode,
@@ -12,6 +12,7 @@ use axum::{
 
 pub fn router() -> Router<AppState> {
     Router::new()
+        .route("/settings", get(get_settings).post(post_settings))
         .route("/roles/create", post(create_role_form))
         .route("/roles/list", get(roles_list_htmx))
         .route("/roles/permission-row", get(permission_row))

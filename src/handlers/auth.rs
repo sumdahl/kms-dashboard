@@ -5,6 +5,7 @@ use crate::auth::hashing::{hash_password, verify_password};
 use crate::auth::jwt::create_jwt;
 use crate::error::{AppError, AppResult};
 use crate::models::{Claims, User};
+
 use askama::Template;
 use axum::response::Response;
 use axum::{
@@ -132,7 +133,7 @@ pub async fn login(
     let email = payload.email.trim().to_string();
     let password = payload.password;
 
-    let attempt: Result<(User, String), AppError> = async {
+        let attempt: Result<(User, String, Uuid), AppError> = async {
         let user = sqlx::query_as::<_, User>("SELECT * FROM users WHERE email = $1")
             .bind(&email)
             .fetch_optional(&pool)
@@ -147,25 +148,49 @@ pub async fn login(
             return Err(AppError::AccountDisabled(user.disabled_reason));
         }
 
+        use crate::repositories::settings::get_session_config;
+        let config = get_session_config(&pool).await?;
         let token = create_jwt(
             &user.user_id.to_string(),
             &user.email,
             user.is_admin,
             user.session_version,
+            config.jwt_access_ttl_minutes as i64,
         )?;
 
-        Ok((user, token))
+        use chrono::Utc;
+        let session_id = Uuid::new_v4();
+        let expires_at = Utc::now() + chrono::Duration::hours(config.session_refresh_ttl_hours as i64);
+
+        sqlx::query!(
+            "INSERT INTO user_sessions (session_id, user_id, expires_at, last_activity)
+             VALUES ($1, $2, $3, NOW())",
+            session_id,
+            user.user_id,
+            expires_at,
+        )
+        .execute(&pool)
+        .await?;
+
+        Ok((user, token, session_id))
     }
     .await;
 
     match attempt {
-        Ok((_user, token)) => {
-            let cookie = Cookie::build(("token", token))
+        Ok((_user, token, session_id)) => {
+            let token_cookie = Cookie::build(("token", token))
                 .http_only(true)
                 .same_site(SameSite::Lax)
                 .path("/")
                 .build();
-            let jar = CookieJar::new().add(cookie);
+
+            let sid_cookie = Cookie::build(("sid", session_id.to_string()))
+                .http_only(true)
+                .same_site(SameSite::Lax)
+                .path("/")
+                .build();
+
+            let jar = CookieJar::new().add(token_cookie).add(sid_cookie);
             let mut res = jar.into_response();
             *res.status_mut() = StatusCode::NO_CONTENT;
             res.headers_mut()
@@ -359,7 +384,17 @@ pub async fn logout(State(state): State<AppState>, claims: Claims, jar: CookieJa
 
     blocklist_token(&pool, &claims.jti, expires_at).await?;
 
-    let jar = jar.remove(Cookie::build(("token", "")).path("/"));
+    if let Some(sid_cookie) = jar.get("sid") {
+        if let Ok(session_id) = Uuid::parse_str(sid_cookie.value()) {
+            sqlx::query!("DELETE FROM user_sessions WHERE session_id = $1", session_id)
+                .execute(&pool)
+                .await?;
+        }
+    }
+
+    let jar = jar
+        .remove(Cookie::build(("token", "")).path("/"))
+        .remove(Cookie::build(("sid", "")).path("/"));
 
     let body = Json(LogoutResponse {
         message: "Logged out".into(),

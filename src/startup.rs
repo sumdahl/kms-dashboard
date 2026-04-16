@@ -34,10 +34,12 @@ pub async fn init(config: &Config) -> AppResult<Router> {
 
     // 3. App state
     crate::auth::jwt::init_jwt_secret(config.jwt_secret.clone());
+    let session_config = crate::repositories::settings::get_session_config(&pool).await?;
     let state = AppState {
         db: pool,
         resend: Resend::default(),
         app_base_url: config.app_base_url.clone(),
+        session_config: std::sync::Arc::new(tokio::sync::RwLock::new(session_config)),
     };
 
     // 4. Router

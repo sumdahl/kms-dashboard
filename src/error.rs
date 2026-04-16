@@ -48,6 +48,18 @@ impl From<serde_json::Error> for AppError {
     }
 }
 
+impl From<askama::Error> for AppError {
+    fn from(err: askama::Error) -> Self {
+        AppError::Internal(err.to_string())
+    }
+}
+
+impl From<uuid::Error> for AppError {
+    fn from(err: uuid::Error) -> Self {
+        AppError::Internal(err.to_string())
+    }
+}
+
 impl IntoResponse for AppError {
     fn into_response(self) -> Response {
         if let AppError::AccountDisabled(ref reason) = self {
