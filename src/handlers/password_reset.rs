@@ -357,7 +357,7 @@ pub async fn forgot_password(
     };
 
     if user.is_some() {
-        /*
+        tracing::info!("User found for forgot password: {}", email);
         // Re-enable when ready: create reset token + send email.
         let user = user.unwrap();
         let token = Uuid::new_v4();
@@ -381,14 +381,18 @@ pub async fn forgot_password(
         .execute(&state.db)
         .await?;
 
-        send_reset_email(
+        if let Err(e) = send_reset_email(
             &state.resend,
             &email,
             &token.to_string(),
             &state.app_base_url,
         )
-        .await?;
-        */
+        .await
+        {
+            tracing::error!("Failed to send reset email to {}: {}", email, e);
+        }
+    } else {
+        tracing::info!("No user found for forgot password: {}", email);
     }
 
     let mut res = StatusCode::NO_CONTENT.into_response();
