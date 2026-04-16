@@ -6,10 +6,12 @@ mod error;
 mod handlers;
 mod middleware;
 mod models;
+mod repositories;
 mod resend_mailer;
 mod routes;
 mod startup;
 mod ui;
+mod utils;
 
 use crate::config::Config;
 

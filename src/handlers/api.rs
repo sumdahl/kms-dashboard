@@ -1,4 +1,4 @@
-use crate::db::Db;
+use crate::app_state::AppState;
 use crate::error::AppResult;
 use askama::Template;
 use axum::{
@@ -28,9 +28,10 @@ pub struct SearchResult {
 }
 
 pub async fn global_search(
-    State(pool): State<Db>,
+    State(state): State<AppState>,
     Query(params): Query<SearchQuery>,
 ) -> AppResult<impl IntoResponse> {
+    let pool = state.db;
     let query = params.q.trim();
 
     // The 3-character rule (backend safety)

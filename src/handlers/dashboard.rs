@@ -1,3 +1,4 @@
+use crate::app_state::AppState;
 use crate::db::Db;
 use crate::error::AppResult;
 use crate::middleware::rbac::Permissions;
@@ -92,7 +93,7 @@ pub async fn load_my_roles(claims: &Claims, pool: &Db) -> AppResult<Vec<MyRole>>
     Ok(result)
 }
 
-pub async fn my_roles(claims: Claims, State(pool): State<Db>) -> AppResult<Json<Vec<MyRole>>> {
-    let roles = load_my_roles(&claims, &pool).await?;
+pub async fn my_roles(claims: Claims, State(state): State<AppState>) -> AppResult<Json<Vec<MyRole>>> {
+    let roles = load_my_roles(&claims, &state.db).await?;
     Ok(Json(roles))
 }

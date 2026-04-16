@@ -1,8 +1,8 @@
+use crate::app_state::AppState;
 use crate::auth::blocklist::blocklist_token;
 use crate::auth::dto::{first_field_message, LoginRequest, SignupRequest};
 use crate::auth::hashing::{hash_password, verify_password};
 use crate::auth::jwt::create_jwt;
-use crate::db::Db;
 use crate::error::{AppError, AppResult};
 use crate::models::{Claims, User};
 use askama::Template;
@@ -86,9 +86,10 @@ pub async fn signup_page() -> impl IntoResponse {
 }
 
 pub async fn login(
-    State(pool): State<Db>,
+    State(state): State<AppState>,
     form: Result<Form<LoginRequest>, axum::extract::rejection::FormRejection>,
 ) -> axum::response::Response {
+    let pool = state.db;
     use axum::response::Html;
 
     fn render_form(view: LoginView) -> Html<String> {
@@ -223,9 +224,10 @@ fn render_signup(view: SignupView) -> Html<String> {
 }
 
 pub async fn signup(
-    State(pool): State<Db>,
+    State(state): State<AppState>,
     form: Result<Form<SignupRequest>, axum::extract::rejection::FormRejection>,
 ) -> Response {
+    let pool = state.db;
     let payload = match form {
         Ok(f) => f.0,
         Err(_) => {
@@ -350,7 +352,8 @@ pub async fn signup(
     res
 }
 
-pub async fn logout(State(pool): State<Db>, claims: Claims, jar: CookieJar) -> AppResult<Response> {
+pub async fn logout(State(state): State<AppState>, claims: Claims, jar: CookieJar) -> AppResult<Response> {
+    let pool = state.db;
     let expires_at = chrono::DateTime::<chrono::Utc>::from_timestamp(claims.exp as i64, 0)
         .ok_or_else(|| AppError::Internal("Invalid token expiry".into()))?;
 
